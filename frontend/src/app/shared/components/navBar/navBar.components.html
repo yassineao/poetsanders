@@ -1,60 +1,73 @@
-<header class="fixed top-0 z-50 w-full border-b border-white/5 bg-slate-950/80 backdrop-blur-lg">
+<header
+  class="fixed inset-x-0 top-0 z-50 border-b border-white/10 bg-slate-950/75 shadow-xl shadow-slate-950/25 backdrop-blur-2xl">
+  <div class="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-cyan-200/60 to-transparent"></div>
+
   <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-    <nav aria-label="Primary navigation" class="flex h-16 items-center justify-between lg:h-20">
-      <a routerLink="/" fragment="home" class="group flex items-center gap-3 transition-opacity hover:opacity-90"
+    <nav aria-label="Primary navigation" class="flex h-16 items-center justify-between gap-4 lg:h-20">
+      <a routerLink="/" fragment="home"
+        class="group flex min-w-0 items-center gap-3 rounded-md outline-none transition focus-visible:ring-2 focus-visible:ring-cyan-200 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
         aria-label="PoetsAnders home" (click)="closeMobileMenu()">
-        <span class="flex h-10 items-center px-1 sm:h-11 lg:h-12">
-          <span class="text-xl font-black tracking-normal text-white sm:text-2xl">
-            Poets<span class="text-sky-300">Anders</span>
-          </span>
+        <span
+          class="relative flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-md border border-cyan-100/20 bg-white shadow-lg shadow-cyan-950/20 transition-transform duration-300 group-hover:-translate-y-0.5">
+          <span class="absolute inset-0 bg-gradient-to-br from-white via-cyan-50 to-slate-200"></span>
+          <img src="/logo-poets-website-1.png" alt="" class="relative h-8 w-8 object-contain" />
+        </span>
+        <span class="min-w-0 leading-none">
+          <span class="block text-lg font-semibold tracking-wide text-white sm:text-xl">Poets Anders</span>
+          <span class="mt-1 hidden text-[11px] font-medium uppercase tracking-[0.22em] text-cyan-200 sm:block">Dutch Car
+            Care</span>
         </span>
       </a>
 
-      <ul class="hidden items-center gap-1 lg:flex">
+      <ul class="hidden items-center rounded-md border border-white/10 bg-white/[0.04] p-1 shadow-sm shadow-black/20 lg:flex">
         <li *ngFor="let item of navItems()" class="group relative">
-          <a [routerLink]="item.routerLink" routerLinkActive="bg-white/5 text-white"
+          <a [routerLink]="item.routerLink" routerLinkActive="bg-cyan-200/15 text-white shadow-sm ring-1 ring-cyan-100/10"
             [routerLinkActiveOptions]="{ exact: item.routerLink === '/' }"
-            class="inline-flex h-10 items-center rounded-lg px-4 text-sm font-medium text-slate-300 transition-colors hover:bg-white/5 hover:text-white">
+            class="inline-flex h-9 items-center rounded px-4 text-sm font-medium text-slate-300 transition-all duration-200 hover:bg-white/[0.08] hover:text-white">
             {{ item.label }}
           </a>
         </li>
       </ul>
 
       <div class="hidden items-center gap-3 lg:flex">
-        <div class="hidden items-center gap-3 lg:flex">
-          <div class="relative flex items-center rounded-xl border border-white/10 bg-white/[0.04] p-1 shadow-sm shadow-slate-950/20"
+        <div class="relative flex items-center rounded-md border border-white/10 bg-white/[0.04] p-1 shadow-sm shadow-slate-950/20 transition-colors hover:border-cyan-100/25"
+          [attr.aria-label]="copy().navbar.langLabel">
+
+          <button type="button" (click)="language_shift_window.set(!language_shift_window())"
+            class="inline-flex h-9 min-w-16 items-center justify-center gap-2 rounded px-3 text-sm font-semibold text-slate-200 outline-none transition-all duration-200 hover:bg-white/10 hover:text-white focus-visible:ring-2 focus-visible:ring-cyan-200 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
+            [ngClass]="language_shift_window() ? 'bg-white/10 text-white shadow-sm' : ''"
+            [attr.aria-expanded]="language_shift_window()">
+            <span>{{ selectedLanguage() | uppercase }}</span>
+            <svg class="h-4 w-4 transition-transform" [ngClass]="language_shift_window() ? 'rotate-180' : ''" fill="none"
+              viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="m6 9 6 6 6-6" />
+            </svg>
+          </button>
+
+          <ul *ngIf="language_shift_window()"
+            class="absolute right-0 top-full mt-3 flex min-w-44 flex-col items-stretch gap-1 rounded-md border border-white/10 bg-slate-950/95 p-1.5 shadow-2xl shadow-slate-950/50 ring-1 ring-cyan-100/10 backdrop-blur-xl"
             [attr.aria-label]="copy().navbar.langLabel">
+            <li *ngFor="let locale of languages" class="group relative">
+              <button type="button" (click)="setLanguage(locale); language_shift_window.set(false)"
+                class="inline-flex h-10 w-full items-center justify-between rounded px-3 text-sm font-semibold text-slate-300 outline-none transition-all duration-200 hover:bg-white/10 hover:text-white focus-visible:ring-2 focus-visible:ring-cyan-200"
+                [ngClass]="locale === selectedLanguage() ? 'bg-cyan-300/15 text-cyan-100 ring-1 ring-cyan-300/20' : ''">
+                <span>{{ copy().navbar.langNames[locale] }}</span>
+                <span *ngIf="locale === selectedLanguage()" class="ml-3 h-1.5 w-1.5 rounded-full bg-cyan-300"></span>
+              </button>
+            </li>
+          </ul>
 
-            <button type="button" (click)="language_shift_window.set(!language_shift_window())" 
-              class="inline-flex h-10 min-w-16 items-center justify-center rounded-lg px-4 text-sm font-semibold text-slate-200 transition-all duration-200 hover:bg-white/10 hover:text-white hover:shadow-sm"
-              [ngClass]="language_shift_window() ? 'bg-white/10 text-white shadow-sm' : ''">
-              {{ selectedLanguage() | uppercase }}
-            </button>
-
-            <ul *ngIf="language_shift_window()"
-              class="absolute right-0 top-full mt-3 flex min-w-28 flex-col items-stretch gap-1 rounded-xl border border-white/10 bg-slate-950/95 p-1.5 shadow-2xl shadow-slate-950/50 ring-1 ring-white/5 backdrop-blur-md"
-              [attr.aria-label]="copy().navbar.langLabel">
-              <li *ngFor="let locale of languages" class="group relative">
-                <button type="button" (click)="setLanguage(locale); language_shift_window.set(false)"
-                  class="inline-flex h-10 w-full items-center justify-between rounded-lg px-3 text-sm font-semibold text-slate-300 transition-all duration-200 hover:bg-white/10 hover:text-white"
-                  [ngClass]="locale === selectedLanguage() ? 'bg-sky-300/15 text-sky-100 ring-1 ring-sky-300/20' : ''">
-                  {{ locale | uppercase }}
-                  <span *ngIf="locale === selectedLanguage()" class="ml-3 h-1.5 w-1.5 rounded-full bg-sky-300"></span>
-                </button>
-              </li>
-            </ul>
-
-          </div>
         </div>
 
         <a routerLink="/collections"
-          class="group relative inline-flex h-10 items-center justify-center overflow-hidden rounded-lg border border-sky-300 bg-sky-300/10 px-5 text-sm font-semibold text-sky-200 transition-all duration-300 hover:border-sky-400 hover:bg-sky-400 hover:text-slate-950 hover:shadow-lg hover:shadow-sky-400/20">
+          class="group relative inline-flex h-10 items-center justify-center overflow-hidden rounded-md border border-cyan-200/90 bg-cyan-200 px-5 text-sm font-semibold text-slate-950 shadow-lg shadow-cyan-950/20 outline-none transition-all duration-300 hover:-translate-y-0.5 hover:bg-white hover:shadow-cyan-400/20 focus-visible:ring-2 focus-visible:ring-cyan-200 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950">
+          <span class="absolute inset-y-0 -left-8 w-8 rotate-12 bg-white/60 blur-md transition-transform duration-700 group-hover:translate-x-36"></span>
           <span class="relative z-10">{{ copy().navbar.ctaPrimary }}</span>
         </a>
       </div>
 
       <button type="button"
-        class="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-white/10 text-slate-200 transition-colors hover:bg-white/5 hover:text-white lg:hidden"
+        class="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-md border border-white/10 bg-white/[0.04] text-slate-200 shadow-sm outline-none transition-colors hover:bg-white/10 hover:text-white focus-visible:ring-2 focus-visible:ring-cyan-200 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 lg:hidden"
         [attr.aria-expanded]="mobileMenuOpen()" aria-controls="mobile-navigation"
         [attr.aria-label]="copy().navbar.menuToggle" (click)="toggleMobileMenu()">
         <span class="sr-only">{{ copy().navbar.menuToggle }}</span>
@@ -69,27 +82,29 @@
       </button>
     </nav>
 
-    <div id="mobile-navigation" class="grid transition-all duration-200 lg:hidden"
+    <div id="mobile-navigation" class="grid transition-all duration-300 lg:hidden"
       [ngClass]="mobileMenuOpen() ? 'grid-rows-[1fr] pb-4 opacity-100' : 'grid-rows-[0fr] opacity-0'">
       <div class="overflow-hidden">
-        <div class="border-t border-white/10 pt-3">
+        <div class="border-t border-white/10 pt-4">
+          <div class="rounded-lg border border-white/10 bg-white/[0.04] p-2 shadow-xl shadow-slate-950/20">
           <a *ngFor="let item of navItems()" [routerLink]="item.routerLink" routerLinkActive="bg-white/5 text-white"
             [routerLinkActiveOptions]="{ exact: item.routerLink === '/' }"
-            class="block rounded-lg px-3 py-2.5 text-sm font-medium text-slate-300 transition-colors hover:bg-white/5 hover:text-white"
+            class="block rounded-md px-3 py-2.5 text-sm font-medium text-slate-300 transition-colors hover:bg-white/[0.08] hover:text-white"
             (click)="closeMobileMenu()">
             {{ item.label }}
           </a>
+          </div>
 
           <div class="mt-3 flex flex-wrap items-center gap-2 border-t border-white/10 pt-3">
             <button *ngFor="let locale of languages" type="button" (click)="setLanguage(locale)"
-              class="rounded-lg border px-3 py-2 text-sm font-semibold transition"
-              [ngClass]="locale === selectedLanguage() ? 'border-white bg-white text-slate-950' : 'border-white/10 text-slate-300 hover:bg-white/5 hover:text-white'">
+              class="rounded-md border px-3 py-2 text-sm font-semibold outline-none transition focus-visible:ring-2 focus-visible:ring-cyan-200"
+              [ngClass]="locale === selectedLanguage() ? 'border-cyan-200 bg-cyan-200 text-slate-950' : 'border-white/10 text-slate-300 hover:bg-white/5 hover:text-white'">
               {{ copy().navbar.langNames[locale] }}
             </button>
           </div>
 
           <a routerLink="/collections"
-            class="mt-3 inline-flex h-10 w-full items-center justify-center rounded-lg border border-sky-300 bg-sky-300/10 px-5 text-sm font-semibold text-sky-200 transition-colors hover:bg-sky-400 hover:text-slate-950"
+            class="mt-3 inline-flex h-11 w-full items-center justify-center rounded-md border border-cyan-200 bg-cyan-200 px-5 text-sm font-semibold text-slate-950 shadow-lg shadow-cyan-950/20 transition-colors hover:bg-white"
             (click)="closeMobileMenu()">
             {{ copy().navbar.ctaPrimary }}
           </a>

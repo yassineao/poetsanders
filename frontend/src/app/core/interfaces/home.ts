@@ -17,7 +17,25 @@ export interface HomeHeroCopy {
 }
 
 export interface HomeCardsSectionCopy {
+  eyebrow: string;
+  heading: string;
+  description: string;
+  highlight: {
+    eyebrow: string;
+    title: string;
+    body: string;
+    image: string;
+    stats: Array<{ value: string; label: string }>;
+  };
   items: Array<{ title: string; body: string }>;
+  treatments: Array<{
+    title: string;
+    description: string;
+    image: string;
+    featured: boolean;
+    featuredLabel?: string;
+    services: string[];
+  }>;
 }
 
 export interface HomeCopy {
