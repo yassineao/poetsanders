@@ -1,30 +1,30 @@
-<section class="relative overflow-hidden rounded-[2rem] border border-white/10 bg-slate-950/95 p-8 shadow-2xl shadow-slate-950/40 ring-1 ring-white/5 sm:p-12">
-  <div class="pointer-events-none absolute inset-x-0 top-0 h-56 bg-[radial-gradient(circle_at_top,_rgba(56,189,248,0.18),transparent_55%)] blur-3xl"></div>
+<section class="relative overflow-hidden    shadow-2xl shadow-slate-950/40  sm:p-12">
+  <!-- <div class="pointer-events-none absolute inset-x-0 top-0 h-56 bg-[radial-gradient(circle_at_top,_rgba(56,189,248,0.18),transparent_55%)] blur-3xl"></div> -->
 
   <div class="relative grid gap-10 lg:grid-cols-[minmax(0,1fr)_340px] lg:items-center">
     <div class="space-y-6">
       <p class="inline-flex rounded-full bg-sky-500/10 px-4 py-1 text-sm font-semibold uppercase tracking-[0.28em] text-sky-300">Dutch Car Care</p>
-      <h1 class="text-4xl font-semibold tracking-tight text-white sm:text-5xl">{{ title }}</h1>
-      <p class="max-w-2xl text-lg leading-8 text-slate-300">{{ subtitle }}</p>
-      <p class="max-w-2xl text-slate-400">{{ description }}</p>
+      <h1 class="text-4xl font-semibold tracking-tight text-white sm:text-5xl">{{ hero.heading }}</h1>
+      <p class="max-w-2xl text-lg leading-8 text-slate-300">{{ hero.subheading }}</p>
+      <p class="max-w-2xl text-slate-400">{{ hero.description }}</p>
 
       <div class="flex flex-col gap-3 sm:flex-row">
         <a
-          [href]="primaryLink"
+          [href]="hero.primaryLink"
           class="inline-flex items-center justify-center rounded-full bg-sky-500 px-6 py-3 text-sm font-semibold text-slate-950 transition hover:bg-sky-400"
         >
-          {{ ctaPrimary }}
+          {{ hero.ctaPrimary }}
         </a>
         <a
-          [href]="secondaryLink"
+          [href]="hero.secondaryLink"
           class="inline-flex items-center justify-center rounded-full border border-white/10 bg-white/5 px-6 py-3 text-sm font-semibold text-slate-100 transition hover:border-slate-300/20 hover:bg-slate-900/80"
         >
-          {{ ctaSecondary }}
+          {{ hero.ctaSecondary }}
         </a>
       </div>
 
-      <ul class="grid gap-3 text-sm text-slate-400 sm:grid-cols-2">
-        <li *ngFor="let feature of features" class="rounded-3xl bg-slate-900/70 px-4 py-3 ring-1 ring-white/10">{{ feature }}</li>
+      <ul class="grid gap-3 text-sm text-slate-400 sm:grid-cols-3">
+        <li *ngFor="let feature of hero.features" class="rounded-xl bg-slate-900/70 px-4 py-3 ring-1 ring-white/10">{{ feature }}</li>
       </ul>
     </div>
 

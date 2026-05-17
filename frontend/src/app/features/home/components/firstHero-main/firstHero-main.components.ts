@@ -1,5 +1,24 @@
 import { CommonModule } from '@angular/common';
 import { Component, Input } from '@angular/core';
+import type { HomeHeroCopy } from '../../../../core/interfaces/home';
+
+type HeroContent = HomeHeroCopy & {
+  description: string;
+};
+
+const defaultHero: HeroContent = {
+  eyebrow: '',
+  heading: '',
+  subheading: '',
+  image: '/hero_Image.jpg',
+  ctaPrimary: '',
+  ctaSecondary: '',
+  primaryLink: '#',
+  secondaryLink: '#',
+  features: [],
+  trustItems: [],
+  description: '',
+};
 
 @Component({
   selector: 'app-first-hero-main',
@@ -8,15 +27,5 @@ import { Component, Input } from '@angular/core';
   templateUrl: './firstHero-main.components.html'
 })
 export class FirstHeroMainComponent {
-  @Input() title = '';
-  @Input() eyebrow = '';
-  @Input() subtitle = '';
-  @Input() description = '';
-  @Input() ctaPrimary = '';
-  @Input() ctaSecondary = '';
-  @Input() primaryLink = '#';
-  @Input() secondaryLink = '#';
-  @Input() features: string[] = [];
-  @Input() trustItems: Array<{ value: string; label: string }> = [];
-  @Input() ImageUrl = '#';
+  @Input() hero: HeroContent = defaultHero;
 }

@@ -1,18 +1,18 @@
 <section class="mx-auto max-w-7xl py-16 sm:py-20 lg:py-24">
   <div class="grid items-center gap-12 lg:grid-cols-[minmax(0,1fr)_440px]">
     <div class="max-w-3xl text-center lg:text-left">
-      <p class="text-xs font-semibold uppercase tracking-[0.24em] text-cyan-200">{{ eyebrow }}</p>
-      <h1 class="mt-5 text-4xl font-semibold leading-tight tracking-tight text-white sm:text-6xl">{{ title }}</h1>
-      <p class="mt-6 max-w-2xl text-lg leading-8 text-slate-200 lg:text-xl">{{ subtitle }}</p>
-      <p class="mt-4 max-w-2xl text-sm leading-7 text-slate-300 sm:text-base">{{ description }}</p>
+      <p class="text-xs font-semibold uppercase tracking-[0.24em] text-cyan-200">{{ hero.eyebrow }}</p>
+      <h1 class="mt-5 text-4xl font-semibold leading-tight tracking-tight text-white sm:text-6xl">{{ hero.heading }}</h1>
+      <p class="mt-6 max-w-2xl text-lg leading-8 text-slate-200 lg:text-xl">{{ hero.subheading }}</p>
+      <p class="mt-4 max-w-2xl text-sm leading-7 text-slate-300 sm:text-base">{{ hero.description }}</p>
 
       <div class="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center lg:justify-start">
-        <a [href]="primaryLink" class="inline-flex items-center justify-center rounded-md bg-white px-6 py-3 text-sm font-semibold text-slate-950 shadow-lg shadow-black/20 transition hover:bg-cyan-100 focus:outline-none focus:ring-2 focus:ring-cyan-200 focus:ring-offset-2 focus:ring-offset-slate-950">{{ ctaPrimary }}</a>
-        <a [href]="secondaryLink" class="inline-flex items-center justify-center rounded-md border border-white/25 bg-white/10 px-6 py-3 text-sm font-semibold text-white backdrop-blur transition hover:bg-white/15 focus:outline-none focus:ring-2 focus:ring-cyan-200 focus:ring-offset-2 focus:ring-offset-slate-950">{{ ctaSecondary }}</a>
+        <a [href]="hero.primaryLink" class="inline-flex items-center justify-center rounded-md bg-white px-6 py-3 text-sm font-semibold text-slate-950 shadow-lg shadow-black/20 transition hover:bg-cyan-100 focus:outline-none focus:ring-2 focus:ring-cyan-200 focus:ring-offset-2 focus:ring-offset-slate-950">{{ hero.ctaPrimary }}</a>
+        <a [href]="hero.secondaryLink" class="inline-flex items-center justify-center rounded-md border border-white/25 bg-white/10 px-6 py-3 text-sm font-semibold text-white backdrop-blur transition hover:bg-white/15 focus:outline-none focus:ring-2 focus:ring-cyan-200 focus:ring-offset-2 focus:ring-offset-slate-950">{{ hero.ctaSecondary }}</a>
       </div>
 
       <ul class="mt-8 grid gap-3 text-left text-sm text-slate-200 sm:grid-cols-3">
-        <li *ngFor="let feature of features" class="rounded-md border border-white/15 bg-white/10 px-4 py-3 shadow-sm backdrop-blur">
+        <li *ngFor="let feature of hero.features" class="rounded-md border border-white/15 bg-white/10 px-4 py-3 shadow-sm backdrop-blur">
           <span class="mb-3 block h-px w-8 bg-cyan-200"></span>
           {{ feature }}
         </li>
@@ -20,9 +20,20 @@
     </div>
 
     <div class="rounded-lg border border-white/15 bg-white/10 p-3 shadow-2xl shadow-black/30 backdrop-blur">
-      <img class="aspect-[4/5] w-full rounded-md object-cover object-center" alt="Poets Anders car wash service" [src]="ImageUrl">
+      <div class="relative aspect-[4/5] overflow-hidden rounded-md bg-slate-900">
+        <img class="absolute inset-0 h-full w-full scale-110 object-cover object-center opacity-45 blur-sm" alt="" [src]="hero.image">
+        
+
+        <div class="absolute inset-0 flex items-center justify-center">
+          <div class="relative flex h-44 w-44 items-center justify-center sm:h-56 sm:w-56">
+            <!-- <span class="absolute inset-0 rounded-full bg-cyan-200/20 blur-2xl"></span> -->
+            <!-- <span class="absolute h-36 w-36 rounded-full bg-slate-950/25 blur-xl sm:h-48 sm:w-48"></span> -->
+            <img src="/logo-poets-website-1_high_resolution.png" alt="" class="relative h-36 w-36 object-contain drop-shadow-2xl sm:h-48 sm:w-48">
+          </div>
+        </div>
+      </div>
       <dl class="mt-3 grid grid-cols-3 divide-x divide-white/10 rounded-md bg-slate-950/75 text-center">
-        <div *ngFor="let item of trustItems" class="px-3 py-4">
+        <div *ngFor="let item of hero.trustItems" class="px-3 py-4">
           <dt class="text-lg font-semibold text-white">{{ item.value }}</dt>
           <dd class="mt-1 text-xs leading-5 text-slate-300">{{ item.label }}</dd>
         </div>

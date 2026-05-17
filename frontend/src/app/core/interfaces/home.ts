@@ -42,4 +42,21 @@ export interface HomeCopy {
   meta: HomeMetaCopy;
   hero: HomeHeroCopy;
   cards: HomeCardsSectionCopy;
+  maps: HomeCopyMap;
+}
+
+export interface HomeCopyMap {
+  ADDRESS_LABEL: string;
+  ADDRESS_DETAILS: string;
+  EMAIL_LABEL: string;
+  EMAIL: string;
+  PHONE_LABEL: string;
+  PHONE: string;
+  FEEDBACK_LABEL: string;
+  NAME_LABEL: string;
+  EMAIL_LABEL_FORM: string;
+  MESSAGE_LABEL: string;
+  SUBMIT_LABEL: string;
+  DISCLAIMER_LABEL: string;
+  FeedbackText: string;
 }

@@ -5,23 +5,23 @@
     <div class="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-slate-950 to-transparent"></div>
 
     <div class="relative z-10">
-      <app-first-hero-main [eyebrow]="copy().home.hero.eyebrow" [title]="copy().home.hero.heading" [subtitle]="copy().home.hero.subheading"
-        [description]="copy().home.meta.description" [ctaPrimary]="copy().home.hero.ctaPrimary"
-        [ctaSecondary]="copy().home.hero.ctaSecondary" [primaryLink]="copy().home.hero.primaryLink"
-        [secondaryLink]="copy().home.hero.secondaryLink" [features]="copy().home.hero.features"
-        [trustItems]="copy().home.hero.trustItems" [ImageUrl]="copy().home.hero.image">
-      </app-first-hero-main>
+      <app-first-hero-main [hero]="hero()"></app-first-hero-main>
     </div>
   </div>
+  <div id="content" class="mx-auto ">
+
+    <app-hero-main [hero]="hero()"></app-hero-main>
+  </div>
+  <div class="mt-12 ">
+    <app-card-main [cards]="copy().home.cards" />
+  </div>
+
+
+
 
   <div id="content" class="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
-    <app-hero-main [title]="copy().home.hero.heading" [subtitle]="copy().home.hero.subheading"
-      [description]="copy().home.meta.description" [ctaPrimary]="copy().home.hero.ctaPrimary"
-      [ctaSecondary]="copy().home.hero.ctaSecondary" [primaryLink]="copy().home.hero.primaryLink"
-      [secondaryLink]="copy().home.hero.secondaryLink" [features]="copy().home.hero.features"></app-hero-main>
-
     <div class="mt-12">
-      <app-card-main [cards]="copy().home.cards" />
+      <app-maps-main [maps]="copy().home.maps"></app-maps-main>
     </div>
   </div>
 </main>
