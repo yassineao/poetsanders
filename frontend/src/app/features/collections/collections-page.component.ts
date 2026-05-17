@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { I18nService } from '../../core/i18/i18n.service';
 
 @Component({
@@ -9,10 +9,6 @@ import { I18nService } from '../../core/i18/i18n.service';
   templateUrl: './collections-page.component.html',
 })
 export class CollectionsPageComponent {
-  copy = computed(() => {
-    this.i18n.copy$();
-    return this.i18n.getCurrentCopy();
-  });
-
-  constructor(private i18n: I18nService) {}
+  private readonly i18n = inject(I18nService);
+  protected readonly copy = this.i18n.copy;
 }

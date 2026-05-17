@@ -4,11 +4,12 @@ import { RouterModule } from '@angular/router';
 import { Title, Meta } from '@angular/platform-browser';
 import { I18nService } from './core/i18/i18n.service';
 import { NavBarComponent } from './shared/components/navBar/navBar.components';
+import { FooterComponent } from './shared/components/footer/footer.components';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, RouterModule, NavBarComponent],
+  imports: [CommonModule, RouterModule, NavBarComponent, FooterComponent],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })
@@ -24,8 +25,8 @@ export class App {
     @Inject(DOCUMENT) private document: Document
   ) {
     this.languages = this.i18n.languages;
-    this.selectedLanguage = this.i18n.language$;
-    this.copy = this.i18n.copy$;
+    this.selectedLanguage = this.i18n.language;
+    this.copy = this.i18n.copy;
     effect(() => this.updateSeo(this.i18n.getCurrentCopy()));
   }
 
@@ -34,12 +35,12 @@ export class App {
   }
 
   private updateSeo(copy: any): void {
-    this.titleService.setTitle(copy.home.pageTitle);
-    this.meta.updateTag({ name: 'description', content: copy.home.description });
-    this.meta.updateTag({ property: 'og:title', content: copy.home.pageTitle });
-    this.meta.updateTag({ property: 'og:description', content: copy.home.description });
-    this.meta.updateTag({ name: 'twitter:title', content: copy.home.pageTitle });
-    this.meta.updateTag({ name: 'twitter:description', content: copy.home.description });
+    this.titleService.setTitle(copy.home.meta.pageTitle);
+    this.meta.updateTag({ name: 'description', content: copy.home.meta.description });
+    this.meta.updateTag({ property: 'og:title', content: copy.home.meta.pageTitle });
+    this.meta.updateTag({ property: 'og:description', content: copy.home.meta.description });
+    this.meta.updateTag({ name: 'twitter:title', content: copy.home.meta.pageTitle });
+    this.meta.updateTag({ name: 'twitter:description', content: copy.home.meta.description });
     this.document.documentElement.lang = this.i18n.getCurrentLanguage();
   }
 }
