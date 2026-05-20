@@ -8,13 +8,13 @@ export const deFooterCopy: FooterCopy = {
   ],
   servicesTitle: 'Angebote',
   serviceLinks: [
-    { label: 'Aussenwaesche', routerLink: '/collections' },
+    { label: 'Außenwäsche', routerLink: '/collections' },
     { label: 'Innenreinigung', routerLink: '/collections' },
     { label: 'Detailing', routerLink: '/collections' },
   ],
   contactTitle: 'Kontakt',
   contactLinks: [
-    { label: 'Waesche buchen', routerLink: '/' },
+    { label: 'Wäsche buchen', routerLink: '/' },
     { label: 'Servicepakete', routerLink: '/collections' },
   ],
   legalLinks: [

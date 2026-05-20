@@ -1,22 +1,22 @@
 import type { HomeHeroCopy } from '../../../../interfaces/types';
 
 export const enHomeHeroCopy: HomeHeroCopy = {
-  eyebrow: 'Premium Dutch car care',
-  heading: 'Fresh, spotless cars from the Netherlands.',
-  subheading: 'Poets Anders brings Dutch precision to every wash.',
+  eyebrow: 'Car cleaning in Papendrecht',
+  heading: 'Your car clean, polished, and ready to drive.',
+  subheading: 'Poets Anders handles total treatments, interior cleaning, exterior polishing, and headlight restoration with careful hand work.',
   image: '/hero_Image.jpg',
-  ctaPrimary: 'Book a wash',
-  ctaSecondary: 'View services',
+  ctaPrimary: 'Call Poets Anders',
+  ctaSecondary: 'View treatments',
   primaryLink: '#content',
   secondaryLink: '#features',
   features: [
-    'Hand wash for paint-safe results',
-    'Interior cleaning and vacuum service',
-    'Detailing packages for a showroom finish',
+    'Total treatment for interior and exterior',
+    'Paint polishing, hand wax, rims and tires',
+    'Located at Vondellaan 164 in Papendrecht',
   ],
   trustItems: [
-    { value: 'NL', label: 'Netherlands-based service' },
-    { value: '100%', label: 'Paint-safe washing process' },
-    { value: '3', label: 'Clear service levels' },
+    { value: '4', label: 'Treatment options' },
+    { value: 'NL', label: 'Papendrecht service' },
+    { value: '4.6 (70)', label: 'Google reviews' },
   ],
 };

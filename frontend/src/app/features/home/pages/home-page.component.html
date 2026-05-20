@@ -8,17 +8,17 @@
       <app-first-hero-main [hero]="hero()"></app-first-hero-main>
     </div>
   </div>
-  <div id="content" class="mx-auto ">
-
-    <app-hero-main [hero]="hero()"></app-hero-main>
-  </div>
+  
   <div class="mt-12 ">
     <app-card-main [cards]="copy().home.cards" />
   </div>
 
+  <app-testimonials-main [testimonials]="copy().home.testimonials" [maps]="copy().home.maps"></app-testimonials-main>
 
+  <div id="content" class="mx-auto bg-slate-900/90 px-4 py-16 sm:px-6 lg:px-8">
 
-
+    <app-hero-main [hero]="hero()"></app-hero-main>
+  </div>
   <div id="content" class="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
     <div class="mt-12">
       <app-maps-main [maps]="copy().home.maps"></app-maps-main>

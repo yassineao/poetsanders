@@ -4,6 +4,11 @@ import type { HomeHeroCopy } from '../../../../core/interfaces/home';
 
 type HeroContent = HomeHeroCopy & {
   description: string;
+  highlightTitle?: string;
+  highlightBody?: string;
+  serviceNames?: string[];
+  contactItems?: Array<{ label: string; value: string; href?: string }>;
+  reviewLabel?: string;
 };
 
 const defaultHero: HeroContent = {
@@ -18,6 +23,11 @@ const defaultHero: HeroContent = {
   features: [],
   trustItems: [],
   description: '',
+  highlightTitle: '',
+  highlightBody: '',
+  serviceNames: [],
+  contactItems: [],
+  reviewLabel: '',
 };
 
 @Component({

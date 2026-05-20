@@ -20,6 +20,7 @@ export interface HomeCardsSectionCopy {
   eyebrow: string;
   heading: string;
   description: string;
+  info: Array<{ label: string; value: string; href?: string }>;
   highlight: {
     eyebrow: string;
     title: string;
@@ -38,10 +39,25 @@ export interface HomeCardsSectionCopy {
   }>;
 }
 
+export interface HomeTestimonialsSectionCopy {
+  eyebrow: string;
+  heading: string;
+  description: string;
+  ratingLabel: string;
+  sourceLabel: string;
+  testimonials: Array<{
+    quote: string;
+    name: string;
+    detail: string;
+    service: string;
+  }>;
+}
+
 export interface HomeCopy {
   meta: HomeMetaCopy;
   hero: HomeHeroCopy;
   cards: HomeCardsSectionCopy;
+  testimonials: HomeTestimonialsSectionCopy;
   maps: HomeCopyMap;
 }
 
@@ -52,6 +68,13 @@ export interface HomeCopyMap {
   EMAIL: string;
   PHONE_LABEL: string;
   PHONE: string;
+  MOBILE_LABEL: string;
+  MOBILE: string;
+  WEBSITE_LABEL: string;
+  WEBSITE: string;
+  WEBSITE_URL: string;
+  MAPS_LABEL: string;
+  MAPS_URL: string;
   FEEDBACK_LABEL: string;
   NAME_LABEL: string;
   EMAIL_LABEL_FORM: string;

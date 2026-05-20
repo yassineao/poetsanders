@@ -4,6 +4,16 @@ export const nlHomeCardsCopy: HomeCardsSectionCopy = {
   eyebrow: 'Behandelingspakketten',
   heading: 'Kies de zorg die je auto verdient.',
   description: 'Van een nauwkeurige interieur opfrisbeurt tot een complete premium behandeling: elk pakket is duidelijk opgebouwd, zodat je precies weet wat je auto krijgt. Kies gerichte cabineverzorging, exterieurpolijsting met bescherming, koplampherstel of een volledige behandeling van binnen en buiten passend bij de staat van je voertuig.',
+  info: [
+    { label: 'Bedrijf', value: 'Poets Anders' },
+    { label: 'Adres', value: 'Vondellaan 164, 3351 HG Papendrecht' },
+    { label: 'Telefoon', value: '078-6933340', href: 'tel:+31786933340' },
+    { label: 'Mobiel', value: '06-34341514', href: 'tel:+31634341514' },
+    { label: 'E-mail', value: 'info@poetsanders.nl', href: 'mailto:info@poetsanders.nl' },
+    { label: 'Website', value: 'poetsanders.nl', href: 'http://poetsanders.nl/' },
+    { label: 'Google Maps', value: 'Locatie openen', href: 'https://maps.app.goo.gl/WZacia8LvDi4aGKQA' },
+    { label: 'Coördinaten', value: '51.8300852, 4.6861988' },
+  ],
   highlight: {
     eyebrow: 'Signature verzorging',
     title: 'Een schonere auto, behandeld met geduld en precisie.',

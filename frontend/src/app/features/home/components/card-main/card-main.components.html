@@ -70,6 +70,21 @@
               <p class="mt-2 text-sm leading-6 text-slate-300">{{ item.body }}</p>
             </div>
           </div>
+
+          <div class="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            <div *ngFor="let detail of cards.info"
+              class="rounded-md border border-cyan-200/20 bg-slate-950/70 p-4 backdrop-blur">
+              <p class="text-xs font-semibold uppercase tracking-[0.18em] text-cyan-200">{{ detail.label }}</p>
+              <a *ngIf="detail.href; else plainDetail"
+                class="mt-2 block break-words text-sm font-medium leading-6 text-white transition hover:text-cyan-200"
+                [href]="detail.href">
+                {{ detail.value }}
+              </a>
+              <ng-template #plainDetail>
+                <p class="mt-2 break-words text-sm font-medium leading-6 text-white">{{ detail.value }}</p>
+              </ng-template>
+            </div>
+          </div>
         </div>
 
         <dl class="mt-10 grid gap-3 sm:grid-cols-3">

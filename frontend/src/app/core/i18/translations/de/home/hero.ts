@@ -1,22 +1,22 @@
 import type { HomeHeroCopy } from '../../../../interfaces/types';
 
 export const deHomeHeroCopy: HomeHeroCopy = {
-  eyebrow: 'Premium-Autopflege aus den Niederlanden',
-  heading: 'Frische, makellose Autos aus den Niederlanden.',
-  subheading: 'Poets Anders bringt niederlaendische Praezision in jede Waesche.',
+  eyebrow: 'Autoreinigung in Papendrecht',
+  heading: 'Ihr Auto sauber, poliert und bereit für die Straße.',
+  subheading: 'Poets Anders übernimmt Totalbehandlungen, Innenreinigung, Außenpolitur und Scheinwerferaufbereitung mit sorgfältiger Handarbeit.',
   image: '/hero_Image.jpg',
-  ctaPrimary: 'Waesche buchen',
-  ctaSecondary: 'Services ansehen',
+  ctaPrimary: 'Poets Anders anrufen',
+  ctaSecondary: 'Behandlungen ansehen',
   primaryLink: '#content',
   secondaryLink: '#features',
   features: [
-    'Handwaesche fuer lackschonende Ergebnisse',
-    'Innenreinigung mit Staubsauger-Service',
-    'Detailing-Pakete fuer einen Showroom-Look',
+    'Totalbehandlung für Innenraum und Außenbereich',
+    'Lack polieren, Handwachs, Felgen und Reifen',
+    'An der Vondellaan 164 in Papendrecht',
   ],
   trustItems: [
-    { value: 'NL', label: 'Service aus den Niederlanden' },
-    { value: '100%', label: 'Lackschonender Waschprozess' },
-    { value: '3', label: 'Klare Service-Stufen' },
+    { value: '4', label: 'Behandlungsoptionen' },
+    { value: 'NL', label: 'Service in Papendrecht' },
+    { value: '4.6 (70)', label: 'Google-Bewertungen sichtbar' },
   ],
 };

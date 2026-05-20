@@ -4,6 +4,16 @@ export const enHomeCardsCopy: HomeCardsSectionCopy = {
   eyebrow: 'Treatment packages',
   heading: 'Choose the care your car deserves.',
   description: 'From a precise interior refresh to a complete premium treatment, every package is structured clearly so you know exactly what your car receives. Choose focused cabin care, exterior polishing and protection, headlight restoration, or a full inside-and-out treatment tailored to the condition of your vehicle.',
+  info: [
+    { label: 'Business', value: 'Poets Anders' },
+    { label: 'Address', value: 'Vondellaan 164, 3351 HG Papendrecht' },
+    { label: 'Phone', value: '078-6933340', href: 'tel:+31786933340' },
+    { label: 'Mobile', value: '06-34341514', href: 'tel:+31634341514' },
+    { label: 'Email', value: 'info@poetsanders.nl', href: 'mailto:info@poetsanders.nl' },
+    { label: 'Website', value: 'poetsanders.nl', href: 'http://poetsanders.nl/' },
+    { label: 'Google Maps', value: 'Open location', href: 'https://maps.app.goo.gl/WZacia8LvDi4aGKQA' },
+    { label: 'Coordinates', value: '51.8300852, 4.6861988' },
+  ],
   highlight: {
     eyebrow: 'Signature care',
     title: 'A cleaner car, handled with patience and precision.',
