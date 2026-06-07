@@ -4,6 +4,7 @@ export const deHomeCardsCopy: HomeCardsSectionCopy = {
   eyebrow: 'Behandlungspakete',
   heading: 'Wählen Sie die Pflege, die Ihr Auto verdient.',
   description: 'Von der präzisen Innenraumauffrischung bis zur kompletten Premium-Behandlung ist jedes Paket klar aufgebaut, damit Sie genau wissen, was Ihr Auto bekommt. Wählen Sie gezielte Innenraumpflege, Außenpolitur mit Schutz, Scheinwerferaufbereitung oder eine vollständige Behandlung innen und außen passend zum Zustand Ihres Fahrzeugs.',
+  detailLinkLabel: 'Mehr erfahren',
   info: [
     { label: 'Firma', value: 'Poets Anders' },
     { label: 'Adresse', value: 'Vondellaan 164, 3351 HG Papendrecht' },
@@ -20,7 +21,7 @@ export const deHomeCardsCopy: HomeCardsSectionCopy = {
     body: 'Poets Anders verbindet sorgfältige Handarbeit mit hochwertigen Finish-Schritten, damit Ihr Auto frisch, geschützt und bereit für die Straße ist.',
     image: '/beautiful-car-washing-service.jpg',
     stats: [
-      { value: '4', label: 'Behandlungsoptionen' },
+      { value: '5', label: 'Behandlungsoptionen' },
       { value: 'NL', label: 'Niederländischer Standard' },
       { value: '1', label: 'Klares Finish-Ziel' },
     ],
@@ -41,6 +42,7 @@ export const deHomeCardsCopy: HomeCardsSectionCopy = {
   ],
   treatments: [
     {
+      slug: 'total-treatment',
       title: 'Total Treatment',
       description: 'Eine komplette Auffrischung innen und außen für Fahrzeuge, die das volle Poets Anders Finish brauchen.',
       image: '/beautiful-car-washing-service.jpg',
@@ -49,6 +51,7 @@ export const deHomeCardsCopy: HomeCardsSectionCopy = {
       services: ['Innenraumbehandlung', 'Außenbehandlung'],
     },
     {
+      slug: 'interior-treatment',
       title: 'Interior Treatment',
       description: 'Gründliche Innenraumpflege für Komfort, Frische und die Flächen, die Sie täglich berühren.',
       image: '/Image_wash.jpg',
@@ -56,6 +59,7 @@ export const deHomeCardsCopy: HomeCardsSectionCopy = {
       services: ['Polster reinigen', 'Geruchsbehandlung', 'Kunststoff behandeln'],
     },
     {
+      slug: 'exterior-treatment',
       title: 'Exterior Treatment',
       description: 'Lack, Felgen, Reifen und Finish werden Schritt für Schritt für einen hochwertigen Look behandelt.',
       image: '/hero_Image.jpg',
@@ -63,11 +67,20 @@ export const deHomeCardsCopy: HomeCardsSectionCopy = {
       services: ['Grob polieren', 'Fein polieren', 'Handwachs', 'Felgenreinigung', 'Reifenbehandlung'],
     },
     {
+      slug: 'headlight-treatment',
       title: 'Scheinwerferbehandlung',
       description: 'Ihre Scheinwerfer werden wieder klar und werten die Front sowie die Sicht bei Nacht auf.',
       image: '/bg_heroo.jpg',
       featured: false,
       services: ['Klare Oberfläche wiederherstellen'],
+    },
+    {
+      slug: 'ozone-treatment',
+      title: 'Ozonbehandlung',
+      description: 'Eine intensive Ozonbehandlung neutralisiert hartnäckigen Rauchgeruch und andere unangenehme Gerüche im Fahrzeuginnenraum.',
+      image: '/Image_wash.jpg',
+      featured: false,
+      services: ['Rauchgeruch neutralisieren', 'Unangenehme Gerüche entfernen'],
     },
   ],
 };

@@ -1,0 +1,33 @@
+<section class="mx-auto grid max-w-7xl gap-6 px-4 py-16 sm:px-6 lg:grid-cols-3 lg:px-8 lg:py-24">
+  <article class="rounded-lg border border-white/10 bg-slate-900/80 p-6">
+    <h2 class="text-xl font-semibold text-white">{{ copy.includedLabel }}</h2>
+    <ul class="mt-5 space-y-3">
+      <li *ngFor="let service of treatment.services" class="flex gap-3 text-sm leading-6 text-slate-300">
+        <span class="mt-2 h-2 w-2 shrink-0 rounded-full bg-cyan-200"></span>
+        {{ service }}
+      </li>
+    </ul>
+  </article>
+
+  <article class="rounded-lg border border-white/10 bg-slate-900/80 p-6">
+    <h2 class="text-xl font-semibold text-white">{{ copy.benefitsLabel }}</h2>
+    <ul class="mt-5 space-y-3">
+      <li *ngFor="let benefit of treatment.benefits" class="flex gap-3 text-sm leading-6 text-slate-300">
+        <span class="mt-2 h-2 w-2 shrink-0 rounded-full bg-cyan-200"></span>
+        {{ benefit }}
+      </li>
+    </ul>
+  </article>
+
+  <article class="rounded-lg border border-white/10 bg-slate-900/80 p-6">
+    <h2 class="text-xl font-semibold text-white">{{ copy.processLabel }}</h2>
+    <ol class="mt-5 space-y-4">
+      <li *ngFor="let step of treatment.process; let index = index" class="flex gap-3 text-sm leading-6 text-slate-300">
+        <span class="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-cyan-200 text-xs font-bold text-slate-950">
+          {{ index + 1 }}
+        </span>
+        {{ step }}
+      </li>
+    </ol>
+  </article>
+</section>

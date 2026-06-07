@@ -14,12 +14,17 @@ export interface HomeHeroCopy {
   secondaryLink: string;
   features: string[];
   trustItems: Array<{ value: string; label: string }>;
+  infoPanel: {
+    eyebrow: string;
+    items: Array<{ title: string; description: string }>;
+  };
 }
 
 export interface HomeCardsSectionCopy {
   eyebrow: string;
   heading: string;
   description: string;
+  detailLinkLabel: string;
   info: Array<{ label: string; value: string; href?: string }>;
   highlight: {
     eyebrow: string;
@@ -30,6 +35,7 @@ export interface HomeCardsSectionCopy {
   };
   items: Array<{ title: string; body: string }>;
   treatments: Array<{
+    slug: string;
     title: string;
     description: string;
     image: string;

@@ -29,15 +29,11 @@
     </div>
 
     <div class="rounded-[1.75rem] border border-white/10 bg-slate-900/80 p-6 shadow-xl shadow-slate-950/20">
-      <p class="text-sm uppercase tracking-[0.25em] text-slate-500">Why Poets Anders</p>
+      <p class="text-sm uppercase tracking-[0.25em] text-slate-500">{{ hero.infoPanel.eyebrow }}</p>
       <div class="mt-5 space-y-4">
-        <div class="rounded-3xl bg-slate-950/70 p-4 text-slate-200">
-          <p class="font-semibold text-white">Clean, careful process</p>
-          <p class="mt-2 text-sm text-slate-400">Every treatment is built around paint-safe washing, tidy interiors, and clear service choices.</p>
-        </div>
-        <div class="rounded-3xl bg-slate-950/70 p-4 text-slate-200">
-          <p class="font-semibold text-white">Treatment packages below</p>
-          <p class="mt-2 text-sm text-slate-400">Compare total, interior, exterior, and headlight care in the service cards.</p>
+        <div *ngFor="let item of hero.infoPanel.items" class="rounded-3xl bg-slate-950/70 p-4 text-slate-200">
+          <p class="font-semibold text-white">{{ item.title }}</p>
+          <p class="mt-2 text-sm text-slate-400">{{ item.description }}</p>
         </div>
       </div>
     </div>

@@ -4,6 +4,7 @@ export const nlHomeCardsCopy: HomeCardsSectionCopy = {
   eyebrow: 'Behandelingspakketten',
   heading: 'Kies de zorg die je auto verdient.',
   description: 'Van een nauwkeurige interieur opfrisbeurt tot een complete premium behandeling: elk pakket is duidelijk opgebouwd, zodat je precies weet wat je auto krijgt. Kies gerichte cabineverzorging, exterieurpolijsting met bescherming, koplampherstel of een volledige behandeling van binnen en buiten passend bij de staat van je voertuig.',
+  detailLinkLabel: 'Meer informatie',
   info: [
     { label: 'Bedrijf', value: 'Poets Anders' },
     { label: 'Adres', value: 'Vondellaan 164, 3351 HG Papendrecht' },
@@ -20,7 +21,7 @@ export const nlHomeCardsCopy: HomeCardsSectionCopy = {
     body: 'Poets Anders combineert zorgvuldig handwerk met hoogwaardige afwerking, zodat je auto fris, beschermd en klaar voor de weg is.',
     image: '/beautiful-car-washing-service.jpg',
     stats: [
-      { value: '4', label: 'Behandelingsopties' },
+      { value: '5', label: 'Behandelingsopties' },
       { value: 'NL', label: 'Nederlandse servicestandaard' },
       { value: '1', label: 'Helder einddoel' },
     ],
@@ -41,6 +42,7 @@ export const nlHomeCardsCopy: HomeCardsSectionCopy = {
   ],
   treatments: [
     {
+      slug: 'total-treatment',
       title: 'Total Treatment',
       description: 'Een complete opfrisbeurt van binnen en buiten voor auto\'s die de volledige Poets Anders afwerking nodig hebben.',
       image: '/beautiful-car-washing-service.jpg',
@@ -49,6 +51,7 @@ export const nlHomeCardsCopy: HomeCardsSectionCopy = {
       services: ['Interieurbehandeling', 'Exterieurbehandeling'],
     },
     {
+      slug: 'interior-treatment',
       title: 'Interior Treatment',
       description: 'Diepe cabineverzorging gericht op comfort, frisheid en de oppervlakken die je dagelijks aanraakt.',
       image: '/Image_wash.jpg',
@@ -56,6 +59,7 @@ export const nlHomeCardsCopy: HomeCardsSectionCopy = {
       services: ['Bekleding reinigen', 'Geurbehandeling', 'Kunststof behandelen'],
     },
     {
+      slug: 'exterior-treatment',
       title: 'Exterior Treatment',
       description: 'Lak, velgen, banden en afwerking worden stap voor stap behandeld voor een premium uitstraling.',
       image: '/hero_Image.jpg',
@@ -63,11 +67,20 @@ export const nlHomeCardsCopy: HomeCardsSectionCopy = {
       services: ['Grof polijsten', 'Fijn polijsten', 'Handwax', 'Velgen reinigen', 'Bandenbehandeling'],
     },
     {
+      slug: 'headlight-treatment',
       title: 'Koplampbehandeling',
       description: 'Je koplampen worden weer helder, voor een betere voorkant en beter zicht in het donker.',
       image: '/bg_heroo.jpg',
       featured: false,
       services: ['Heldere afwerking herstellen'],
+    },
+    {
+      slug: 'ozone-treatment',
+      title: 'Ozonbehandeling',
+      description: 'Een intensieve ozonbehandeling neutraliseert hardnekkige rooklucht en andere onaangename geuren in het interieur.',
+      image: '/Image_wash.jpg',
+      featured: false,
+      services: ['Rooklucht neutraliseren', 'Onaangename geuren verwijderen'],
     },
   ],
 };

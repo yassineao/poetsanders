@@ -17,6 +17,10 @@ const defaultHero: HeroContent = {
   secondaryLink: '#',
   features: [],
   trustItems: [],
+  infoPanel: {
+    eyebrow: '',
+    items: [],
+  },
   description: '',
 };
 

@@ -4,6 +4,7 @@ export const enHomeCardsCopy: HomeCardsSectionCopy = {
   eyebrow: 'Treatment packages',
   heading: 'Choose the care your car deserves.',
   description: 'From a precise interior refresh to a complete premium treatment, every package is structured clearly so you know exactly what your car receives. Choose focused cabin care, exterior polishing and protection, headlight restoration, or a full inside-and-out treatment tailored to the condition of your vehicle.',
+  detailLinkLabel: 'Learn more',
   info: [
     { label: 'Business', value: 'Poets Anders' },
     { label: 'Address', value: 'Vondellaan 164, 3351 HG Papendrecht' },
@@ -20,7 +21,7 @@ export const enHomeCardsCopy: HomeCardsSectionCopy = {
     body: 'Poets Anders combines careful hand work with premium finishing steps, so your car leaves looking fresh, protected, and ready for the road.',
     image: '/beautiful-car-washing-service.jpg',
     stats: [
-      { value: '4', label: 'Treatment options' },
+      { value: '5', label: 'Treatment options' },
       { value: 'NL', label: 'Dutch service standard' },
       { value: '1', label: 'Clear finish goal' },
     ],
@@ -41,6 +42,7 @@ export const enHomeCardsCopy: HomeCardsSectionCopy = {
   ],
   treatments: [
     {
+      slug: 'total-treatment',
       title: 'Total Treatment',
       description: 'A complete inside-and-out refresh for cars that need the full Poets Anders finish.',
       image: '/beautiful-car-washing-service.jpg',
@@ -49,6 +51,7 @@ export const enHomeCardsCopy: HomeCardsSectionCopy = {
       services: ['Interior treatment', 'Exterior treatment'],
     },
     {
+      slug: 'interior-treatment',
       title: 'Interior Treatment',
       description: 'Deep cabin care focused on comfort, freshness, and the surfaces you touch every day.',
       image: '/Image_wash.jpg',
@@ -56,6 +59,7 @@ export const enHomeCardsCopy: HomeCardsSectionCopy = {
       services: ['Clean upholstery', 'Odor treatment', 'Treat plastic'],
     },
     {
+      slug: 'exterior-treatment',
       title: 'Exterior Treatment',
       description: 'Paint, wheels, tires, and finish treated step by step for a clean premium look.',
       image: '/hero_Image.jpg',
@@ -63,11 +67,20 @@ export const enHomeCardsCopy: HomeCardsSectionCopy = {
       services: ['Coarse polishing', 'Fine polishing', 'Hand wax', 'Rims cleaning', 'Tire treatment'],
     },
     {
+      slug: 'headlight-treatment',
       title: 'Headlight treatment',
       description: 'Your headlights clear again, improving the look of the front end and night visibility.',
       image: '/bg_heroo.jpg',
       featured: false,
       services: ['Clear finish restoration'],
+    },
+    {
+      slug: 'ozone-treatment',
+      title: 'Ozone treatment',
+      description: 'An intensive ozone treatment neutralizes stubborn smoke smells and other unpleasant odors inside your vehicle.',
+      image: '/Image_wash.jpg',
+      featured: false,
+      services: ['Neutralize smoke smells', 'Remove unpleasant odors'],
     },
   ],
 };

@@ -18,7 +18,10 @@ export class NavBarComponent {
   protected readonly mobileMenuOpen = signal(false);
   protected readonly navItems = computed(() => [
     { label: this.copy().navbar.home, routerLink: '/' },
-    { label: this.copy().navbar.collections, routerLink: '/services' },
+    ...this.copy().services.treatments.items.map((treatment) => ({
+      label: treatment.title,
+      routerLink: `/services/${treatment.slug}`,
+    })),
   ]);
 
   protected readonly copy = this.i18n.copy;

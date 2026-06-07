@@ -1,10 +1,12 @@
 import { ServicesCopy } from "../../../../interfaces/services";
 import { enServicesHeroCopy } from "./hero";
+import { enServicesTreatmentsCopy } from "./treatments";
 
 
 export const enServicesCopy: ServicesCopy = {
   meta: enServicesHeroCopy,
   hero: enServicesHeroCopy,
+  treatments: enServicesTreatmentsCopy,
   features: {
     eyebrow: 'What you get',
     heading: 'Car care you can see right away',

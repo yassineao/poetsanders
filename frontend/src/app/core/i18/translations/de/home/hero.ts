@@ -15,8 +15,21 @@ export const deHomeHeroCopy: HomeHeroCopy = {
     'An der Vondellaan 164 in Papendrecht',
   ],
   trustItems: [
-    { value: '4', label: 'Behandlungsoptionen' },
+    { value: '5', label: 'Behandlungsoptionen' },
     { value: 'NL', label: 'Service in Papendrecht' },
     { value: '4.6 (70)', label: 'Google-Bewertungen sichtbar' },
   ],
+  infoPanel: {
+    eyebrow: 'Warum Poets Anders',
+    items: [
+      {
+        title: 'Sauberer, sorgfältiger Ablauf',
+        description: 'Jede Behandlung basiert auf lackschonender Wäsche, gepflegten Innenräumen und klaren Serviceoptionen.',
+      },
+      {
+        title: 'Behandlungspakete im Überblick',
+        description: 'Vergleichen Sie Komplett-, Innenraum-, Außen- und Scheinwerferpflege in den Servicekarten.',
+      },
+    ],
+  },
 };

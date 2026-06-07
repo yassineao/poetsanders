@@ -1,0 +1,47 @@
+<section class="border-t border-white/10 bg-slate-900/50">
+  <div class="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8 lg:py-24">
+    <div class="grid gap-12 lg:grid-cols-[1.35fr_0.65fr]">
+      <div class="space-y-12">
+        <article *ngFor="let section of details.sections">
+          <h2 class="text-2xl font-semibold tracking-tight text-white sm:text-3xl">{{ section.heading }}</h2>
+          <div class="mt-5 space-y-4">
+            <p *ngFor="let paragraph of section.paragraphs" class="text-base leading-8 text-slate-300">
+              {{ paragraph }}
+            </p>
+          </div>
+        </article>
+
+        <aside class="rounded-lg border border-cyan-200/20 bg-cyan-200/5 p-5 text-sm leading-6 text-cyan-50">
+          {{ details.safetyNote }}
+        </aside>
+      </div>
+
+      <div class="space-y-6 lg:sticky lg:top-28 lg:self-start">
+        <article class="rounded-lg border border-white/10 bg-slate-950/80 p-6 shadow-xl shadow-slate-950/20">
+          <h2 class="text-2xl font-semibold text-white">{{ details.odorsHeading }}</h2>
+          <p class="mt-3 text-sm leading-6 text-slate-300">{{ details.odorsDescription }}</p>
+          <ul class="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-1">
+            <li *ngFor="let item of details.odors" class="flex items-start gap-3 text-sm text-slate-200">
+              <svg class="mt-0.5 h-4 w-4 shrink-0 text-cyan-200" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" d="m5 13 4 4L19 7" />
+              </svg>
+              {{ item }}
+            </li>
+          </ul>
+        </article>
+
+        <article class="rounded-lg bg-cyan-200 p-6 text-slate-950 shadow-xl shadow-cyan-950/20">
+          <p class="text-sm font-semibold uppercase tracking-[0.18em]">{{ details.priceLabel }}</p>
+          <p class="mt-2 text-4xl font-bold">{{ details.price }}</p>
+          <h2 class="mt-6 text-xl font-semibold">{{ details.ctaHeading }}</h2>
+          <a
+            [routerLink]="copy.bookLink"
+            class="mt-5 inline-flex w-full items-center justify-center rounded-md bg-slate-950 px-5 py-3 text-sm font-bold text-white transition hover:bg-slate-800"
+          >
+            {{ copy.bookLabel }}
+          </a>
+        </article>
+      </div>
+    </div>
+  </div>
+</section>

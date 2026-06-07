@@ -1,0 +1,158 @@
+<section class="bg-slate-950 px-4 py-16 text-slate-100 sm:px-6 lg:px-8 lg:py-24">
+  <div class="mx-auto max-w-7xl">
+    <div class="max-w-3xl">
+      <p class="text-sm font-semibold uppercase tracking-[0.22em] text-cyan-200">{{ copy().eyebrow }}</p>
+      <h1 class="mt-4 text-4xl font-bold tracking-tight text-white sm:text-5xl">{{ copy().heading }}</h1>
+      <p class="mt-5 text-lg leading-8 text-slate-300">{{ copy().description }}</p>
+    </div>
+
+    <form class="mt-12 grid gap-8 lg:grid-cols-[0.9fr_1.1fr]" [formGroup]="bookingForm" (ngSubmit)="submit()">
+      <div class="rounded-xl border border-white/10 bg-slate-900/80 p-6 shadow-xl shadow-slate-950/30 sm:p-8">
+        <h2 class="text-2xl font-semibold text-white">{{ copy().formHeading }}</h2>
+
+        <div class="mt-7 grid gap-5 sm:grid-cols-2">
+          <label class="block">
+            <span class="text-sm font-medium text-slate-200">{{ copy().nameLabel }}</span>
+            <input formControlName="name" type="text" autocomplete="name" class="mt-2 h-12 w-full rounded-md border border-white/10 bg-slate-950/70 px-4 text-white outline-none transition focus:border-cyan-200 focus:ring-2 focus:ring-cyan-200/20" />
+            <span *ngIf="bookingForm.controls.name.touched && bookingForm.controls.name.invalid" class="mt-2 block text-xs text-rose-300">{{ copy().requiredMessage }}</span>
+          </label>
+
+          <label class="block">
+            <span class="text-sm font-medium text-slate-200">{{ copy().emailLabel }}</span>
+            <input formControlName="email" type="email" autocomplete="email" class="mt-2 h-12 w-full rounded-md border border-white/10 bg-slate-950/70 px-4 text-white outline-none transition focus:border-cyan-200 focus:ring-2 focus:ring-cyan-200/20" />
+            <span *ngIf="bookingForm.controls.email.touched && bookingForm.controls.email.hasError('required')" class="mt-2 block text-xs text-rose-300">{{ copy().requiredMessage }}</span>
+            <span *ngIf="bookingForm.controls.email.touched && bookingForm.controls.email.hasError('email')" class="mt-2 block text-xs text-rose-300">{{ copy().invalidEmailMessage }}</span>
+          </label>
+
+          <label class="block">
+            <span class="text-sm font-medium text-slate-200">{{ copy().phoneLabel }}</span>
+            <input formControlName="phone" type="tel" autocomplete="tel" class="mt-2 h-12 w-full rounded-md border border-white/10 bg-slate-950/70 px-4 text-white outline-none transition focus:border-cyan-200 focus:ring-2 focus:ring-cyan-200/20" />
+            <span *ngIf="bookingForm.controls.phone.touched && bookingForm.controls.phone.invalid" class="mt-2 block text-xs text-rose-300">{{ copy().requiredMessage }}</span>
+          </label>
+
+          <label class="block">
+            <span class="text-sm font-medium text-slate-200">{{ copy().vehicleLabel }}</span>
+            <input formControlName="vehicle" type="text" class="mt-2 h-12 w-full rounded-md border border-white/10 bg-slate-950/70 px-4 text-white outline-none transition focus:border-cyan-200 focus:ring-2 focus:ring-cyan-200/20" />
+            <span *ngIf="bookingForm.controls.vehicle.touched && bookingForm.controls.vehicle.invalid" class="mt-2 block text-xs text-rose-300">{{ copy().requiredMessage }}</span>
+          </label>
+        </div>
+
+        <fieldset class="mt-6">
+          <legend class="text-sm font-medium text-slate-200">{{ copy().serviceLabel }}</legend>
+          <p class="mt-1 text-xs text-slate-500">{{ copy().selectService }}</p>
+
+          <div class="mt-3 grid gap-3 sm:grid-cols-2">
+            <label
+              *ngFor="let treatment of treatments()"
+              class="group flex cursor-pointer items-start gap-3 rounded-lg border p-4 transition"
+              [ngClass]="isTreatmentSelected(treatment.slug) ? 'border-cyan-200 bg-cyan-200/10 shadow-sm shadow-cyan-950/20' : 'border-white/10 bg-slate-950/50 hover:border-cyan-200/30 hover:bg-white/[0.04]'"
+            >
+              <input
+                type="checkbox"
+                class="sr-only"
+                [checked]="isTreatmentSelected(treatment.slug)"
+                (change)="toggleTreatment(treatment.slug)"
+              />
+              <span
+                class="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded border transition"
+                [ngClass]="isTreatmentSelected(treatment.slug) ? 'border-cyan-200 bg-cyan-200 text-slate-950' : 'border-white/20 bg-slate-900 text-transparent group-hover:border-cyan-200/50'"
+              >
+                <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3" aria-hidden="true">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="m5 13 4 4L19 7" />
+                </svg>
+              </span>
+              <span class="min-w-0">
+                <span class="block text-sm font-semibold text-white">{{ treatment.title }}</span>
+                <span class="mt-1 block text-xs leading-5 text-slate-400">{{ treatment.description }}</span>
+              </span>
+            </label>
+          </div>
+
+          <span *ngIf="bookingForm.controls.services.touched && bookingForm.controls.services.invalid" class="mt-2 block text-xs text-rose-300">
+            {{ copy().requiredMessage }}
+          </span>
+
+          <div *ngIf="selectedTreatmentNames().length" class="mt-4 rounded-md border border-cyan-200/20 bg-cyan-200/5 p-4">
+            <p class="text-xs font-semibold uppercase tracking-[0.18em] text-cyan-200">{{ copy().selectedTreatments }}</p>
+            <div class="mt-3 flex flex-wrap gap-2">
+              <span *ngFor="let treatmentName of selectedTreatmentNames()" class="rounded-full bg-cyan-200 px-3 py-1 text-xs font-semibold text-slate-950">
+                {{ treatmentName }}
+              </span>
+            </div>
+          </div>
+        </fieldset>
+
+        <label class="mt-5 block">
+          <span class="text-sm font-medium text-slate-200">{{ copy().messageLabel }}</span>
+          <textarea formControlName="message" rows="5" class="mt-2 w-full resize-none rounded-md border border-white/10 bg-slate-950/70 px-4 py-3 text-white outline-none transition focus:border-cyan-200 focus:ring-2 focus:ring-cyan-200/20"></textarea>
+        </label>
+      </div>
+
+      <div class="rounded-xl border border-cyan-200/15 bg-slate-900/80 p-6 shadow-xl shadow-slate-950/30 sm:p-8">
+        <h2 class="text-2xl font-semibold text-white">{{ copy().calendarHeading }}</h2>
+        <p class="mt-2 text-sm leading-6 text-slate-400">{{ copy().calendarDescription }}</p>
+
+        <div class="mt-7 flex items-center justify-between">
+          <button type="button" (click)="previousMonth()" [attr.aria-label]="copy().previousMonth" class="flex h-10 w-10 items-center justify-center rounded-md border border-white/10 text-slate-200 transition hover:border-cyan-200/30 hover:bg-white/5">
+            <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="m15 19-7-7 7-7" /></svg>
+          </button>
+          <p class="text-lg font-semibold capitalize text-white">{{ monthLabel() }}</p>
+          <button type="button" (click)="nextMonth()" [attr.aria-label]="copy().nextMonth" class="flex h-10 w-10 items-center justify-center rounded-md border border-white/10 text-slate-200 transition hover:border-cyan-200/30 hover:bg-white/5">
+            <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="m9 5 7 7-7 7" /></svg>
+          </button>
+        </div>
+
+        <div class="mt-6 grid grid-cols-7 gap-2 text-center">
+          <span *ngFor="let weekday of copy().weekdays" class="py-2 text-xs font-semibold uppercase tracking-wide text-slate-500">{{ weekday }}</span>
+          <ng-container *ngFor="let day of calendarDays()">
+            <span *ngIf="!day" aria-hidden="true"></span>
+            <button
+              *ngIf="day"
+              type="button"
+              (click)="selectDate(day)"
+              [disabled]="day.disabled"
+              [attr.aria-pressed]="isSelectedDate(day.date)"
+              class="aspect-square rounded-md text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-200"
+              [ngClass]="isSelectedDate(day.date) ? 'bg-cyan-200 text-slate-950' : day.disabled ? 'cursor-not-allowed text-slate-700' : 'border border-white/10 text-slate-200 hover:border-cyan-200/40 hover:bg-white/5'"
+            >
+              {{ day.day }}
+            </button>
+          </ng-container>
+        </div>
+
+        <p *ngIf="attemptedSubmit() && !selectedDate()" class="mt-3 text-xs text-rose-300">{{ copy().dateRequiredMessage }}</p>
+
+        <div class="mt-8 border-t border-white/10 pt-6">
+          <h3 class="text-sm font-semibold uppercase tracking-[0.18em] text-cyan-200">{{ copy().timeLabel }}</h3>
+          <div class="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3">
+            <button
+              *ngFor="let time of copy().timeSlots"
+              type="button"
+              (click)="selectTime(time)"
+              [disabled]="!selectedDate()"
+              class="rounded-md border px-3 py-2.5 text-sm font-semibold transition"
+              [ngClass]="selectedTime() === time ? 'border-cyan-200 bg-cyan-200 text-slate-950' : !selectedDate() ? 'cursor-not-allowed border-white/5 text-slate-700' : 'border-white/10 text-slate-200 hover:border-cyan-200/40 hover:bg-white/5'"
+            >
+              {{ time }}
+            </button>
+          </div>
+          <p *ngIf="attemptedSubmit() && !selectedTime()" class="mt-3 text-xs text-rose-300">{{ copy().timeRequiredMessage }}</p>
+        </div>
+
+        <div *ngIf="selectedAppointmentLabel()" class="mt-6 rounded-md border border-cyan-200/20 bg-cyan-200/5 p-4">
+          <p class="text-xs font-semibold uppercase tracking-[0.18em] text-cyan-200">{{ copy().selectedAppointment }}</p>
+          <p class="mt-2 font-semibold capitalize text-white">{{ selectedAppointmentLabel() }}</p>
+        </div>
+
+        <button type="submit" class="mt-7 inline-flex h-12 w-full items-center justify-center rounded-md bg-cyan-200 px-5 text-sm font-bold text-slate-950 transition hover:bg-cyan-100">
+          {{ copy().submitLabel }}
+        </button>
+
+        <div *ngIf="submitted()" class="mt-5 rounded-md border border-emerald-300/20 bg-emerald-300/10 p-4 text-emerald-100">
+          <p class="font-semibold">{{ copy().successHeading }}</p>
+          <p class="mt-1 text-sm">{{ copy().successMessage }}</p>
+        </div>
+      </div>
+    </form>
+  </div>
+</section>

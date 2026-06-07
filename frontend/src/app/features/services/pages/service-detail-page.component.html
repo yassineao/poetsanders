@@ -1,0 +1,15 @@
+<main class="min-h-screen bg-slate-950 text-slate-100">
+  <ng-container *ngIf="treatment() as item; else notFound">
+    <app-service-detail-hero [treatment]="item" [copy]="treatments()"></app-service-detail-hero>
+    <app-service-detail-overview [treatment]="item" [copy]="treatments()"></app-service-detail-overview>
+    <app-service-detail-content
+      *ngIf="item.details as details"
+      [details]="details"
+      [copy]="treatments()"
+    ></app-service-detail-content>
+  </ng-container>
+
+  <ng-template #notFound>
+    <app-service-detail-not-found [copy]="treatments()"></app-service-detail-not-found>
+  </ng-template>
+</main>

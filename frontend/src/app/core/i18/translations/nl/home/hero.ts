@@ -15,8 +15,21 @@ export const nlHomeHeroCopy: HomeHeroCopy = {
     'Gevestigd aan de Vondellaan 164 in Papendrecht',
   ],
   trustItems: [
-    { value: '4', label: 'Behandelingsopties' },
+    { value: '5', label: 'Behandelingsopties' },
     { value: 'NL', label: 'Service in Papendrecht' },
     { value: '4.6 (70)', label: 'Google reviews' },
   ],
+  infoPanel: {
+    eyebrow: 'Waarom Poets Anders',
+    items: [
+      {
+        title: 'Schoon en zorgvuldig proces',
+        description: 'Elke behandeling draait om lakveilig wassen, nette interieurs en duidelijke servicekeuzes.',
+      },
+      {
+        title: 'Behandelingspakketten hieronder',
+        description: 'Vergelijk totaal-, interieur-, exterieur- en koplampverzorging in de servicekaarten.',
+      },
+    ],
+  },
 };

@@ -1,10 +1,12 @@
 import { ServicesCopy } from "../../../../interfaces/services";
 import { deServicesHeroCopy } from "./hero";
+import { deServicesTreatmentsCopy } from "./treatments";
 
 
 export const deServicesCopy: ServicesCopy = {
   meta: deServicesHeroCopy,
   hero: deServicesHeroCopy,
+  treatments: deServicesTreatmentsCopy,
   features: {
     eyebrow: 'Was Sie bekommen',
     heading: 'Pflege, die man sofort sieht',

@@ -1,0 +1,29 @@
+export interface BookingCopy {
+  eyebrow: string;
+  heading: string;
+  description: string;
+  formHeading: string;
+  calendarHeading: string;
+  calendarDescription: string;
+  nameLabel: string;
+  emailLabel: string;
+  phoneLabel: string;
+  vehicleLabel: string;
+  serviceLabel: string;
+  messageLabel: string;
+  selectService: string;
+  selectedTreatments: string;
+  previousMonth: string;
+  nextMonth: string;
+  timeLabel: string;
+  selectedAppointment: string;
+  submitLabel: string;
+  requiredMessage: string;
+  invalidEmailMessage: string;
+  dateRequiredMessage: string;
+  timeRequiredMessage: string;
+  successHeading: string;
+  successMessage: string;
+  weekdays: string[];
+  timeSlots: string[];
+}
