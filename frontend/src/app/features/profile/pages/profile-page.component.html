@@ -1,0 +1,31 @@
+<main class="min-h-[60vh] bg-slate-950 px-4 py-16 text-slate-100 sm:px-6 lg:px-8">
+  <section class="mx-auto max-w-3xl rounded-xl border border-white/10 bg-slate-900/80 p-6 shadow-xl sm:p-8">
+    <p class="text-sm font-semibold uppercase tracking-[0.22em] text-cyan-200">Customer account</p>
+    <h1 class="mt-4 text-3xl font-bold text-white">Profile</h1>
+
+    <div *ngIf="auth.currentUser() as user; else loadingState" class="mt-8 space-y-4">
+      <app-profile-details [user]="user" />
+
+      <app-profile-bookings
+        [appointments]="appointments()"
+        [loading]="bookingsLoading()"
+        [hasError]="bookingsError()"
+        [cancellingIds]="cancellingIds()"
+        (cancelAppointment)="cancelAppointment($event)"
+      />
+
+      <button
+        type="button"
+        (click)="logout()"
+        [disabled]="loggingOut()"
+        class="mt-4 h-11 rounded-md bg-cyan-200 px-5 text-sm font-bold text-slate-950 disabled:opacity-70"
+      >
+        {{ loggingOut() ? 'Logging out...' : 'Log out' }}
+      </button>
+    </div>
+
+    <ng-template #loadingState>
+      <p class="mt-8 text-slate-400">Loading profile...</p>
+    </ng-template>
+  </section>
+</main>

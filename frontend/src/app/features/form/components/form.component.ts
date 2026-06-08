@@ -1,7 +1,11 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, inject, signal } from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { HttpErrorResponse } from '@angular/common/http';
+import { Component, computed, DestroyRef, inject, signal } from '@angular/core';
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
+import { AbstractControl, FormBuilder, ReactiveFormsModule, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
+import { finalize, switchMap } from 'rxjs';
+import { AuthService } from '../../../core/auth/auth.service';
+import { BookingService } from '../../../core/booking/booking.service';
 import { I18nService } from '../../../core/i18/i18n.service';
 
 interface CalendarDay {
@@ -9,6 +13,15 @@ interface CalendarDay {
   day: number;
   disabled: boolean;
 }
+
+const passwordsMatchValidator: ValidatorFn = (control: AbstractControl): ValidationErrors | null => {
+  const password = control.get('password')?.value;
+  const retypePassword = control.get('retypePassword')?.value;
+
+  return password && retypePassword && password !== retypePassword
+    ? { passwordMismatch: true }
+    : null;
+};
 
 @Component({
   selector: 'app-booking-form',
@@ -19,29 +32,53 @@ interface CalendarDay {
 export class BookingFormComponent {
   private readonly formBuilder = inject(FormBuilder);
   private readonly i18n = inject(I18nService);
+  private readonly auth = inject(AuthService);
+  private readonly booking = inject(BookingService);
+  private readonly destroyRef = inject(DestroyRef);
   private readonly today = this.startOfDay(new Date());
 
+  protected readonly isAuthenticated = computed(() => this.auth.currentUser() !== null);
   protected readonly copy = computed(() => this.i18n.copy().booking);
   protected readonly treatments = computed(() => this.i18n.copy().services.treatments.items);
   protected readonly viewMonth = signal(new Date(this.today.getFullYear(), this.today.getMonth(), 1));
   protected readonly selectedDate = signal<Date | null>(null);
   protected readonly selectedTime = signal('');
   protected readonly submitted = signal(false);
+  protected readonly submitting = signal(false);
+  protected readonly errorKind = signal<'conflict' | 'unavailable' | null>(null);
+  protected readonly errorMessage = computed(() => {
+    const kind = this.errorKind();
+    return kind === 'conflict'
+      ? this.copy().registrationConflictMessage
+      : kind === 'unavailable'
+        ? this.copy().unavailableMessage
+        : '';
+  });
   protected readonly attemptedSubmit = signal(false);
 
   protected readonly bookingForm = this.formBuilder.nonNullable.group({
-    name: ['', Validators.required],
+    name: ['', [Validators.required, Validators.maxLength(255)]],
     email: ['', [Validators.required, Validators.email]],
-    phone: ['', Validators.required],
-    vehicle: ['', Validators.required],
+    password: [
+      '',
+      [
+        Validators.required,
+        Validators.minLength(12),
+        Validators.maxLength(30),
+        Validators.pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{12,}$/),
+      ],
+    ],
+    retypePassword: ['', Validators.required],
+    phone: ['', [Validators.required, Validators.minLength(8), Validators.maxLength(30)]],
     services: this.formBuilder.nonNullable.control<string[]>([], Validators.required),
     message: [''],
-  });
+  }, { validators: passwordsMatchValidator });
 
   protected readonly selectedServiceSlugs = toSignal(
     this.bookingForm.controls.services.valueChanges,
     { initialValue: this.bookingForm.controls.services.value },
   );
+
 
   protected readonly monthLabel = computed(() => {
     this.i18n.language();
@@ -151,13 +188,75 @@ export class BookingFormComponent {
   protected submit(): void {
     this.attemptedSubmit.set(true);
     this.submitted.set(false);
+    this.errorKind.set(null);
     this.bookingForm.markAllAsTouched();
 
-    if (this.bookingForm.invalid || !this.selectedDate() || !this.selectedTime()) {
+    if (
+      this.bookingForm.controls.services.invalid
+      || !this.selectedDate()
+      || !this.selectedTime()
+      || this.submitting()
+      || (!this.isAuthenticated() && this.bookingForm.invalid)
+    ) {
       return;
     }
 
-    this.submitted.set(true);
+    if (this.isAuthenticated()) {
+      this.submitting.set(true);
+
+      this.booking
+        .bookTreatments(this.selectedServiceSlugs(), this.selectedLocalDateTime())
+        .pipe(
+          finalize(() => this.submitting.set(false)),
+          takeUntilDestroyed(this.destroyRef),
+        )
+        .subscribe({
+          next: () => this.submitted.set(true),
+          error: () => this.errorKind.set('unavailable'),
+        });
+    } else {
+      const { email, password, name, phone } = this.bookingForm.getRawValue();
+      this.submitting.set(true);
+
+      this.auth
+        .register({
+          email: email.trim(),
+          password,
+          name: name.trim(),
+          phoneNumber: phone.trim(),
+        })
+        .pipe(
+          switchMap(() =>
+            this.booking.bookTreatments(
+              this.bookingForm.controls.services.value,
+              this.selectedLocalDateTime(),
+            ),
+          ),
+          finalize(() => this.submitting.set(false)),
+          takeUntilDestroyed(this.destroyRef),
+        )
+        .subscribe({
+          next: () => this.submitted.set(true),
+          error: (error: HttpErrorResponse) => {
+            this.errorKind.set(error.status === 409 ? 'conflict' : 'unavailable');
+          },
+        });
+    }
+
+
+  }
+
+  private selectedLocalDateTime(): string {
+    const date = this.selectedDate();
+    if (!date) {
+      throw new Error('Appointment date is missing');
+    }
+
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+
+    return `${year}-${month}-${day}T${this.selectedTime()}:00`;
   }
 
   private startOfDay(date: Date): Date {

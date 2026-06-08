@@ -40,7 +40,7 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody UserCreateRequest req, HttpServletRequest request) {
+    public ResponseEntity<?> register(@Valid @RequestBody UserCreateRequest req, HttpServletRequest request) {
         try {
             User u = userService.register(req);
             // optional: auto-login after register
@@ -61,7 +61,7 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody AuthRequest req, HttpServletRequest request) {
+    public ResponseEntity<?> login(@Valid @RequestBody AuthRequest req, HttpServletRequest request) {
 
         try {
             User u = userService.findByEmailOrThrow(req.getEmail());

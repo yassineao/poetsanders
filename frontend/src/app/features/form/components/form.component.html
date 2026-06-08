@@ -10,7 +10,7 @@
       <div class="rounded-xl border border-white/10 bg-slate-900/80 p-6 shadow-xl shadow-slate-950/30 sm:p-8">
         <h2 class="text-2xl font-semibold text-white">{{ copy().formHeading }}</h2>
 
-        <div class="mt-7 grid gap-5 sm:grid-cols-2">
+        <div *ngIf="!isAuthenticated()" class="mt-7 grid gap-5 sm:grid-cols-2">
           <label class="block">
             <span class="text-sm font-medium text-slate-200">{{ copy().nameLabel }}</span>
             <input formControlName="name" type="text" autocomplete="name" class="mt-2 h-12 w-full rounded-md border border-white/10 bg-slate-950/70 px-4 text-white outline-none transition focus:border-cyan-200 focus:ring-2 focus:ring-cyan-200/20" />
@@ -25,16 +25,44 @@
           </label>
 
           <label class="block">
-            <span class="text-sm font-medium text-slate-200">{{ copy().phoneLabel }}</span>
-            <input formControlName="phone" type="tel" autocomplete="tel" class="mt-2 h-12 w-full rounded-md border border-white/10 bg-slate-950/70 px-4 text-white outline-none transition focus:border-cyan-200 focus:ring-2 focus:ring-cyan-200/20" />
-            <span *ngIf="bookingForm.controls.phone.touched && bookingForm.controls.phone.invalid" class="mt-2 block text-xs text-rose-300">{{ copy().requiredMessage }}</span>
+            <span class="text-sm font-medium text-slate-200">{{ copy().passwordLabel }}</span>
+            <input formControlName="password" type="password" autocomplete="new-password" class="mt-2 h-12 w-full rounded-md border border-white/10 bg-slate-950/70 px-4 text-white outline-none transition focus:border-cyan-200 focus:ring-2 focus:ring-cyan-200/20" />
+            <span *ngIf="bookingForm.controls.password.touched && bookingForm.controls.password.hasError('required')" class="mt-2 block text-xs text-rose-300">{{ copy().requiredMessage }}</span>
+            <span
+              *ngIf="bookingForm.controls.password.touched && !bookingForm.controls.password.hasError('required') && (bookingForm.controls.password.hasError('minlength') || bookingForm.controls.password.hasError('maxlength'))"
+              class="mt-2 block text-xs text-rose-300"
+            >
+              {{ copy().passwordLengthMessage }}
+            </span>
+            <span
+              *ngIf="bookingForm.controls.password.touched && !bookingForm.controls.password.hasError('required') && !bookingForm.controls.password.hasError('minlength') && !bookingForm.controls.password.hasError('maxlength') && bookingForm.controls.password.hasError('pattern')"
+              class="mt-2 block text-xs text-rose-300"
+            >
+              {{ copy().passwordPatternMessage }}
+            </span>
           </label>
 
           <label class="block">
-            <span class="text-sm font-medium text-slate-200">{{ copy().vehicleLabel }}</span>
-            <input formControlName="vehicle" type="text" class="mt-2 h-12 w-full rounded-md border border-white/10 bg-slate-950/70 px-4 text-white outline-none transition focus:border-cyan-200 focus:ring-2 focus:ring-cyan-200/20" />
-            <span *ngIf="bookingForm.controls.vehicle.touched && bookingForm.controls.vehicle.invalid" class="mt-2 block text-xs text-rose-300">{{ copy().requiredMessage }}</span>
+            <span class="text-sm font-medium text-slate-200">{{ copy().retypePasswordLabel }}</span>
+            <input formControlName="retypePassword" type="password" autocomplete="new-password" class="mt-2 h-12 w-full rounded-md border border-white/10 bg-slate-950/70 px-4 text-white outline-none transition focus:border-cyan-200 focus:ring-2 focus:ring-cyan-200/20" />
+            <span *ngIf="bookingForm.controls.retypePassword.touched && bookingForm.controls.retypePassword.hasError('required')" class="mt-2 block text-xs text-rose-300">{{ copy().requiredMessage }}</span>
+            <span *ngIf="bookingForm.controls.retypePassword.touched && !bookingForm.controls.retypePassword.hasError('required') && bookingForm.hasError('passwordMismatch')" class="mt-2 block text-xs text-rose-300">
+              {{ copy().passwordMismatchMessage }}
+            </span>
           </label>
+
+          <label class="block">
+            <span class="text-sm font-medium text-slate-200">{{ copy().phoneLabel }}</span>
+            <input formControlName="phone" type="tel" autocomplete="tel" class="mt-2 h-12 w-full rounded-md border border-white/10 bg-slate-950/70 px-4 text-white outline-none transition focus:border-cyan-200 focus:ring-2 focus:ring-cyan-200/20" />
+            <span *ngIf="bookingForm.controls.phone.touched && bookingForm.controls.phone.hasError('required')" class="mt-2 block text-xs text-rose-300">{{ copy().requiredMessage }}</span>
+            <span
+              *ngIf="bookingForm.controls.phone.touched && !bookingForm.controls.phone.hasError('required') && (bookingForm.controls.phone.hasError('minlength') || bookingForm.controls.phone.hasError('maxlength'))"
+              class="mt-2 block text-xs text-rose-300"
+            >
+              {{ copy().phoneLengthMessage }}
+            </span>
+          </label>
+
         </div>
 
         <fieldset class="mt-6">
@@ -144,9 +172,17 @@
           <p class="mt-2 font-semibold capitalize text-white">{{ selectedAppointmentLabel() }}</p>
         </div>
 
-        <button type="submit" class="mt-7 inline-flex h-12 w-full items-center justify-center rounded-md bg-cyan-200 px-5 text-sm font-bold text-slate-950 transition hover:bg-cyan-100">
-          {{ copy().submitLabel }}
+        <button
+          type="submit"
+          [disabled]="submitting()"
+          class="mt-7 inline-flex h-12 w-full items-center justify-center rounded-md bg-cyan-200 px-5 text-sm font-bold text-slate-950 transition hover:bg-cyan-100 disabled:cursor-wait disabled:opacity-70"
+        >
+          {{ submitting() ? copy().submittingLabel : copy().submitLabel }}
         </button>
+
+        <div *ngIf="errorMessage()" role="alert" class="mt-5 rounded-md border border-rose-300/20 bg-rose-300/10 p-4 text-sm text-rose-100">
+          {{ errorMessage() }}
+        </div>
 
         <div *ngIf="submitted()" class="mt-5 rounded-md border border-emerald-300/20 bg-emerald-300/10 p-4 text-emerald-100">
           <p class="font-semibold">{{ copy().successHeading }}</p>

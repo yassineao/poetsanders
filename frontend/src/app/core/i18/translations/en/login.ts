@@ -1,0 +1,26 @@
+import type { LoginCopy } from '../../../interfaces/login';
+
+export const enLoginCopy: LoginCopy = {
+  eyebrow: 'Customer account',
+  heading: 'Welcome back',
+  description: 'Sign in to access your account and keep your car care details in one place.',
+  formHeading: 'Sign in',
+  formDescription: 'Enter the email address and password linked to your account.',
+  emailLabel: 'Email address',
+  passwordLabel: 'Password',
+  showPassword: 'Show password',
+  hidePassword: 'Hide password',
+  submitLabel: 'Sign in',
+  submittingLabel: 'Signing in...',
+  requiredMessage: 'This field is required.',
+  invalidEmailMessage: 'Enter a valid email address.',
+  passwordLengthMessage: 'Password must be between 12 and 30 characters.',
+  passwordPatternMessage: 'Password must include uppercase, lowercase, number, and special character.',
+  invalidCredentialsMessage: 'The email address or password is incorrect.',
+  unavailableMessage: 'The login service is unavailable. Please try again shortly.',
+  successHeading: 'You are signed in',
+  successMessage: 'Your account was authenticated successfully.',
+  supportHeading: 'Need help signing in?',
+  supportMessage: 'Contact us and we will help you regain access to your account.',
+  supportLinkLabel: 'Contact support',
+};

@@ -1,0 +1,26 @@
+import type { LoginCopy } from '../../../interfaces/login';
+
+export const nlLoginCopy: LoginCopy = {
+  eyebrow: 'Klantaccount',
+  heading: 'Welkom terug',
+  description: 'Log in om toegang te krijgen tot je account en autoverzorgingsgegevens.',
+  formHeading: 'Inloggen',
+  formDescription: 'Vul het e-mailadres en wachtwoord van je account in.',
+  emailLabel: 'E-mailadres',
+  passwordLabel: 'Wachtwoord',
+  showPassword: 'Wachtwoord tonen',
+  hidePassword: 'Wachtwoord verbergen',
+  submitLabel: 'Inloggen',
+  submittingLabel: 'Bezig met inloggen...',
+  requiredMessage: 'Dit veld is verplicht.',
+  invalidEmailMessage: 'Vul een geldig e-mailadres in.',
+  passwordLengthMessage: 'Het wachtwoord moet tussen 12 en 30 tekens lang zijn.',
+  passwordPatternMessage: 'Het wachtwoord moet hoofdletters, kleine letters, een cijfer en een speciaal teken bevatten.',
+  invalidCredentialsMessage: 'Het e-mailadres of wachtwoord is onjuist.',
+  unavailableMessage: 'De inlogservice is niet bereikbaar. Probeer het zo opnieuw.',
+  successHeading: 'Je bent ingelogd',
+  successMessage: 'Je account is succesvol geverifieerd.',
+  supportHeading: 'Hulp nodig bij het inloggen?',
+  supportMessage: 'Neem contact met ons op. We helpen je weer toegang tot je account te krijgen.',
+  supportLinkLabel: 'Contact opnemen',
+};

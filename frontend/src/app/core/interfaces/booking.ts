@@ -7,7 +7,13 @@ export interface BookingCopy {
   calendarDescription: string;
   nameLabel: string;
   emailLabel: string;
+  passwordLabel: string;
+  retypePasswordLabel: string;
+  passwordLengthMessage: string;
+  passwordPatternMessage: string;
+  passwordMismatchMessage: string;
   phoneLabel: string;
+  phoneLengthMessage: string;
   vehicleLabel: string;
   serviceLabel: string;
   messageLabel: string;
@@ -18,8 +24,11 @@ export interface BookingCopy {
   timeLabel: string;
   selectedAppointment: string;
   submitLabel: string;
+  submittingLabel: string;
   requiredMessage: string;
   invalidEmailMessage: string;
+  registrationConflictMessage: string;
+  unavailableMessage: string;
   dateRequiredMessage: string;
   timeRequiredMessage: string;
   successHeading: string;
