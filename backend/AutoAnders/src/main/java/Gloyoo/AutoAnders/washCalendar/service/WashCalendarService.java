@@ -48,9 +48,13 @@ public class WashCalendarService {
         return washCalendarRepository.findByLocalDateTime(localDateTime);
     }
 
-    public void deleteWashCalendar(UUID uuid) {
+    public void deleteWashCalendar(UUID uuid, UUID userId) {
         WashCalendar washCalendar = washCalendarRepository.findById(uuid)
                 .orElseThrow(() -> new RuntimeException("Wash calendar not found"));
+
+        if (!washCalendar.getUser().getId().equals(userId)) {
+            throw new IllegalArgumentException("Wash calendar does not belong to the authenticated user");
+        }
 
         washCalendarRepository.delete(washCalendar);
     }

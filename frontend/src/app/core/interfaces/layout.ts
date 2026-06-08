@@ -4,6 +4,7 @@ export interface NavbarCopy {
   home: string;
   collections: string;
   ctaPrimary: string;
+  loginLabel: string;
   langLabel: string;
   langNames: Record<Locale, string>;
   menuToggle: string;

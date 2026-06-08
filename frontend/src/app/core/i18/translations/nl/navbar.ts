@@ -4,6 +4,7 @@ export const nlNavbarCopy: NavbarCopy = {
   home: 'Home',
   collections: 'Diensten',
   ctaPrimary: 'Boek een wasbeurt',
+  loginLabel: 'Inloggen',
   langLabel: 'Taal',
   langNames: {
     en: 'English',

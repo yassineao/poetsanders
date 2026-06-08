@@ -3,9 +3,14 @@
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
+    "generate:environment": "node scripts/generate-environment.mjs",
+    "prestart": "npm run generate:environment",
     "start": "ng serve",
+    "prebuild": "npm run generate:environment",
     "build": "ng build",
+    "prewatch": "npm run generate:environment",
     "watch": "ng build --watch --configuration development",
+    "pretest": "npm run generate:environment",
     "test": "ng test",
     "serve:ssr:frontend": "node dist/frontend/server/server.mjs"
   },
@@ -31,6 +36,7 @@
     "@tailwindcss/postcss": "^4.1.12",
     "@types/express": "^5.0.1",
     "@types/node": "^20.17.19",
+    "dotenv": "^17.4.2",
     "jsdom": "^28.0.0",
     "postcss": "^8.5.3",
     "prettier": "^3.8.1",

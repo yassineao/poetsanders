@@ -2,6 +2,7 @@ package Gloyoo.AutoAnders.user.dto;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
 public class UserCreateRequest {
@@ -12,13 +13,16 @@ public class UserCreateRequest {
     private String email;
 
     @NotBlank
-    @Size(min = 8, max = 255)
+    @Size(min = 12, max = 30)
+    @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{12,}$")
     private String password;
 
-    @Size(min = 8, max = 255)
+    @NotBlank
+    @Size(max = 255)
     private String name;
 
 
+    @NotBlank
     @Size(min = 8, max = 30)
     private String phoneNumber;
 

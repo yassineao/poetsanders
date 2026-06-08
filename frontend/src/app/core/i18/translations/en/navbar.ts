@@ -4,6 +4,7 @@ export const enNavbarCopy: NavbarCopy = {
   home: 'Home',
   collections: 'Services',
   ctaPrimary: 'Book a wash',
+  loginLabel: 'Log in',
   langLabel: 'Language',
   langNames: {
     en: 'English',

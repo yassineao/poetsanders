@@ -32,6 +32,9 @@ yarn-error.log
 # Miscellaneous
 .angular/
 *.log
+.env
+.env.local
+/frontend/src/environments/environment.generated.ts
 .sass-cache/
 connect.lock
 coverage/

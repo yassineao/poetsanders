@@ -1,0 +1,26 @@
+import type { LoginCopy } from '../../../interfaces/login';
+
+export const deLoginCopy: LoginCopy = {
+  eyebrow: 'Kundenkonto',
+  heading: 'Willkommen zurück',
+  description: 'Melden Sie sich an, um auf Ihr Konto und Ihre Fahrzeugpflegedaten zuzugreifen.',
+  formHeading: 'Anmelden',
+  formDescription: 'Geben Sie die E-Mail-Adresse und das Passwort Ihres Kontos ein.',
+  emailLabel: 'E-Mail-Adresse',
+  passwordLabel: 'Passwort',
+  showPassword: 'Passwort anzeigen',
+  hidePassword: 'Passwort ausblenden',
+  submitLabel: 'Anmelden',
+  submittingLabel: 'Anmeldung läuft...',
+  requiredMessage: 'Dieses Feld ist erforderlich.',
+  invalidEmailMessage: 'Geben Sie eine gültige E-Mail-Adresse ein.',
+  passwordLengthMessage: 'Das Passwort muss zwischen 12 und 30 Zeichen lang sein.',
+  passwordPatternMessage: 'Das Passwort muss Groß- und Kleinbuchstaben, eine Zahl und ein Sonderzeichen enthalten.',
+  invalidCredentialsMessage: 'Die E-Mail-Adresse oder das Passwort ist falsch.',
+  unavailableMessage: 'Der Anmeldedienst ist nicht erreichbar. Bitte versuchen Sie es gleich erneut.',
+  successHeading: 'Sie sind angemeldet',
+  successMessage: 'Ihr Konto wurde erfolgreich authentifiziert.',
+  supportHeading: 'Probleme bei der Anmeldung?',
+  supportMessage: 'Kontaktieren Sie uns. Wir helfen Ihnen, wieder Zugriff auf Ihr Konto zu erhalten.',
+  supportLinkLabel: 'Support kontaktieren',
+};
