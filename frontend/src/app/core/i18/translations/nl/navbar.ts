@@ -7,6 +7,7 @@ export const nlNavbarCopy: NavbarCopy = {
   dealership: 'Autodealer',
   ctaPrimary: 'Boek een wasbeurt',
   loginLabel: 'Inloggen',
+  adminLabel: 'Beheer',
   langLabel: 'Taal',
   langNames: {
     en: 'English',

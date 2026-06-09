@@ -51,6 +51,8 @@ for cars and Supabase-hosted car pictures.
 - Appointment history and upcoming appointment display
 - Pending, partially accepted, and accepted appointment states
 - Appointment cancellation
+- Admin dashboard with summary statistics, searchable paginated users,
+  chronologically sorted appointments, status filtering, and appointment acceptance
 - Link to a separate dealership website through `DEALERSHIP_URL`
 
 ### Backend Domains
@@ -166,11 +168,13 @@ poetsanders/
 |   |   |   `-- environment.generated.ts  Generated and gitignored
 |   |   |-- app/
 |   |   |   |-- core/
+|   |   |   |   |-- admin/             Admin dashboard HTTP client
 |   |   |   |   |-- auth/              Authentication HTTP client
 |   |   |   |   |-- booking/           Appointment HTTP client
 |   |   |   |   |-- i18/               Locale state and translations
 |   |   |   |   `-- interfaces/        TypeScript contracts
 |   |   |   |-- features/
+|   |   |   |   |-- admin/             Admin dashboard page and components
 |   |   |   |   |-- appointments/      Appointment cards and history
 |   |   |   |   |-- faq/               FAQ page
 |   |   |   |   |-- form/              Booking form and calendar
@@ -225,6 +229,7 @@ flowchart TD
 
     RouterProvider --> Routes[app.routes.ts]
     Routes --> Home[HomePageComponent]
+    Routes --> Admin[AdminDashboardPageComponent]
     Routes --> Services[ServicesPageComponent]
     Routes --> Detail[ServiceDetailPageComponent]
     Routes --> Book[BookingPageComponent]
@@ -238,6 +243,9 @@ flowchart TD
     Login --> LoginForm[LoginFormComponent]
     Profile --> ProfileEditor[ProfileEditorComponent]
     Appointments --> History[AppointmentsListComponent pageMode=true]
+    Admin --> Stats[AdminDashboardStatsComponent]
+    Admin --> Users[AdminUsersComponent]
+    Admin --> AdminAppointments[AdminAppointmentsComponent]
 ```
 
 ### Frontend Routes
@@ -245,6 +253,7 @@ flowchart TD
 | Route | Component | Rendering | Purpose |
 | --- | --- | --- | --- |
 | `/` | `HomePageComponent` | Prerender | Landing page and upcoming bookings |
+| `/admin` | `AdminDashboardPageComponent` | Prerender | Admin-only users and appointments dashboard |
 | `/appointments` | `AppointmentsPageComponent` | Prerender | Full appointment history |
 | `/book` | `BookingPageComponent` | Prerender | Registration and booking |
 | `/faq` | `FaqPageComponent` | Prerender | Frequently asked questions |
@@ -256,6 +265,11 @@ flowchart TD
 
 Routes are not protected with Angular route guards. Components restore the
 session in the browser and redirect to `/login` after a `401` where required.
+The admin page also verifies `currentUser.role === 'ADMIN'`; backend
+authorization remains the authoritative security boundary.
+
+After login, users with the `ADMIN` role are sent directly to `/admin`.
+Other users are sent to `/`.
 
 ### Core Frontend Services
 
@@ -286,9 +300,11 @@ The signal is memory-only. It is restored after a browser refresh by calls to
 | `ozone-treatment` | `Ozone_Treatment` |
 | `headlight-treatment` | `Headlight_Treatment` |
 
-It creates one HTTP request per treatment and combines requests with
-`forkJoin`. It also normalizes backend date values because `LocalDateTime` may
-arrive as an ISO string or a numeric date array.
+It sends all selected treatments to the transactional
+`POST /wash_calendar/batch` endpoint. Grouped cancellation sends every row ID
+to the transactional `DELETE /wash_calendar/batch` endpoint. It also
+normalizes backend date values because `LocalDateTime` may arrive as an ISO
+string or a numeric date array.
 
 #### `I18nService`
 
@@ -306,6 +322,30 @@ the active locale.
 
 The selected language is not currently persisted to local storage or a cookie.
 A full page reload resets it to English.
+
+#### `AdminService`
+
+`AdminService` loads the role-protected dashboard and accepts appointment rows:
+
+| Method | HTTP request | Purpose |
+| --- | --- | --- |
+| `dashboard()` | `GET /admin/dashboard` | Load totals, users, and appointments |
+| `acceptAppointment(id)` | `POST /wash_calendar/accept/{id}` | Mark one appointment row accepted |
+
+### Admin Dashboard Components
+
+The admin feature keeps API orchestration in the routed page and presentation
+state in focused standalone components:
+
+| Component | Responsibility |
+| --- | --- |
+| `AdminDashboardPageComponent` | Authentication, dashboard loading, acceptance requests, shared state updates |
+| `AdminDashboardStatsComponent` | User and appointment summary cards |
+| `AdminUsersComponent` | User search, localized dates, and independent pagination |
+| `AdminAppointmentsComponent` | Search, status filter, earliest-first sorting, pagination, and accept actions |
+
+Both tables show 10 rows per page. User and appointment pagination are
+independent. Appointment filtering and search happen before pagination.
 
 ### Frontend State Model
 
@@ -416,7 +456,7 @@ flowchart TD
 | Package | Responsibility |
 | --- | --- |
 | `config` | JWT parsing, Spring Security, CORS, datasource resolution |
-| `user` | Accounts, password hashing, authentication, profile update |
+| `user` | Accounts, authentication, profile updates, and the role-based admin dashboard |
 | `washCalendar` | Detailing appointment rows and acceptance state |
 | `Cars` | Dealership vehicle inventory |
 | `CarPictures` | Picture metadata linked to cars |
@@ -433,6 +473,9 @@ flowchart TD
 - Verify login passwords
 - Load cars owned by a user
 - Update nonblank name, phone number, and password values
+
+Administrators are not a separate entity or table. An administrator is an
+ordinary `User` record whose existing `role` field is `ADMIN`.
 
 #### `WashCalendarService`
 
@@ -621,6 +664,9 @@ credentialed requests.
 | `OPTIONS /**` | Public |
 | `/`, `/health`, `/auth/**` | Public at the authorization-rule level |
 | `/admin/**` | Requires `ADMIN` |
+| `GET /wash_calendar` | Requires `ADMIN` |
+| `GET /wash_calendar/date/**` | Requires `ADMIN` |
+| `POST /wash_calendar/accept/**` | Requires `ADMIN` |
 | `POST`, `PUT`, `PATCH`, `DELETE /cars/**` | Requires `ADMIN` |
 | `GET /cars/**` | Public |
 | Everything else | Requires authentication |
@@ -662,18 +708,15 @@ sequenceDiagram
     Form->>Form: Build YYYY-MM-DDTHH:mm:00
     Form->>Client: bookTreatments(slugs, localDateTime)
 
-    loop One request per treatment
-        Client->>Security: POST /wash_calendar + access cookie
-        Security->>Controller: Authenticated request
-        Controller->>Service: book request + user UUID
-        Service->>DB: Load user
-        Service->>DB: Insert wash_calendar row
-        DB-->>Service: Saved row
-        Service-->>Controller: WashCalendar
-        Controller-->>Client: WashCalendarResponse
-    end
-
-    Client-->>Form: forkJoin completes
+    Client->>Security: POST /wash_calendar/batch + access cookie
+    Security->>Controller: Authenticated request
+    Controller->>Service: wash types + date/time + user UUID
+    Service->>DB: Load user
+    Service->>DB: Insert all rows in one transaction
+    DB-->>Service: Saved rows
+    Service-->>Controller: WashCalendar list
+    Controller-->>Client: WashCalendarResponse list
+    Client-->>Form: Batch request completes
     Form-->>Customer: Show confirmation
 ```
 
@@ -685,7 +728,7 @@ flowchart TD
     Validate[Validate account and appointment]
     Register[POST /auth/register]
     Cookies[Receive auth cookies]
-    Book[POST one row per treatment]
+    Book[POST one transactional batch]
     Success[Show confirmation]
     Conflict[Show account already exists]
     Error[Show service unavailable]
@@ -733,7 +776,7 @@ For grouped appointments:
 
 ### Cancellation Logic
 
-The UI cancels a grouped appointment by sending one delete request per row:
+The UI cancels a grouped appointment with one transactional batch request:
 
 ```mermaid
 sequenceDiagram
@@ -748,19 +791,17 @@ sequenceDiagram
     Card->>List: Emit appointment IDs
     List->>List: Mark all IDs as cancelling
 
-    loop Every treatment row
-        List->>Client: DELETE row
-        Client->>API: DELETE /wash_calendar/{uuid}
-        API->>DB: Delete row by UUID
-        DB-->>API: Deleted
-    end
-
-    Client-->>List: forkJoin completes
+    List->>Client: cancelBookings(ids)
+    Client->>API: DELETE /wash_calendar/batch
+    API->>API: Validate every ID and owner
+    API->>DB: Delete all rows in one transaction
+    DB-->>API: Deleted
+    API-->>List: 204 No Content
     List->>List: Remove IDs from local state
 ```
 
-This operation is not atomic. See
-[Known Issues and Security Gaps](#known-issues-and-security-gaps).
+If any ID is missing or belongs to another user, validation fails before any
+row is deleted.
 
 ## Car and Picture Logic
 
@@ -1018,12 +1059,14 @@ rule.
 | Method | Endpoint | Purpose |
 | --- | --- | --- |
 | `POST` | `/wash_calendar` | Create one treatment row |
-| `GET` | `/wash_calendar` | List every appointment row |
+| `POST` | `/wash_calendar/batch` | Atomically create treatment rows |
+| `GET` | `/wash_calendar` | Admin: list every appointment row |
 | `GET` | `/wash_calendar/by_user` | List current user's rows |
-| `GET` | `/wash_calendar/date/{localDateTime}` | List rows at exact date/time |
+| `GET` | `/wash_calendar/date/{localDateTime}` | Admin: list rows at exact date/time |
 | `GET` | `/wash_calendar/accepted/{TF}` | Current user's rows by status |
-| `POST` | `/wash_calendar/accept/{uuid}` | Mark one row accepted |
-| `DELETE` | `/wash_calendar/{uuid}` | Delete one row |
+| `POST` | `/wash_calendar/accept/{uuid}` | Admin: mark one row accepted |
+| `DELETE` | `/wash_calendar/{uuid}` | Delete one owned row |
+| `DELETE` | `/wash_calendar/batch` | Atomically delete owned rows |
 
 #### Create Booking
 
@@ -1048,6 +1091,46 @@ Response:
 
 `{TF}` accepts standard boolean path values such as `true` and `false`.
 `{localDateTime}` must be an ISO date-time accepted by Spring.
+
+Batch booking request:
+
+```json
+{
+  "washTypes": [
+    "Interior_Treatment",
+    "Exterior_Treatment"
+  ],
+  "localDateTime": "2026-06-15T10:00:00"
+}
+```
+
+Batch cancellation request:
+
+```json
+{
+  "ids": [
+    "fc912912-310d-4d1d-822f-a5ada79d3528",
+    "67aa9e29-6cc8-4372-aa03-82452c025db9"
+  ]
+}
+```
+
+Batch cancellation verifies that every ID exists and belongs to the
+authenticated user before deleting any rows.
+
+### Admin API
+
+| Method | Endpoint | Access | Purpose |
+| --- | --- | --- | --- |
+| `GET` | `/admin/dashboard` | `ADMIN` | Return totals, users, and appointments |
+
+The response excludes password hashes and JWT values. It contains summary
+counts, password-safe user records, and appointment records enriched with the
+customer's name, email address, and phone number.
+
+The Angular admin dashboard sorts appointments from the earliest date to the
+latest. Pending rows expose an Accept action. A successful action updates the
+row status and the pending/accepted summary totals without reloading the page.
 
 ### Cars API
 
@@ -1304,8 +1387,10 @@ cd frontend
 cp .env.example .env
 ```
 
-For local development, keep `API_BASE_URL` empty and set
-`API_PROXY_TARGET=http://localhost:8080`.
+For customer flows, keep `API_BASE_URL` empty and set
+`API_PROXY_TARGET=http://localhost:8080`. The current proxy does not include
+`/admin`, so set `API_BASE_URL=http://localhost:8080` when testing the admin
+dashboard locally, or add an `/admin` proxy entry.
 
 ### 6. Install and Start the Frontend
 
@@ -1385,7 +1470,16 @@ Existing backend tests include:
 - User repository email lookup
 - Booking service assignment of the authenticated user
 
-Docker must be running for Testcontainers-based tests.
+Current test prerequisites and limitations:
+
+- Docker must be running for `AutoAndersApplicationTests`, which starts a
+  PostgreSQL Testcontainer.
+- `UserRepositoryTest` currently cannot create its test application context
+  because `@DataJpaTest` requests an embedded database, but no embedded database
+  dependency is installed and the test does not import the PostgreSQL
+  Testcontainer configuration.
+- `WashCalendarServiceTest` is an isolated Mockito unit test and passes without
+  Docker.
 
 ### Suggested Manual Smoke Test
 
@@ -1399,6 +1493,9 @@ Docker must be running for Testcontainers-based tests.
 8. Update name or phone on `/profile`.
 9. Log out and verify protected pages redirect or hide authenticated content.
 10. Log in again and cancel the grouped appointment.
+11. Log in with an `ADMIN` account and verify redirect to `/admin`.
+12. Search and paginate users and appointments.
+13. Accept a pending appointment and verify its status and summary totals update.
 
 ## Build and Rendering
 
@@ -1470,7 +1567,7 @@ flowchart LR
 
 ### Vercel Frontend
 
-The root `vercel.json` configures:
+The repository-root `vercel.json` currently declares:
 
 ```text
 Install: npm ci
@@ -1479,8 +1576,16 @@ Output: dist/frontend/browser
 Fallback rewrite: /(.*) -> /index.html
 ```
 
-Configure the Vercel project root as `frontend`, or adjust paths if deploying
-from the repository root.
+There is a path mismatch in the current repository layout:
+
+- If Vercel runs from the repository root, `package.json` is under `frontend`,
+  so the declared install and build commands need to enter that directory.
+- If the Vercel project root is configured as `frontend`, the root-level
+  `vercel.json` is outside that project root and should be moved or duplicated
+  into `frontend`.
+
+Resolve one of those layouts before relying on the current config for a fresh
+deployment.
 
 Production frontend variables:
 
@@ -1514,29 +1619,6 @@ For cross-origin cookie authentication:
 These items describe the current implementation and should be reviewed before
 production use.
 
-### High Priority
-
-1. **Appointment deletion has no ownership check.**
-   `DELETE /wash_calendar/{uuid}` deletes any row found by UUID. Any
-   authenticated user who learns another booking UUID can delete it.
-
-2. **Appointment acceptance is not restricted to administrators.**
-   `POST /wash_calendar/accept/{uuid}` is available to every authenticated user
-   and does not verify ownership or role.
-
-3. **All appointment rows are visible to every authenticated user.**
-   `GET /wash_calendar` returns the complete table.
-
-4. **Exact-date appointment queries are visible to every authenticated user.**
-   `GET /wash_calendar/date/{localDateTime}` can expose other users' rows.
-
-5. **Multi-treatment creation is not transactional.**
-   Each treatment is a separate request. If request two fails after request one
-   succeeds, a partial appointment remains.
-
-6. **Grouped cancellation is not transactional.**
-   Each row is deleted separately. A partial cancellation can occur.
-
 ### Correctness and Runtime Risks
 
 1. `GET /auth/getUserCars` casts `Authentication.getPrincipal()` to `User`, but
@@ -1552,20 +1634,17 @@ production use.
 
 4. Past dates are blocked in the browser but not validated by the backend.
 
-5. Wash request DTO fields have no bean-validation annotations, so null values
-   are rejected only later by persistence constraints.
-
-6. `CarPictureRepository` declares `Long` as its ID type while `CarPicture.id`
+5. `CarPictureRepository` declares `Long` as its ID type while `CarPicture.id`
    is a UUID.
 
-7. Picture request fields `title` and `description` are optional at the HTTP
+6. Picture request fields `title` and `description` are optional at the HTTP
    layer, while migration V6 declares them `NOT NULL`.
 
-8. Car entities are returned directly from controllers. Lazy relationships and
+7. Car entities are returned directly from controllers. Lazy relationships and
    bidirectional references can create serialization or session-boundary
    problems. Dedicated response DTOs are safer.
 
-9. The registration flow detects duplicate email addresses before insert, but a
+8. The registration flow detects duplicate email addresses before insert, but a
    concurrent duplicate can still rely on the database unique constraint and
    may not be converted to the intended `409`.
 
@@ -1591,6 +1670,10 @@ production use.
    Express SSR server produced by the build.
 
 7. The frontend development proxy does not include `/cars`.
+
+8. `UserRepositoryTest` is configured as `@DataJpaTest` without an embedded
+   database dependency or imported Testcontainer configuration, so it cannot
+   currently initialize its datasource.
 
 ### UX and State Limitations
 
@@ -1635,14 +1718,12 @@ production use.
 
 ### Recommended Production Hardening Order
 
-1. Enforce booking ownership and admin-only acceptance.
-2. Add transactional batch booking and cancellation endpoints.
-3. Add backend date and conflict validation.
-4. Complete Flyway migrations and disable Hibernate schema mutation.
-5. Clean and pin Maven dependency versions.
-6. Add automatic token refresh or a clear re-authentication strategy.
-7. Replace entity responses with DTOs.
-8. Add frontend route guards and broader automated tests.
+1. Add backend date and conflict validation.
+2. Complete Flyway migrations and disable Hibernate schema mutation.
+3. Clean and pin Maven dependency versions.
+4. Add automatic token refresh or a clear re-authentication strategy.
+5. Replace entity responses with DTOs.
+6. Add frontend route guards and broader automated tests.
 
 ## Repository
 

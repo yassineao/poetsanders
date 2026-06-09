@@ -1,0 +1,12 @@
+package Gloyoo.AutoAnders.washCalendar.dto;
+
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+
+import java.util.List;
+import java.util.UUID;
+
+public record WashCalendarBatchDeleteRequest(
+        @NotEmpty List<@NotNull UUID> ids
+) {
+}

@@ -1,3 +1,4 @@
+import type { AdminCopy } from './admin';
 import type { BookingCopy } from './booking';
 import type { FaqCopy } from './faq';
 import type { HomeCopy } from './home';
@@ -17,8 +18,10 @@ export type { FooterCopy, NavbarCopy } from './layout';
 export type { Locale } from './locale';
 export type { BookingCopy } from './booking';
 export type { LoginCopy } from './login';
+export type { AdminCopy } from './admin';
 
 export interface Copy {
+  admin: AdminCopy;
   booking: BookingCopy;
   faq: FaqCopy;
   login: LoginCopy;

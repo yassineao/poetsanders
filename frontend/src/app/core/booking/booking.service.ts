@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
-import { forkJoin, map, type Observable } from 'rxjs';
+import { map, type Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 
 export type WashType =
@@ -35,19 +35,15 @@ export class BookingService {
   private readonly http = inject(HttpClient);
   private readonly apiBaseUrl = environment.apiBaseUrl;
 
-  bookTreatments(treatmentSlugs: string[], localDateTime: string): Observable<unknown[]> {
-    const requests = treatmentSlugs.map((slug) =>
-      this.http.post<unknown>(
-        `${this.apiBaseUrl}/wash_calendar`,
-        {
-          washType: washTypeBySlug[slug],
-          localDateTime,
-        },
-        { withCredentials: true },
-      ),
+  bookTreatments(treatmentSlugs: string[], localDateTime: string): Observable<UserBooking[]> {
+    return this.http.post<UserBooking[]>(
+      `${this.apiBaseUrl}/wash_calendar/batch`,
+      {
+        washTypes: treatmentSlugs.map((slug) => washTypeBySlug[slug]),
+        localDateTime,
+      },
+      { withCredentials: true },
     );
-
-    return forkJoin(requests);
   }
 
   bookedSlotsByUser(): Observable<UserBooking[]> {
@@ -65,12 +61,11 @@ export class BookingService {
       );
   }
 
-  cancelBookings(ids: string[]): Observable<void[]> {
-    return forkJoin(
-      ids.map((id) =>
-        this.http.delete<void>(`${this.apiBaseUrl}/wash_calendar/${id}`, { withCredentials: true }),
-      ),
-    );
+  cancelBookings(ids: string[]): Observable<void> {
+    return this.http.delete<void>(`${this.apiBaseUrl}/wash_calendar/batch`, {
+      body: { ids },
+      withCredentials: true,
+    });
   }
 
   private normalizeLocalDateTime(value: string | number[]): string | null {

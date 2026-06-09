@@ -1,4 +1,5 @@
 import type { Copy } from '../../../interfaces/types';
+import { enAdminCopy } from './admin';
 import { enBookingCopy } from './booking';
 import { enFooterCopy } from './footer';
 import { enFaqCopy } from './faq';
@@ -9,6 +10,7 @@ import { enProfileCopy } from './profile';
 import { enServicesCopy } from './services';
 
 export const enCopy: Copy = {
+  admin: enAdminCopy,
   booking: enBookingCopy,
   faq: enFaqCopy,
   home: enHomeCopy,

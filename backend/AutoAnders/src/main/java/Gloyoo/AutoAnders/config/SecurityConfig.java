@@ -43,6 +43,9 @@ public class SecurityConfig {
 
                         // Admin endpoints
                         .requestMatchers("/admin/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/wash_calendar").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/wash_calendar/date/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/wash_calendar/accept/**").hasRole("ADMIN")
 
                         // Car management: only ADMIN
                         .requestMatchers(HttpMethod.POST, "/cars/**").hasRole("ADMIN")

@@ -61,7 +61,7 @@ export class LoginFormComponent {
         takeUntilDestroyed(this.destroyRef),
       )
       .subscribe({
-        next: () => void this.router.navigateByUrl('/'),
+        next: (user) => void this.router.navigateByUrl(user.role === 'ADMIN' ? '/admin' : '/'),
         error: (error: HttpErrorResponse) => {
           this.errorKind.set(error.status === 401 ? 'credentials' : 'unavailable');
         },
