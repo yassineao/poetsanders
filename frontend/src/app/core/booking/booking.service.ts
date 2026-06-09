@@ -15,6 +15,7 @@ export interface UserBooking {
   washType: WashType;
   userId: string;
   localDateTime: string;
+  accepted: boolean;
 }
 
 const washTypeBySlug: Record<string, WashType> = {
@@ -46,19 +47,15 @@ export class BookingService {
   }
 
   bookedSlotsByUser(): Observable<UserBooking[]> {
-    return this.http.get<UserBooking[]>(
-      `${this.apiBaseUrl}/wash_calendar/by_user`,
-      { withCredentials: true },
-    );
+    return this.http.get<UserBooking[]>(`${this.apiBaseUrl}/wash_calendar/by_user`, {
+      withCredentials: true,
+    });
   }
 
   cancelBookings(ids: string[]): Observable<void[]> {
     return forkJoin(
       ids.map((id) =>
-        this.http.delete<void>(
-          `${this.apiBaseUrl}/wash_calendar/${id}`,
-          { withCredentials: true },
-        ),
+        this.http.delete<void>(`${this.apiBaseUrl}/wash_calendar/${id}`, { withCredentials: true }),
       ),
     );
   }

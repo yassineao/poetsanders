@@ -7,12 +7,13 @@ import { EMPTY, catchError } from 'rxjs';
 import { AuthService } from '../../../core/auth/auth.service';
 import type { Locale } from '../../../core/i18';
 import { I18nService } from '../../../core/i18/i18n.service';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-navbar',
   standalone: true,
   imports: [CommonModule, RouterModule],
-  templateUrl: './navBar.components.html'
+  templateUrl: './navBar.components.html',
 })
 export class NavBarComponent {
   private readonly i18n = inject(I18nService);
@@ -28,13 +29,9 @@ export class NavBarComponent {
   protected readonly languages = this.i18n.languages;
   protected readonly selectedLanguage = this.i18n.language;
   protected readonly mobileMenuOpen = signal(false);
-  protected readonly navItems = computed(() => [
-    { label: this.copy().navbar.home, routerLink: '/' },
-    ...this.copy().services.treatments.items.map((treatment) => ({
-      label: treatment.title,
-      routerLink: `/services/${treatment.slug}`,
-    })),
-  ]);
+  protected readonly servicesMenuOpen = signal(false);
+  protected readonly treatments = computed(() => this.copy().services.treatments.items);
+  protected readonly dealershipUrl = environment.dealershipUrl;
 
   protected readonly copy = this.i18n.copy;
   protected readonly language_shift_window = signal(false);
@@ -59,9 +56,26 @@ export class NavBarComponent {
 
   protected closeMobileMenu(): void {
     this.mobileMenuOpen.set(false);
+    this.servicesMenuOpen.set(false);
+  }
+
+  protected closeServicesMenu(): void {
+    this.servicesMenuOpen.set(false);
   }
 
   protected toggleMobileMenu(): void {
     this.mobileMenuOpen.update((isOpen) => !isOpen);
+    this.servicesMenuOpen.set(false);
+    this.language_shift_window.set(false);
   }
-}   
+
+  protected toggleServicesMenu(): void {
+    this.servicesMenuOpen.update((isOpen) => !isOpen);
+    this.language_shift_window.set(false);
+  }
+
+  protected toggleLanguageMenu(): void {
+    this.language_shift_window.update((isOpen) => !isOpen);
+    this.servicesMenuOpen.set(false);
+  }
+}

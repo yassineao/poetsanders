@@ -33,6 +33,14 @@ export interface BookingCopy {
   timeRequiredMessage: string;
   successHeading: string;
   successMessage: string;
+  confirmationEyebrow: string;
+  confirmationAppointmentLabel: string;
+  confirmationTreatmentsLabel: string;
+  confirmationCustomerLabel: string;
+  confirmationNextStepsHeading: string;
+  confirmationNextStepsMessage: string;
+  viewBookingsLabel: string;
+  bookAnotherLabel: string;
   weekdays: string[];
   timeSlots: string[];
 }

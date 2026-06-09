@@ -2,7 +2,15 @@ import { CommonModule } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, computed, DestroyRef, inject, signal } from '@angular/core';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
-import { AbstractControl, FormBuilder, ReactiveFormsModule, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
+import {
+  AbstractControl,
+  FormBuilder,
+  ReactiveFormsModule,
+  ValidationErrors,
+  ValidatorFn,
+  Validators,
+} from '@angular/forms';
+import { RouterModule } from '@angular/router';
 import { finalize, switchMap } from 'rxjs';
 import { AuthService } from '../../../core/auth/auth.service';
 import { BookingService } from '../../../core/booking/booking.service';
@@ -14,7 +22,16 @@ interface CalendarDay {
   disabled: boolean;
 }
 
-const passwordsMatchValidator: ValidatorFn = (control: AbstractControl): ValidationErrors | null => {
+interface BookingConfirmation {
+  appointment: string;
+  treatments: string[];
+  customerName: string;
+  customerEmail: string;
+}
+
+const passwordsMatchValidator: ValidatorFn = (
+  control: AbstractControl,
+): ValidationErrors | null => {
   const password = control.get('password')?.value;
   const retypePassword = control.get('retypePassword')?.value;
 
@@ -26,7 +43,7 @@ const passwordsMatchValidator: ValidatorFn = (control: AbstractControl): Validat
 @Component({
   selector: 'app-booking-form',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, RouterModule],
   templateUrl: './form.component.html',
 })
 export class BookingFormComponent {
@@ -40,10 +57,13 @@ export class BookingFormComponent {
   protected readonly isAuthenticated = computed(() => this.auth.currentUser() !== null);
   protected readonly copy = computed(() => this.i18n.copy().booking);
   protected readonly treatments = computed(() => this.i18n.copy().services.treatments.items);
-  protected readonly viewMonth = signal(new Date(this.today.getFullYear(), this.today.getMonth(), 1));
+  protected readonly viewMonth = signal(
+    new Date(this.today.getFullYear(), this.today.getMonth(), 1),
+  );
   protected readonly selectedDate = signal<Date | null>(null);
   protected readonly selectedTime = signal('');
   protected readonly submitted = signal(false);
+  protected readonly confirmation = signal<BookingConfirmation | null>(null);
   protected readonly submitting = signal(false);
   protected readonly errorKind = signal<'conflict' | 'unavailable' | null>(null);
   protected readonly errorMessage = computed(() => {
@@ -56,29 +76,33 @@ export class BookingFormComponent {
   });
   protected readonly attemptedSubmit = signal(false);
 
-  protected readonly bookingForm = this.formBuilder.nonNullable.group({
-    name: ['', [Validators.required, Validators.maxLength(255)]],
-    email: ['', [Validators.required, Validators.email]],
-    password: [
-      '',
-      [
-        Validators.required,
-        Validators.minLength(12),
-        Validators.maxLength(30),
-        Validators.pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{12,}$/),
+  protected readonly bookingForm = this.formBuilder.nonNullable.group(
+    {
+      name: ['', [Validators.required, Validators.maxLength(255)]],
+      email: ['', [Validators.required, Validators.email]],
+      password: [
+        '',
+        [
+          Validators.required,
+          Validators.minLength(12),
+          Validators.maxLength(30),
+          Validators.pattern(
+            /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{12,}$/,
+          ),
+        ],
       ],
-    ],
-    retypePassword: ['', Validators.required],
-    phone: ['', [Validators.required, Validators.minLength(8), Validators.maxLength(30)]],
-    services: this.formBuilder.nonNullable.control<string[]>([], Validators.required),
-    message: [''],
-  }, { validators: passwordsMatchValidator });
+      retypePassword: ['', Validators.required],
+      phone: ['', [Validators.required, Validators.minLength(8), Validators.maxLength(30)]],
+      services: this.formBuilder.nonNullable.control<string[]>([], Validators.required),
+      message: [''],
+    },
+    { validators: passwordsMatchValidator },
+  );
 
   protected readonly selectedServiceSlugs = toSignal(
     this.bookingForm.controls.services.valueChanges,
     { initialValue: this.bookingForm.controls.services.value },
   );
-
 
   protected readonly monthLabel = computed(() => {
     this.i18n.language();
@@ -192,11 +216,11 @@ export class BookingFormComponent {
     this.bookingForm.markAllAsTouched();
 
     if (
-      this.bookingForm.controls.services.invalid
-      || !this.selectedDate()
-      || !this.selectedTime()
-      || this.submitting()
-      || (!this.isAuthenticated() && this.bookingForm.invalid)
+      this.bookingForm.controls.services.invalid ||
+      !this.selectedDate() ||
+      !this.selectedTime() ||
+      this.submitting() ||
+      (!this.isAuthenticated() && this.bookingForm.invalid)
     ) {
       return;
     }
@@ -211,7 +235,7 @@ export class BookingFormComponent {
           takeUntilDestroyed(this.destroyRef),
         )
         .subscribe({
-          next: () => this.submitted.set(true),
+          next: () => this.completeBooking(),
           error: () => this.errorKind.set('unavailable'),
         });
     } else {
@@ -236,14 +260,43 @@ export class BookingFormComponent {
           takeUntilDestroyed(this.destroyRef),
         )
         .subscribe({
-          next: () => this.submitted.set(true),
+          next: () => this.completeBooking(),
           error: (error: HttpErrorResponse) => {
             this.errorKind.set(error.status === 409 ? 'conflict' : 'unavailable');
           },
         });
     }
+  }
 
+  protected startAnotherBooking(): void {
+    this.bookingForm.reset({
+      name: '',
+      email: '',
+      password: '',
+      retypePassword: '',
+      phone: '',
+      services: [],
+      message: '',
+    });
+    this.selectedDate.set(null);
+    this.selectedTime.set('');
+    this.attemptedSubmit.set(false);
+    this.errorKind.set(null);
+    this.submitted.set(false);
+    this.confirmation.set(null);
+  }
 
+  private completeBooking(): void {
+    const user = this.auth.currentUser();
+    const formValue = this.bookingForm.getRawValue();
+
+    this.confirmation.set({
+      appointment: this.selectedAppointmentLabel(),
+      treatments: [...this.selectedTreatmentNames()],
+      customerName: user?.user || formValue.name.trim(),
+      customerEmail: user?.email || formValue.email.trim(),
+    });
+    this.submitted.set(true);
   }
 
   private selectedLocalDateTime(): string {

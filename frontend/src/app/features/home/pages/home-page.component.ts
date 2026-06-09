@@ -1,7 +1,9 @@
 import { CommonModule } from '@angular/common';
 import { Component, computed, inject } from '@angular/core';
 import { I18nService } from '../../../core/i18/i18n.service';
+import { AppointmentsListComponent } from '../../appointments/components/appointments-list/appointments-list.component';
 import { CardMainComponent } from '../components/card-main/card-main.components';
+import { FaqMainComponent } from '../components/faq-main/faq-main.component';
 import { FirstHeroMainComponent } from '../components/firstHero-main/firstHero-main.components';
 import { HeroMainComponent } from '../components/hero-main/hero-main.component';
 import { MapsMainComponent } from '../components/maps-main/maps-main.components';
@@ -10,7 +12,16 @@ import { TestimonialsMainComponent } from '../components/testimonials-main/testi
 @Component({
   selector: 'app-home-page',
   standalone: true,
-  imports: [CommonModule, FirstHeroMainComponent, HeroMainComponent, CardMainComponent, TestimonialsMainComponent, MapsMainComponent],
+  imports: [
+    CommonModule,
+    FirstHeroMainComponent,
+    AppointmentsListComponent,
+    HeroMainComponent,
+    CardMainComponent,
+    TestimonialsMainComponent,
+    FaqMainComponent,
+    MapsMainComponent,
+  ],
   templateUrl: './home-page.component.html',
 })
 export class HomePageComponent {
@@ -42,7 +53,9 @@ export class HomePageComponent {
     ],
     reviewLabel: this.copy().home.testimonials.ratingLabel,
     trustItems: this.copy().home.hero.trustItems.map((item, index) =>
-      index === 2 ? { ...item, value: String(this.copy().home.testimonials.testimonials.length) } : item,
+      index === 2
+        ? { ...item, value: String(this.copy().home.testimonials.testimonials.length) }
+        : item,
     ),
   }));
 }

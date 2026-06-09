@@ -1,7 +1,6 @@
 package Gloyoo.AutoAnders.washCalendar.controller;
 
 import Gloyoo.AutoAnders.washCalendar.dto.WashCalendarRequest;
-import Gloyoo.AutoAnders.washCalendar.dto.WashCalendarResponse;
 import Gloyoo.AutoAnders.washCalendar.entity.WashCalendar;
 import Gloyoo.AutoAnders.washCalendar.service.WashCalendarService;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -25,7 +24,7 @@ public class WashCalendarController {
     }
 
     @PostMapping
-    public ResponseEntity<WashCalendarResponse> addWashCalendar(
+    public ResponseEntity<WashCalendar> addWashCalendar(
             @RequestBody WashCalendarRequest washCalendarRequest,
             Authentication authentication
     ) {
@@ -35,54 +34,66 @@ public class WashCalendarController {
                         authenticatedUserId(authentication)
                 );
 
-        return ResponseEntity.ok(WashCalendarResponse.from(washCalendar));
+        return ResponseEntity.ok(washCalendar);
     }
 
     @GetMapping
-    public ResponseEntity<List<WashCalendarResponse>> getWashCalendar() {
-        return ResponseEntity.ok(toResponses(washCalendarService.findAllWashCalendar()));
+    public ResponseEntity<List<WashCalendar>> getWashCalendar() {
+        List<WashCalendar> washCalendars = washCalendarService.findAllWashCalendar();
+        return ResponseEntity.ok(washCalendars);
     }
 
     @DeleteMapping("/{uuid}")
     public ResponseEntity<Void> deleteWashCalendar(
-            @PathVariable UUID uuid,
-            Authentication authentication
+            @PathVariable UUID uuid
+
     ) {
-        washCalendarService.deleteWashCalendar(
-                uuid,
-                authenticatedUserId(authentication)
-        );
+        washCalendarService.deleteWashCalendar(uuid);
         return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/date/{localDateTime}")
-    public ResponseEntity<List<WashCalendarResponse>> getWashCalendarByDate(
+    public ResponseEntity<List<WashCalendar>> getWashCalendarByDate(
             @PathVariable
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
             LocalDateTime localDateTime
     ) {
-        return ResponseEntity.ok(
-                toResponses(washCalendarService.getWashCalendarByDate(localDateTime))
-        );
+        List<WashCalendar> washCalendars =
+                washCalendarService.getWashCalendarByDate(localDateTime);
+
+        return ResponseEntity.ok(washCalendars);
     }
 
-    @GetMapping("/by_user")
-    public ResponseEntity<List<WashCalendarResponse>> getWashCalendarByUser(
+    @GetMapping("/accepted/{TF}")
+    public ResponseEntity<List<WashCalendar>> getAcceptedWashCalendar(
+            @PathVariable boolean TF,
             Authentication authentication
     ) {
-        return ResponseEntity.ok(
-                toResponses(
-                        washCalendarService.getWashCalendarByUser(
-                                authenticatedUserId(authentication)
-                        )
-                )
-        );
+        UUID uuid = authenticatedUserId(authentication);
+        List<WashCalendar> washCalendars = washCalendarService.findByAccepted(TF, uuid);
+        return ResponseEntity.ok(washCalendars);
     }
 
-    private List<WashCalendarResponse> toResponses(List<WashCalendar> washCalendars) {
-        return washCalendars.stream()
-                .map(WashCalendarResponse::from)
-                .toList();
+    @PostMapping("/accept/{uuid}")
+    public ResponseEntity<WashCalendar> acceptWashCalendar(
+            @PathVariable UUID uuid
+    ) {
+        washCalendarService.accept(uuid);
+        return ResponseEntity.ok().build();
+
+    }
+
+
+    @GetMapping("/by_user")
+    public ResponseEntity<List<WashCalendar>> getWashCalendarByUser(
+            Authentication authentication
+    ) {
+        List<WashCalendar> washCalendars =
+                washCalendarService.getWashCalendarByUser(
+                        authenticatedUserId(authentication)
+                );
+
+        return ResponseEntity.ok(washCalendars);
     }
 
     private UUID authenticatedUserId(Authentication authentication) {

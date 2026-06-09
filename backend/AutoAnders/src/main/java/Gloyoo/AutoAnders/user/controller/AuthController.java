@@ -8,6 +8,7 @@ import Gloyoo.AutoAnders.user.dto.TokenResponse;
 import Gloyoo.AutoAnders.user.entity.User;
 import Gloyoo.AutoAnders.user.service.UserService;
 import Gloyoo.AutoAnders.user.dto.UserCreateRequest;
+import Gloyoo.AutoAnders.user.dto.UserUpdateRequest;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -15,12 +16,12 @@ import jakarta.validation.Valid;
 import org.springframework.http.*;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.http.ResponseEntity;
 
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/auth")
@@ -45,10 +46,10 @@ public class AuthController {
             User u = userService.register(req);
             // optional: auto-login after register
             String access = jwt.generateToken(u.getEmail(),
-                    Map.of("uid", u.getId().toString(), "role", u.getRole(),"user",u.getName()),
+                    Map.of("uid", u.getId().toString(), "role", u.getRole(), "user", u.getName()),
                     ACCESS_TTL);
             String refresh = jwt.generateToken(u.getEmail(),
-                    Map.of("uid", u.getId().toString(), "role", u.getRole(),"user",u.getName(), "type", "refresh"),
+                    Map.of("uid", u.getId().toString(), "role", u.getRole(), "user", u.getName(), "type", "refresh"),
                     REFRESH_TTL);
             return withAuthCookies(ResponseEntity.status(HttpStatus.CREATED), request, access, refresh)
                     .body(authPayload(u));
@@ -67,27 +68,53 @@ public class AuthController {
             User u = userService.findByEmailOrThrow(req.getEmail());
 
             if (!userService.checkPassword(u, req.getPassword())) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error","Invalid credentials"));
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "Invalid credentials"));
             }
 
             String access = jwt.generateToken(u.getEmail(),
-                    Map.of("uid", u.getId().toString(), "role", u.getRole(),"user",u.getName()),
+                    Map.of("uid", u.getId().toString(), "role", u.getRole(), "user", u.getName()),
                     ACCESS_TTL);
             String refresh = jwt.generateToken(u.getEmail(),
-                    Map.of("uid", u.getId().toString(), "role", u.getRole(),"user",u.getName(), "type", "refresh"),
+                    Map.of("uid", u.getId().toString(), "role", u.getRole(), "user", u.getName(), "type", "refresh"),
                     REFRESH_TTL);
             return withAuthCookies(ResponseEntity.ok(), request, access, refresh)
                     .body(authPayload(u));
         } catch (IllegalArgumentException ex) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error","Invalid credentials"));
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "Invalid credentials"));
+        }
+    }
+
+    @PatchMapping("/update")
+    public ResponseEntity<?> updateUser(
+            @Valid @RequestBody UserUpdateRequest req,
+            Authentication authentication,
+            HttpServletRequest request) {
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("error", "Not authenticated"));
+        }
+
+        try {
+            User user = userService.update(authenticatedUserId(authentication), req);
+            String access = jwt.generateToken(user.getEmail(),
+                    Map.of("uid", user.getId().toString(), "role", user.getRole(), "user", user.getName()),
+                    ACCESS_TTL);
+            String refresh = jwt.generateToken(user.getEmail(),
+                    Map.of("uid", user.getId().toString(), "role", user.getRole(), "user", user.getName(), "type", "refresh"),
+                    REFRESH_TTL);
+
+            return withAuthCookies(ResponseEntity.ok(), request, access, refresh)
+                    .body(authPayload(user));
+        } catch (IllegalArgumentException ex) {
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .body(Map.of("error", ex.getMessage()));
         }
     }
 
     @PostMapping("/refresh")
     public ResponseEntity<?> refresh(
             @RequestBody(required = false) TokenResponse body,
-            HttpServletRequest request
-    ) {
+            HttpServletRequest request) {
         try {
             String refreshToken = body != null && body.refreshToken() != null
                     ? body.refreshToken()
@@ -120,14 +147,13 @@ public class AuthController {
 
     }
 
-
     @GetMapping("/me")
     public ResponseEntity<?> me(Authentication authentication) {
         if (authentication == null || !authentication.isAuthenticated()) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "Not authenticated"));
         }
 
-        return ResponseEntity.ok(authentication.getDetails());
+        return ResponseEntity.ok(authPayload(userService.findByIdOrThrow(authenticatedUserId(authentication))));
     }
 
     @PostMapping("/logout")
@@ -143,13 +169,11 @@ public class AuthController {
         return "OK";
     }
 
-
     private ResponseEntity.BodyBuilder withAuthCookies(
             ResponseEntity.BodyBuilder builder,
             HttpServletRequest request,
             String access,
-            String refresh
-    ) {
+            String refresh) {
         return builder
                 .header(HttpHeaders.SET_COOKIE, authCookie(request, ACCESS_COOKIE, access, ACCESS_TTL).toString())
                 .header(HttpHeaders.SET_COOKIE, authCookie(request, REFRESH_COOKIE, refresh, REFRESH_TTL).toString());
@@ -220,6 +244,7 @@ public class AuthController {
         payload.put("role", user.getRole());
         payload.put("user", user.getName());
         payload.put("email", user.getEmail());
+        payload.put("phoneNumber", user.getPhoneNumber() == null ? "" : user.getPhoneNumber());
         return payload;
     }
 
@@ -230,5 +255,18 @@ public class AuthController {
         payload.put("user", claims.get("user"));
         payload.put("email", claims.getSubject());
         return payload;
+    }
+
+    private UUID authenticatedUserId(Authentication authentication) {
+        if (authentication == null || !(authentication.getDetails() instanceof Map<?, ?> details)) {
+            throw new IllegalArgumentException("Not authenticated");
+        }
+
+        Object uid = details.get("uid");
+        if (uid == null) {
+            throw new IllegalArgumentException("User ID missing");
+        }
+
+        return UUID.fromString(uid.toString());
     }
 }
