@@ -6,6 +6,8 @@ export const deBookingCopy: BookingCopy = {
   description:
     'Teilen Sie uns mit, was Ihr Fahrzeug braucht, und wählen Sie anschließend Datum und Uhrzeit.',
   formHeading: 'Ihre Angaben',
+  existingAccountPrompt: 'Sie haben bereits ein Konto?',
+  loginLabel: 'Anmelden',
   calendarHeading: 'Datum und Uhrzeit wählen',
   calendarDescription:
     'Wählen Sie zuerst einen Tag im Kalender und danach Ihre bevorzugte Uhrzeit.',

@@ -5,6 +5,8 @@ export const nlBookingCopy: BookingCopy = {
   heading: 'Kies het juiste moment voor uw auto',
   description: 'Vertel ons wat uw auto nodig heeft en kies daarna een beschikbare datum en tijd.',
   formHeading: 'Uw gegevens',
+  existingAccountPrompt: 'Heeft u al een account?',
+  loginLabel: 'Inloggen',
   calendarHeading: 'Kies een datum en tijd',
   calendarDescription: 'Selecteer eerst een dag in de kalender en kies daarna uw gewenste tijd.',
   nameLabel: 'Naam',
