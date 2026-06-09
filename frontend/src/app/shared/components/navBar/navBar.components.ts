@@ -22,6 +22,7 @@ export class NavBarComponent {
   private readonly platformId = inject(PLATFORM_ID);
 
   protected readonly isAuthenticated = computed(() => this.auth.currentUser() !== null);
+  protected readonly isAdmin = computed(() => this.auth.currentUser()?.role === 'ADMIN');
   protected readonly userName = computed(() => {
     const user = this.auth.currentUser();
     return user?.user || user?.email || '';

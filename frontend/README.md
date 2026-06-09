@@ -1,206 +1,154 @@
-# Poets Anders
+# Poets Anders Frontend
 
-Multilingual website for **Poets Anders**, a car-cleaning and detailing business in Papendrecht, the Netherlands.
-
-The application presents the available treatments, provides detailed service pages, and includes a responsive booking form with a calendar and time-slot selection.
+Angular frontend for the Poets Anders detailing website and appointment
+platform.
 
 ## Features
 
-- Responsive home and services pages
-- Five detailed car-care treatments:
-  - Total Treatment
-  - Interior Treatment
-  - Exterior Treatment
-  - Headlight Treatment
-  - Ozone Treatment
-- Multilingual content in English, German, and Dutch
-- Reactive language switching
-- Booking form with:
-  - Multiple treatment selection
-  - Customer and vehicle details
-  - Monthly calendar
-  - Date and time selection
-  - Client-side validation
-- Responsive navbar and footer
-- Angular server-side rendering and prerendering
-- Tailwind CSS styling
+- Responsive multilingual website in English, Dutch, and German
+- Treatment overview and detail pages
+- Account registration and cookie-based login
+- Multi-treatment booking with date and time selection
+- Booking confirmation and appointment history
+- Pending, partially accepted, and accepted appointment states
+- Appointment cancellation
+- Profile updates for name, phone number, and password
+- Admin dashboard with:
+  - Summary statistics
+  - Searchable and paginated users
+  - Searchable, filterable, paginated appointments
+  - Earliest-first appointment ordering
+  - Appointment acceptance
+- Configurable external dealership link
+- Angular SSR, prerendering, and hydration
 
 ## Technology
 
-- Angular 21
-- TypeScript
-- Angular Router
-- Angular Reactive Forms
-- Angular SSR
-- RxJS
+- Angular 21 standalone components
+- TypeScript 5.9
+- Angular Router and Reactive Forms
+- Angular signals and RxJS
 - Tailwind CSS 4
+- Angular SSR
 - Vitest
 
 ## Routes
 
-| Route | Description |
+| Route | Purpose |
 | --- | --- |
-| `/` | Home page |
-| `/services` | Main services overview |
-| `/services/:slug` | Dynamic treatment detail page |
-| `/book` | Appointment request form |
+| `/` | Home page and authenticated appointment preview |
+| `/admin` | Admin dashboard |
+| `/appointments` | Full appointment history |
+| `/book` | Registration and booking form |
+| `/faq` | Frequently asked questions |
+| `/login` | Login |
+| `/profile` | Profile editing and logout |
+| `/services` | Treatment overview |
+| `/services/:slug` | Treatment details |
 
-Available service slugs:
+After login, `ADMIN` users are redirected to `/admin`; other users are
+redirected to `/`.
+
+## Environment
+
+Create `.env` from `.env.example`:
+
+```dotenv
+API_BASE_URL=
+API_PROXY_TARGET=http://localhost:8080
+DEALERSHIP_URL=
+```
+
+| Variable | Purpose |
+| --- | --- |
+| `API_BASE_URL` | Backend origin compiled into production builds |
+| `API_PROXY_TARGET` | Local Angular proxy target |
+| `DEALERSHIP_URL` | External dealership URL shown in navigation |
+
+With an empty `API_BASE_URL`, requests to `/auth` and `/wash_calendar` are
+forwarded to `API_PROXY_TARGET`. The current proxy does not include `/admin`,
+so use `API_BASE_URL=http://localhost:8080` when testing the admin dashboard
+locally, or add `/admin` to `proxy.conf.cjs`.
+
+The `prestart`, `prebuild`, `prewatch`, and `pretest` scripts generate:
 
 ```text
-total-treatment
-interior-treatment
-exterior-treatment
-headlight-treatment
-ozone-treatment
+src/environments/environment.generated.ts
 ```
 
 ## Getting Started
 
-### Requirements
+Requirements:
 
-- A Node.js version supported by Angular 21
-- npm 11 or a compatible npm version
-
-### Installation
-
-```bash
-git clone https://github.com/yassineao/poetsanders.git
-cd poetsanders/frontend
-npm install
-```
-
-### Development Server
+- Node.js supported by Angular 21
+- npm 11
+- Running Poets Anders backend
 
 ```bash
+npm ci
 npm start
 ```
 
 Open [http://localhost:4200](http://localhost:4200).
 
-The development server watches the source files and reloads the application after changes.
+## Scripts
 
-## Available Scripts
+| Command | Purpose |
+| --- | --- |
+| `npm start` | Generate environment and start Angular |
+| `npm run build` | Build browser and SSR bundles |
+| `npm run watch` | Run a development build in watch mode |
+| `npm test` | Run tests |
+| `npm run serve:ssr:frontend` | Serve an existing SSR build |
 
-```bash
-npm start
-```
-
-Starts the Angular development server.
-
-```bash
-npm run build
-```
-
-Creates a production browser and server build in `dist/frontend`.
-
-```bash
-npm run watch
-```
-
-Runs a development build in watch mode.
-
-```bash
-npm test
-```
-
-Runs the test suite.
-
-```bash
-npm run serve:ssr:frontend
-```
-
-Runs the compiled SSR server after a production build.
-
-## Project Structure
+## Structure
 
 ```text
 src/app/
-├── core/
-│   ├── i18/
-│   │   └── translations/
-│   │       ├── de/
-│   │       ├── en/
-│   │       └── nl/
-│   └── interfaces/
-├── features/
-│   ├── form/
-│   │   ├── components/
-│   │   └── page/
-│   ├── home/
-│   │   ├── components/
-│   │   └── pages/
-│   └── services/
-│       ├── components/
-│       └── pages/
-└── shared/
-    └── components/
-        ├── footer/
-        └── navBar/
+|-- core/
+|   |-- admin/                 Admin API client
+|   |-- auth/                  Authentication and session state
+|   |-- booking/               Appointment API client
+|   |-- i18/                   Locale state and translations
+|   `-- interfaces/            Typed frontend contracts
+|-- features/
+|   |-- admin/
+|   |   |-- components/
+|   |   |   |-- admin-appointments/
+|   |   |   |-- admin-dashboard-stats/
+|   |   |   `-- admin-users/
+|   |   `-- pages/
+|   |-- appointments/
+|   |-- faq/
+|   |-- form/
+|   |-- home/
+|   |-- login/
+|   |-- profile/
+|   `-- services/
+`-- shared/components/        Navbar and footer
 ```
 
-## Localization
+The admin page remains the data container. Its child components independently
+own table search, filtering, sorting, and pagination.
 
-Localized content is stored in:
+## Authentication
 
-```text
-src/app/core/i18/translations/
-```
+All authenticated requests use `withCredentials: true`. The backend stores
+access and refresh JWTs in HTTP-only cookies. `AuthService.currentUser` holds
+the active user in memory and `/auth/me` restores the session after reload.
 
-Each language has its own `home`, `services`, navbar, footer, and booking content. Shared interfaces in `src/app/core/interfaces` ensure that every locale provides the required fields.
+Backend authorization is authoritative. The frontend also checks the `ADMIN`
+role before displaying the admin dashboard.
 
-To update a translation, edit the matching file in:
-
-```text
-translations/en/
-translations/de/
-translations/nl/
-```
-
-## Service Detail Pages
-
-Service detail pages use the dynamic route `/services/:slug`.
-
-The route selects the matching treatment from the active locale. Each treatment can provide:
-
-- Introductory description
-- Included services
-- Benefits
-- Treatment process
-- Detailed content sections
-- Price information
-- Booking call to action
-
-## Booking Form
-
-The booking form is implemented with Angular Reactive Forms in:
-
-```text
-src/app/features/form/components/form.component.ts
-src/app/features/form/components/form.component.html
-```
-
-Users can select multiple treatments, choose a future date, select a preferred time, and enter their contact and vehicle information.
-
-> The form currently performs client-side validation and displays a confirmation message. It is not yet connected to an email service, API, or database.
-
-## Production Build
+## Verification
 
 ```bash
+npx tsc --noEmit -p tsconfig.app.json
+npx ngc -p tsconfig.app.json
 npm run build
 ```
 
-The application uses Angular SSR with server output. Dynamic service-detail routes are rendered on the server, while static routes are prerendered.
-
-The current production build may report an initial bundle budget warning because the bundle exceeds the configured `500 kB` warning threshold. The build still completes successfully.
-
-## Assets
-
-Static images and branding files are stored in:
-
-```text
-public/
-```
+The production build currently completes with an initial bundle budget warning.
 
 ## Repository
 

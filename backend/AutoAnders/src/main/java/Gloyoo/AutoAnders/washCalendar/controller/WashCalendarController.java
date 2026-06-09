@@ -1,9 +1,12 @@
 package Gloyoo.AutoAnders.washCalendar.controller;
 
+import Gloyoo.AutoAnders.washCalendar.dto.WashCalendarBatchDeleteRequest;
+import Gloyoo.AutoAnders.washCalendar.dto.WashCalendarBatchRequest;
 import Gloyoo.AutoAnders.washCalendar.dto.WashCalendarRequest;
 import Gloyoo.AutoAnders.washCalendar.dto.WashCalendarResponse;
 import Gloyoo.AutoAnders.washCalendar.entity.WashCalendar;
 import Gloyoo.AutoAnders.washCalendar.service.WashCalendarService;
+import jakarta.validation.Valid;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -26,7 +29,7 @@ public class WashCalendarController {
 
     @PostMapping
     public ResponseEntity<WashCalendarResponse> addWashCalendar(
-            @RequestBody WashCalendarRequest washCalendarRequest,
+            @Valid @RequestBody WashCalendarRequest washCalendarRequest,
             Authentication authentication
     ) {
         WashCalendar washCalendar =
@@ -36,6 +39,19 @@ public class WashCalendarController {
                 );
 
         return ResponseEntity.ok(WashCalendarResponse.from(washCalendar));
+    }
+
+    @PostMapping("/batch")
+    public ResponseEntity<List<WashCalendarResponse>> addWashCalendars(
+            @Valid @RequestBody WashCalendarBatchRequest request,
+            Authentication authentication
+    ) {
+        return ResponseEntity.ok(toResponses(
+                washCalendarService.bookWashCalendars(
+                        request,
+                        authenticatedUserId(authentication)
+                )
+        ));
     }
 
     @GetMapping
@@ -48,10 +64,22 @@ public class WashCalendarController {
 
     @DeleteMapping("/{uuid}")
     public ResponseEntity<Void> deleteWashCalendar(
-            @PathVariable UUID uuid
-
+            @PathVariable UUID uuid,
+            Authentication authentication
     ) {
-        washCalendarService.deleteWashCalendar(uuid);
+        washCalendarService.deleteWashCalendar(uuid, authenticatedUserId(authentication));
+        return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping("/batch")
+    public ResponseEntity<Void> deleteWashCalendars(
+            @Valid @RequestBody WashCalendarBatchDeleteRequest request,
+            Authentication authentication
+    ) {
+        washCalendarService.deleteWashCalendars(
+                request.ids(),
+                authenticatedUserId(authentication)
+        );
         return ResponseEntity.noContent().build();
     }
 

@@ -7,6 +7,7 @@ export const deNavbarCopy: NavbarCopy = {
   dealership: 'Autohaus',
   ctaPrimary: 'Wäsche buchen',
   loginLabel: 'Anmelden',
+  adminLabel: 'Admin',
   langLabel: 'Sprache',
   langNames: {
     en: 'English',

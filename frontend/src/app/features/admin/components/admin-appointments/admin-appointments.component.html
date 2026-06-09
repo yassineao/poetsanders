@@ -1,0 +1,126 @@
+<section class="mt-10 overflow-hidden rounded-2xl border border-white/10 bg-slate-900/70">
+  <div
+    class="flex flex-col gap-5 border-b border-white/10 p-6 lg:flex-row lg:items-end lg:justify-between"
+  >
+    <div>
+      <h2 class="text-2xl font-bold text-white">{{ copy().appointmentsHeading }}</h2>
+      <p class="mt-2 text-sm text-slate-400">{{ copy().appointmentsDescription }}</p>
+    </div>
+    <div class="grid w-full gap-3 sm:grid-cols-[1fr_180px] lg:max-w-xl">
+      <label>
+        <span class="sr-only">{{ copy().searchAppointmentsLabel }}</span>
+        <input
+          type="search"
+          [placeholder]="copy().searchAppointmentsLabel"
+          (input)="updateQuery($event)"
+          class="h-11 w-full rounded-lg border border-white/10 bg-slate-950 px-4 text-sm text-white outline-none transition placeholder:text-slate-600 focus:border-cyan-300/50"
+        />
+      </label>
+      <label>
+        <span class="sr-only">{{ copy().statusLabel }}</span>
+        <select
+          (change)="updateStatus($event)"
+          class="h-11 w-full rounded-lg border border-white/10 bg-slate-950 px-3 text-sm text-white outline-none focus:border-cyan-300/50"
+        >
+          <option value="all">{{ copy().allStatusesLabel }}</option>
+          <option value="pending">{{ copy().pendingLabel }}</option>
+          <option value="accepted">{{ copy().acceptedLabel }}</option>
+        </select>
+      </label>
+    </div>
+  </div>
+
+  <p
+    *ngIf="acceptError()"
+    role="alert"
+    class="m-6 rounded-xl border border-rose-300/20 bg-rose-300/10 p-4 text-sm text-rose-100"
+  >
+    {{ copy().acceptErrorLabel }}
+  </p>
+
+  <div class="overflow-x-auto">
+    <table class="w-full min-w-[1160px] text-left text-sm">
+      <thead class="bg-slate-950/60 text-xs uppercase tracking-wide text-slate-500">
+        <tr>
+          <th class="px-6 py-4">{{ copy().customerLabel }}</th>
+          <th class="px-6 py-4">{{ copy().phoneLabel }}</th>
+          <th class="px-6 py-4">{{ copy().treatmentLabel }}</th>
+          <th class="px-6 py-4">{{ copy().dateLabel }}</th>
+          <th class="px-6 py-4">{{ copy().statusLabel }}</th>
+          <th class="px-6 py-4">{{ copy().actionsLabel }}</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-white/10">
+        <tr
+          *ngFor="let appointment of paginatedAppointments()"
+          class="transition hover:bg-white/[0.03]"
+        >
+          <td class="px-6 py-4">
+            <p class="font-semibold text-white">{{ appointment.customerName || '-' }}</p>
+            <p class="mt-1 text-xs text-slate-400">{{ appointment.customerEmail }}</p>
+          </td>
+          <td class="px-6 py-4 text-slate-300">
+            {{ appointment.customerPhoneNumber || '-' }}
+          </td>
+          <td class="px-6 py-4 font-semibold text-cyan-100">
+            {{ treatmentName(appointment.washType) }}
+          </td>
+          <td class="px-6 py-4 text-slate-300">{{ formatDate(appointment.localDateTime) }}</td>
+          <td class="px-6 py-4">
+            <span
+              class="rounded-full border px-2.5 py-1 text-xs font-bold"
+              [ngClass]="
+                appointment.accepted
+                  ? 'border-emerald-300/25 bg-emerald-300/10 text-emerald-200'
+                  : 'border-amber-300/25 bg-amber-300/10 text-amber-200'
+              "
+            >
+              {{ appointment.accepted ? copy().acceptedLabel : copy().pendingLabel }}
+            </span>
+          </td>
+          <td class="px-6 py-4">
+            <button
+              *ngIf="!appointment.accepted"
+              type="button"
+              [disabled]="isAccepting(appointment.id)"
+              (click)="appointmentAccepted.emit(appointment)"
+              class="inline-flex min-h-10 items-center rounded-lg border border-emerald-300/25 bg-emerald-300/10 px-4 text-sm font-bold text-emerald-100 transition hover:bg-emerald-300/20 disabled:cursor-wait disabled:opacity-60"
+            >
+              {{ isAccepting(appointment.id) ? copy().acceptingLabel : copy().acceptLabel }}
+            </button>
+            <span *ngIf="appointment.accepted" class="text-sm text-slate-500">-</span>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p *ngIf="!filteredAppointments().length" class="p-6 text-sm text-slate-400">
+    {{ copy().noAppointmentsLabel }}
+  </p>
+
+  <div
+    *ngIf="filteredAppointments().length"
+    class="flex items-center justify-between gap-4 border-t border-white/10 px-6 py-4"
+  >
+    <button
+      type="button"
+      [disabled]="page() === 1"
+      (click)="changePage(-1)"
+      class="rounded-lg border border-white/10 px-4 py-2 text-sm font-semibold text-slate-200 transition hover:bg-white/5 disabled:cursor-not-allowed disabled:opacity-40"
+    >
+      {{ copy().previousLabel }}
+    </button>
+    <span class="text-sm text-slate-400">
+      {{ copy().pageLabel }} {{ page() }} {{ copy().ofLabel }} {{ pageCount() }}
+    </span>
+    <button
+      type="button"
+      [disabled]="page() === pageCount()"
+      (click)="changePage(1)"
+      class="rounded-lg border border-white/10 px-4 py-2 text-sm font-semibold text-slate-200 transition hover:bg-white/5 disabled:cursor-not-allowed disabled:opacity-40"
+    >
+      {{ copy().nextLabel }}
+    </button>
+  </div>
+</section>

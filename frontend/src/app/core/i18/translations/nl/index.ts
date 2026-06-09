@@ -1,4 +1,5 @@
 import type { Copy } from '../../../interfaces/types';
+import { nlAdminCopy } from './admin';
 import { nlBookingCopy } from './booking';
 import { nlFooterCopy } from './footer';
 import { nlFaqCopy } from './faq';
@@ -9,6 +10,7 @@ import { nlProfileCopy } from './profile';
 import { nlServicesCopy } from './services';
 
 export const nlCopy: Copy = {
+  admin: nlAdminCopy,
   booking: nlBookingCopy,
   faq: nlFaqCopy,
   home: nlHomeCopy,

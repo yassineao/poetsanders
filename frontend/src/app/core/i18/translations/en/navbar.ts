@@ -7,6 +7,7 @@ export const enNavbarCopy: NavbarCopy = {
   dealership: 'Car dealership',
   ctaPrimary: 'Book a wash',
   loginLabel: 'Log in',
+  adminLabel: 'Admin',
   langLabel: 'Language',
   langNames: {
     en: 'English',

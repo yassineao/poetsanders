@@ -1,4 +1,5 @@
 import type { Copy } from '../../../interfaces/types';
+import { deAdminCopy } from './admin';
 import { deBookingCopy } from './booking';
 import { deFooterCopy } from './footer';
 import { deFaqCopy } from './faq';
@@ -10,6 +11,7 @@ import { deServicesCopy } from './services';
 import { deServicesHeroCopy } from './services/hero';
 
 export const deCopy: Copy = {
+  admin: deAdminCopy,
   booking: deBookingCopy,
   faq: deFaqCopy,
   home: deHomeCopy,

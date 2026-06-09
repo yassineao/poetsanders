@@ -7,6 +7,7 @@ export interface NavbarCopy {
   dealership: string;
   ctaPrimary: string;
   loginLabel: string;
+  adminLabel: string;
   langLabel: string;
   langNames: Record<Locale, string>;
   menuToggle: string;
