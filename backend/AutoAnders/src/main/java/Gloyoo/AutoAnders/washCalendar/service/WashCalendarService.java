@@ -2,6 +2,7 @@ package Gloyoo.AutoAnders.washCalendar.service;
 
 import Gloyoo.AutoAnders.user.entity.User;
 import Gloyoo.AutoAnders.user.repository.UserRepository;
+import Gloyoo.AutoAnders.user.service.UserService;
 import Gloyoo.AutoAnders.washCalendar.dto.WashCalendarRequest;
 import Gloyoo.AutoAnders.washCalendar.entity.WashCalendar;
 import Gloyoo.AutoAnders.washCalendar.repository.WashCalendarRepository;
@@ -15,21 +16,21 @@ import java.util.UUID;
 public class WashCalendarService {
 
     private final WashCalendarRepository washCalendarRepository;
-    private final UserRepository userRepository;
+    private final UserService userService;
 
     public WashCalendarService(
             WashCalendarRepository washCalendarRepository,
-            UserRepository userRepository
+            UserService userService
     ) {
         this.washCalendarRepository = washCalendarRepository;
-        this.userRepository = userRepository;
+        this.userService = userService;
     }
 
     public WashCalendar book_a_wash_calendar(
             WashCalendarRequest washCalendarRequest,
             UUID userId
     ) {
-        User user = findUser(userId);
+        User user = userService.findByIdOrThrow(userId);
 
         WashCalendar washCalendar = WashCalendar.builder()
                 .washType(washCalendarRequest.washType())
@@ -41,20 +42,16 @@ public class WashCalendarService {
     }
 
     public List<WashCalendar> getWashCalendarByUser(UUID userId) {
-        return washCalendarRepository.findByUser(findUser(userId));
+        return washCalendarRepository.findByUser(userService.findByIdOrThrow(userId));
     }
 
     public List<WashCalendar> getWashCalendarByDate(LocalDateTime localDateTime) {
         return washCalendarRepository.findByLocalDateTime(localDateTime);
     }
 
-    public void deleteWashCalendar(UUID uuid, UUID userId) {
+    public void deleteWashCalendar(UUID uuid) {
         WashCalendar washCalendar = washCalendarRepository.findById(uuid)
                 .orElseThrow(() -> new RuntimeException("Wash calendar not found"));
-
-        if (!washCalendar.getUser().getId().equals(userId)) {
-            throw new IllegalArgumentException("Wash calendar does not belong to the authenticated user");
-        }
 
         washCalendarRepository.delete(washCalendar);
     }
@@ -63,8 +60,20 @@ public class WashCalendarService {
         return washCalendarRepository.findAll();
     }
 
-    private User findUser(UUID userId) {
-        return userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+
+    public List<WashCalendar> findByAccepted(boolean accepted, UUID userId) {
+        return washCalendarRepository.findByUserAndAccepted(
+                userService.findByIdOrThrow(userId),
+                accepted
+        );
+    }
+
+    public void accept(UUID washCalendarId) {
+        WashCalendar washCalendar = washCalendarRepository.findById(washCalendarId)
+                .orElseThrow();
+
+        washCalendar.setAccepted(true);
+
+        washCalendarRepository.save(washCalendar);
     }
 }

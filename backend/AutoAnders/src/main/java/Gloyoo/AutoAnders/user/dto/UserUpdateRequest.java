@@ -1,37 +1,25 @@
 package Gloyoo.AutoAnders.user.dto;
 
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 
 @AllArgsConstructor
+@NoArgsConstructor
 public class UserUpdateRequest {
 
-    @NotBlank
-    @Email
-    @Size(max = 255)
-    private String email;
-
-    @NotBlank
-    @Size(min = 8, max = 255)
+    @Size(min = 12, max = 30)
+    @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{12,}$")
     private String password;
 
-    @Size(max = 30)
+    @Size(max = 255)
     private String name;
 
-    @Size(max = 30)
+    @Size(min = 8, max = 30)
     private String phoneNumber;
 
     // getters & setters
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
     public String getPassword() {
         return password;
     }

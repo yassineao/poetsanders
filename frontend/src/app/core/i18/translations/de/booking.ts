@@ -3,16 +3,19 @@ import type { BookingCopy } from '../../../interfaces/booking';
 export const deBookingCopy: BookingCopy = {
   eyebrow: 'Autowäsche buchen',
   heading: 'Wählen Sie den passenden Termin für Ihr Auto',
-  description: 'Teilen Sie uns mit, was Ihr Fahrzeug braucht, und wählen Sie anschließend Datum und Uhrzeit.',
+  description:
+    'Teilen Sie uns mit, was Ihr Fahrzeug braucht, und wählen Sie anschließend Datum und Uhrzeit.',
   formHeading: 'Ihre Angaben',
   calendarHeading: 'Datum und Uhrzeit wählen',
-  calendarDescription: 'Wählen Sie zuerst einen Tag im Kalender und danach Ihre bevorzugte Uhrzeit.',
+  calendarDescription:
+    'Wählen Sie zuerst einen Tag im Kalender und danach Ihre bevorzugte Uhrzeit.',
   nameLabel: 'Name',
   emailLabel: 'E-Mail-Adresse',
   passwordLabel: 'Passwort',
   retypePasswordLabel: 'Passwort bestätigen',
   passwordLengthMessage: 'Das Passwort muss zwischen 12 und 30 Zeichen lang sein.',
-  passwordPatternMessage: 'Das Passwort muss Groß- und Kleinbuchstaben, eine Zahl und ein Sonderzeichen enthalten.',
+  passwordPatternMessage:
+    'Das Passwort muss Groß- und Kleinbuchstaben, eine Zahl und ein Sonderzeichen enthalten.',
   passwordMismatchMessage: 'Die Passwörter stimmen nicht überein.',
   phoneLabel: 'Telefonnummer',
   phoneLengthMessage: 'Die Telefonnummer muss zwischen 8 und 30 Zeichen lang sein.',
@@ -35,6 +38,15 @@ export const deBookingCopy: BookingCopy = {
   timeRequiredMessage: 'Wählen Sie eine Uhrzeit.',
   successHeading: 'Terminanfrage erhalten',
   successMessage: 'Wir melden uns bei Ihnen, um den gewählten Termin zu bestätigen.',
+  confirmationEyebrow: 'Buchungsbestätigung',
+  confirmationAppointmentLabel: 'Termin',
+  confirmationTreatmentsLabel: 'Gewählte Behandlungen',
+  confirmationCustomerLabel: 'Gebucht für',
+  confirmationNextStepsHeading: 'Wie geht es weiter?',
+  confirmationNextStepsMessage:
+    'Ihre Anfrage wurde in Ihrem Profil gespeichert. Wir melden uns, falls noch Details zum Termin geklärt werden müssen.',
+  viewBookingsLabel: 'Meine Buchungen ansehen',
+  bookAnotherLabel: 'Weiteren Termin buchen',
   weekdays: ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So'],
   timeSlots: ['09:00', '10:30', '12:00', '13:30', '15:00', '16:30'],
 };

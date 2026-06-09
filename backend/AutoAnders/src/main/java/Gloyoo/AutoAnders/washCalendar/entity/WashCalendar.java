@@ -30,4 +30,7 @@ public class WashCalendar {
 
     @Column(name = "local_date_time", nullable = false)
     private LocalDateTime localDateTime;
+    
+    @Column(name= "accepted" , nullable = false)
+    private boolean accepted = false;
 }

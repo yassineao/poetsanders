@@ -12,7 +12,8 @@ export const nlBookingCopy: BookingCopy = {
   passwordLabel: 'Wachtwoord',
   retypePasswordLabel: 'Bevestig wachtwoord',
   passwordLengthMessage: 'Wachtwoord moet tussen de 12 en 30 tekens lang zijn.',
-  passwordPatternMessage: 'Het wachtwoord moet hoofdletters, kleine letters, een cijfer en een speciaal teken bevatten.',
+  passwordPatternMessage:
+    'Het wachtwoord moet hoofdletters, kleine letters, een cijfer en een speciaal teken bevatten.',
   passwordMismatchMessage: 'De wachtwoorden komen niet overeen.',
   phoneLabel: 'Telefoonnummer',
   phoneLengthMessage: 'Het telefoonnummer moet tussen 8 en 30 tekens lang zijn.',
@@ -35,6 +36,15 @@ export const nlBookingCopy: BookingCopy = {
   timeRequiredMessage: 'Kies een tijd.',
   successHeading: 'Afspraakverzoek ontvangen',
   successMessage: 'Wij nemen contact met u op om de gekozen afspraak te bevestigen.',
+  confirmationEyebrow: 'Boekingsbevestiging',
+  confirmationAppointmentLabel: 'Afspraak',
+  confirmationTreatmentsLabel: 'Gekozen behandelingen',
+  confirmationCustomerLabel: 'Geboekt voor',
+  confirmationNextStepsHeading: 'Wat gebeurt er nu?',
+  confirmationNextStepsMessage:
+    'Uw aanvraag is opgeslagen in uw profiel. Wij nemen contact met u op als er nog iets over de afspraak moet worden afgestemd.',
+  viewBookingsLabel: 'Mijn boekingen bekijken',
+  bookAnotherLabel: 'Nog een afspraak boeken',
   weekdays: ['Ma', 'Di', 'Wo', 'Do', 'Vr', 'Za', 'Zo'],
   timeSlots: ['09:00', '10:30', '12:00', '13:30', '15:00', '16:30'],
 };

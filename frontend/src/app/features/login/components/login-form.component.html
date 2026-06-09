@@ -1,8 +1,12 @@
 <section class="bg-slate-950 px-4 py-16 text-slate-100 sm:px-6 lg:px-8 lg:py-24">
   <div class="mx-auto max-w-5xl">
     <div class="max-w-3xl">
-      <p class="text-sm font-semibold uppercase tracking-[0.22em] text-cyan-200">{{ copy().eyebrow }}</p>
-      <h1 class="mt-4 text-4xl font-bold tracking-tight text-white sm:text-5xl">{{ copy().heading }}</h1>
+      <p class="text-sm font-semibold uppercase tracking-[0.22em] text-cyan-200">
+        {{ copy().eyebrow }}
+      </p>
+      <h1 class="mt-4 text-4xl font-bold tracking-tight text-white sm:text-5xl">
+        {{ copy().heading }}
+      </h1>
       <p class="mt-5 text-lg leading-8 text-slate-300">{{ copy().description }}</p>
     </div>
 
@@ -23,10 +27,18 @@
             autocomplete="email"
             class="mt-2 h-12 w-full rounded-md border border-white/10 bg-slate-950/70 px-4 text-white outline-none transition focus:border-cyan-200 focus:ring-2 focus:ring-cyan-200/20"
           />
-          <span *ngIf="loginForm.controls.email.touched && loginForm.controls.email.hasError('required')" class="mt-2 block text-xs text-rose-300">
+          <span
+            *ngIf="
+              loginForm.controls.email.touched && loginForm.controls.email.hasError('required')
+            "
+            class="mt-2 block text-xs text-rose-300"
+          >
             {{ copy().requiredMessage }}
           </span>
-          <span *ngIf="loginForm.controls.email.touched && loginForm.controls.email.hasError('email')" class="mt-2 block text-xs text-rose-300">
+          <span
+            *ngIf="loginForm.controls.email.touched && loginForm.controls.email.hasError('email')"
+            class="mt-2 block text-xs text-rose-300"
+          >
             {{ copy().invalidEmailMessage }}
           </span>
         </label>
@@ -46,26 +58,67 @@
               class="absolute inset-y-0 right-0 flex w-12 items-center justify-center text-slate-400 transition hover:text-cyan-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-cyan-200"
               [attr.aria-label]="passwordVisible() ? copy().hidePassword : copy().showPassword"
             >
-              <svg *ngIf="!passwordVisible()" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z" />
+              <svg
+                *ngIf="!passwordVisible()"
+                class="h-5 w-5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                stroke-width="2"
+                aria-hidden="true"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z"
+                />
                 <circle cx="12" cy="12" r="2.5" />
               </svg>
-              <svg *ngIf="passwordVisible()" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                <path stroke-linecap="round" stroke-linejoin="round" d="m3 3 18 18M10.6 10.7a2 2 0 0 0 2.7 2.7M9.9 5.2A10.8 10.8 0 0 1 12 5c6 0 9.5 7 9.5 7a18 18 0 0 1-2.1 3M6.6 6.7C4 8.3 2.5 12 2.5 12s3.5 7 9.5 7a9.7 9.7 0 0 0 3.1-.5" />
+              <svg
+                *ngIf="passwordVisible()"
+                class="h-5 w-5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                stroke-width="2"
+                aria-hidden="true"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="m3 3 18 18M10.6 10.7a2 2 0 0 0 2.7 2.7M9.9 5.2A10.8 10.8 0 0 1 12 5c6 0 9.5 7 9.5 7a18 18 0 0 1-2.1 3M6.6 6.7C4 8.3 2.5 12 2.5 12s3.5 7 9.5 7a9.7 9.7 0 0 0 3.1-.5"
+                />
               </svg>
             </button>
           </span>
-          <span *ngIf="loginForm.controls.password.touched && loginForm.controls.password.hasError('required')" class="mt-2 block text-xs text-rose-300">
+          <span
+            *ngIf="
+              loginForm.controls.password.touched &&
+              loginForm.controls.password.hasError('required')
+            "
+            class="mt-2 block text-xs text-rose-300"
+          >
             {{ copy().requiredMessage }}
           </span>
           <span
-            *ngIf="loginForm.controls.password.touched && !loginForm.controls.password.hasError('required') && (loginForm.controls.password.hasError('minlength') || loginForm.controls.password.hasError('maxlength'))"
+            *ngIf="
+              loginForm.controls.password.touched &&
+              !loginForm.controls.password.hasError('required') &&
+              (loginForm.controls.password.hasError('minlength') ||
+                loginForm.controls.password.hasError('maxlength'))
+            "
             class="mt-2 block text-xs text-rose-300"
           >
             {{ copy().passwordLengthMessage }}
           </span>
           <span
-            *ngIf="loginForm.controls.password.touched && !loginForm.controls.password.hasError('required') && !loginForm.controls.password.hasError('minlength') && !loginForm.controls.password.hasError('maxlength') && loginForm.controls.password.hasError('pattern')"
+            *ngIf="
+              loginForm.controls.password.touched &&
+              !loginForm.controls.password.hasError('required') &&
+              !loginForm.controls.password.hasError('minlength') &&
+              !loginForm.controls.password.hasError('maxlength') &&
+              loginForm.controls.password.hasError('pattern')
+            "
             class="mt-2 block text-xs text-rose-300"
           >
             {{ copy().passwordPatternMessage }}
@@ -80,25 +133,42 @@
           {{ submitting() ? copy().submittingLabel : copy().submitLabel }}
         </button>
 
-        <div *ngIf="errorMessage()" role="alert" class="mt-5 rounded-md border border-rose-300/20 bg-rose-300/10 p-4 text-sm text-rose-100">
+        <div
+          *ngIf="errorMessage()"
+          role="alert"
+          class="mt-5 rounded-md border border-rose-300/20 bg-rose-300/10 p-4 text-sm text-rose-100"
+        >
           {{ errorMessage() }}
-        </div>
-
-        <div *ngIf="authenticatedUser() as user" class="mt-5 rounded-md border border-emerald-300/20 bg-emerald-300/10 p-4 text-emerald-100">
-          <p class="font-semibold">{{ copy().successHeading }}</p>
-          <p class="mt-1 text-sm">{{ copy().successMessage }} {{ user.user || user.email }}</p>
         </div>
       </form>
 
-      <aside class="rounded-xl border border-cyan-200/15 bg-slate-900/80 p-6 shadow-xl shadow-slate-950/30 sm:p-8">
-        <div class="flex h-12 w-12 items-center justify-center rounded-lg bg-cyan-200/10 text-cyan-200 ring-1 ring-cyan-200/20">
-          <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 0 0 2-2v-7a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2Zm2-11V7a4 4 0 0 1 8 0v3" />
+      <aside
+        class="rounded-xl border border-cyan-200/15 bg-slate-900/80 p-6 shadow-xl shadow-slate-950/30 sm:p-8"
+      >
+        <div
+          class="flex h-12 w-12 items-center justify-center rounded-lg bg-cyan-200/10 text-cyan-200 ring-1 ring-cyan-200/20"
+        >
+          <svg
+            class="h-6 w-6"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            stroke-width="2"
+            aria-hidden="true"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M12 15v2m-6 4h12a2 2 0 0 0 2-2v-7a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2Zm2-11V7a4 4 0 0 1 8 0v3"
+            />
           </svg>
         </div>
         <h2 class="mt-6 text-2xl font-semibold text-white">{{ copy().supportHeading }}</h2>
         <p class="mt-3 text-sm leading-6 text-slate-400">{{ copy().supportMessage }}</p>
-        <a href="mailto:info@poetsanders.nl" class="mt-6 inline-flex h-11 items-center justify-center rounded-md border border-cyan-200/30 px-4 text-sm font-semibold text-cyan-100 transition hover:border-cyan-200 hover:bg-cyan-200/10">
+        <a
+          href="mailto:info@poetsanders.nl"
+          class="mt-6 inline-flex h-11 items-center justify-center rounded-md border border-cyan-200/30 px-4 text-sm font-semibold text-cyan-100 transition hover:border-cyan-200 hover:bg-cyan-200/10"
+        >
           {{ copy().supportLinkLabel }}
         </a>
       </aside>

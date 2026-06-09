@@ -3,6 +3,8 @@ import type { Locale } from './locale';
 export interface NavbarCopy {
   home: string;
   collections: string;
+  faq: string;
+  dealership: string;
   ctaPrimary: string;
   loginLabel: string;
   langLabel: string;

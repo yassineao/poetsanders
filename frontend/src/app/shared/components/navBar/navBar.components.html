@@ -1,180 +1,631 @@
 <header
-  class="fixed inset-x-0 top-0 z-50 border-b border-white/10 bg-slate-950/85 shadow-2xl shadow-black/20 backdrop-blur-2xl">
+  class="fixed inset-x-0 top-0 z-50 border-b border-white/10 bg-slate-950/90 shadow-xl shadow-black/20 backdrop-blur-xl"
+>
   <div
-    class="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-cyan-200/80 to-transparent">
-  </div>
-  <div
-    class="pointer-events-none absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent">
-  </div>
+    class="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-cyan-300/70 to-transparent"
+  ></div>
 
   <div class="mx-auto max-w-[96rem] px-4 sm:px-6 xl:px-8">
-    <nav aria-label="Primary navigation" class="flex h-16 items-center justify-between gap-4 xl:h-20">
-      <a routerLink="/" fragment="home"
-        class="group flex min-w-0 shrink-0 items-center gap-3 rounded-lg outline-none transition focus-visible:ring-2 focus-visible:ring-cyan-200 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
-        aria-label="PoetsAnders home" (click)="closeMobileMenu()">
+    <nav aria-label="Primary navigation" class="flex h-16 items-center gap-3 xl:h-20">
+      <a
+        routerLink="/"
+        class="group flex min-w-0 shrink-0 items-center gap-3 rounded-xl outline-none focus-visible:ring-2 focus-visible:ring-cyan-300"
+        aria-label="Poets Anders home"
+        (click)="closeMobileMenu()"
+      >
         <span
-          class="relative flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-cyan-100/30 bg-white shadow-lg shadow-cyan-950/30 transition duration-300 group-hover:-translate-y-0.5 group-hover:shadow-cyan-500/20">
-          <span class="absolute inset-0 bg-gradient-to-br from-white via-cyan-50 to-slate-200"></span>
-          <img src="/logo-poets-website-1.png" alt="" class="relative h-8 w-8 object-contain" />
+          class="relative grid h-10 w-10 shrink-0 place-items-center overflow-hidden rounded-xl bg-white shadow-lg shadow-cyan-950/40 ring-1 ring-cyan-100/30 transition duration-300 group-hover:-translate-y-0.5"
+        >
+          <span
+            class="absolute inset-0 bg-gradient-to-br from-white via-cyan-50 to-slate-200"
+          ></span>
+          <img src="/logo-poets-website-1.png" alt="" class="relative h-7 w-7 object-contain" />
         </span>
-        <span class="min-w-0 leading-none">
-          <span class="block text-lg font-bold tracking-wide text-white sm:text-xl">Poets Anders</span>
-          <span class="mt-1 hidden text-[11px] font-medium uppercase tracking-[0.22em] text-cyan-200 sm:block">Dutch Car
-            Care</span>
+        <span class="min-w-0">
+          <span class="block truncate text-base font-bold tracking-wide text-white sm:text-lg"
+            >Poets Anders</span
+          >
+          <span
+            class="hidden text-[10px] font-semibold uppercase tracking-[0.24em] text-cyan-300 2xl:block"
+            >Dutch Car Care</span
+          >
         </span>
       </a>
 
-      <ul
-        class="hidden min-w-0 items-center rounded-xl border border-white/10 bg-white/[0.035] p-1.5 shadow-inner shadow-black/20 xl:flex">
-        <li *ngFor="let item of navItems(); let last = last" class="relative flex items-center">
-          <a [routerLink]="item.routerLink"
-            routerLinkActive="bg-gradient-to-b from-cyan-200/20 to-cyan-300/10 text-cyan-50 shadow-sm ring-1 ring-cyan-100/15"
-            [routerLinkActiveOptions]="{ exact: item.routerLink === '/' }"
-            class="relative inline-flex h-9 items-center whitespace-nowrap rounded-lg px-2.5 text-[13px] font-semibold text-slate-300 outline-none transition-all duration-200 hover:bg-white/[0.08] hover:text-white focus-visible:ring-2 focus-visible:ring-cyan-200 2xl:px-3 2xl:text-sm">
-            {{ item.label }}
+      <ul class="mx-auto hidden min-w-0 items-center gap-0.5 xl:flex 2xl:ml-8 2xl:gap-1">
+        <li>
+          <a
+            routerLink="/"
+            routerLinkActive="bg-white/10 text-white"
+            #navLink="routerLinkActive"
+            [routerLinkActiveOptions]="{ exact: true }"
+            class="relative inline-flex h-10 items-center rounded-lg px-3 text-sm font-semibold text-slate-300 outline-none transition hover:bg-white/[0.06] hover:text-white focus-visible:ring-2 focus-visible:ring-cyan-300 2xl:px-4"
+          >
+            {{ copy().navbar.home }}
+            <span
+              [ngClass]="navLink.isActive ? 'scale-x-100' : 'scale-x-0'"
+              class="absolute inset-x-4 -bottom-px h-0.5 origin-center scale-x-0 rounded-full bg-cyan-300 transition-transform"
+            ></span>
           </a>
-          <span *ngIf="!last"
-            class="mx-0.5 h-4 w-px bg-gradient-to-b from-transparent via-white/20 to-transparent 2xl:mx-1"
-            aria-hidden="true"></span>
         </li>
-      </ul>
-
-      <div class="hidden shrink-0 items-center gap-2 xl:flex 2xl:gap-3">
-        <div
-          class="relative flex items-center rounded-xl border border-white/10 bg-white/[0.04] p-1 shadow-sm shadow-slate-950/20 transition-colors hover:border-cyan-100/25"
-          [attr.aria-label]="copy().navbar.langLabel">
-
-          <button type="button" (click)="language_shift_window.set(!language_shift_window())"
-            class="inline-flex h-9 min-w-14 items-center justify-center gap-1.5 rounded-lg px-2.5 text-xs font-bold tracking-wider text-slate-200 outline-none transition-all duration-200 hover:bg-white/10 hover:text-white focus-visible:ring-2 focus-visible:ring-cyan-200 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 2xl:min-w-16 2xl:px-3 2xl:text-sm"
-            [ngClass]="language_shift_window() ? 'bg-white/10 text-white shadow-sm' : ''"
-            [attr.aria-expanded]="language_shift_window()">
-            <span>{{ selectedLanguage() | uppercase }}</span>
-            <svg class="h-4 w-4 transition-transform" [ngClass]="language_shift_window() ? 'rotate-180' : ''"
-              fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-              <path stroke-linecap="round" stroke-linejoin="round" d="m6 9 6 6 6-6" />
+        <li
+          class="relative"
+          (mouseenter)="servicesMenuOpen.set(true)"
+          (mouseleave)="servicesMenuOpen.set(false)"
+        >
+          <button
+            type="button"
+            class="relative inline-flex h-10 items-center gap-1.5 rounded-lg px-3 text-sm font-semibold text-slate-300 outline-none transition hover:bg-white/[0.06] hover:text-white focus-visible:ring-2 focus-visible:ring-cyan-300 2xl:px-4"
+            [ngClass]="servicesMenuOpen() ? 'bg-white/10 text-white' : ''"
+            [attr.aria-expanded]="servicesMenuOpen()"
+            aria-haspopup="menu"
+            aria-controls="services-navigation"
+            (click)="toggleServicesMenu()"
+          >
+            {{ copy().navbar.collections }}
+            <svg
+              class="h-3.5 w-3.5 transition-transform duration-200"
+              [ngClass]="servicesMenuOpen() ? 'rotate-180 text-cyan-300' : ''"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              stroke-width="2"
+              aria-hidden="true"
+            >
+              <path stroke-linecap="round" stroke-linejoin="round" d="m6 9 6 6 6-6"></path>
             </svg>
           </button>
 
-          <ul *ngIf="language_shift_window()"
-            class="absolute right-0 top-full mt-3 flex min-w-44 flex-col items-stretch gap-1 rounded-xl border border-white/10 bg-slate-950/95 p-2 shadow-2xl shadow-slate-950/50 ring-1 ring-cyan-100/10 backdrop-blur-xl"
-            [attr.aria-label]="copy().navbar.langLabel">
-            <li *ngFor="let locale of languages" class="group relative">
-              <button type="button" (click)="setLanguage(locale); language_shift_window.set(false)"
-                class="inline-flex h-10 w-full items-center justify-between rounded px-3 text-sm font-semibold text-slate-300 outline-none transition-all duration-200 hover:bg-white/10 hover:text-white focus-visible:ring-2 focus-visible:ring-cyan-200"
-                [ngClass]="locale === selectedLanguage() ? 'bg-cyan-300/15 text-cyan-100 ring-1 ring-cyan-300/20' : ''">
-                <span>{{ copy().navbar.langNames[locale] }}</span>
-                <span *ngIf="locale === selectedLanguage()" class="ml-3 h-1.5 w-1.5 rounded-full bg-cyan-300"></span>
+          <div
+            *ngIf="servicesMenuOpen()"
+            id="services-navigation"
+            class="absolute left-0 top-full w-[36rem] pt-3 2xl:w-[38rem]"
+          >
+            <div
+              class="overflow-hidden rounded-2xl border border-white/10 bg-slate-900/95 shadow-2xl shadow-black/50 ring-1 ring-cyan-300/10 backdrop-blur-xl"
+              role="menu"
+            >
+              <div class="flex items-center justify-between border-b border-white/10 px-5 py-4">
+                <div>
+                  <p class="text-[10px] font-bold uppercase tracking-[0.22em] text-cyan-300">
+                    {{ copy().services.treatments.eyebrow }}
+                  </p>
+                  <p class="mt-1 text-sm font-semibold text-white">
+                    {{ copy().services.treatments.heading }}
+                  </p>
+                </div>
+                <a
+                  routerLink="/services"
+                  class="inline-flex items-center gap-1.5 rounded-lg px-3 py-2 text-xs font-bold text-cyan-200 transition hover:bg-cyan-300/10 hover:text-cyan-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300"
+                  role="menuitem"
+                  (click)="closeServicesMenu()"
+                >
+                  {{ copy().navbar.collections }}
+                  <svg
+                    class="h-3.5 w-3.5"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    aria-hidden="true"
+                  >
+                    <path stroke-linecap="round" stroke-linejoin="round" d="m9 5 7 7-7 7"></path>
+                  </svg>
+                </a>
+              </div>
+
+              <div class="grid grid-cols-2 gap-2 p-3">
+                <a
+                  *ngFor="let treatment of treatments(); let index = index"
+                  [routerLink]="['/services', treatment.slug]"
+                  class="group flex min-h-24 gap-3 rounded-xl border border-transparent p-3 outline-none transition duration-200 hover:border-cyan-300/15 hover:bg-white/[0.06] focus-visible:ring-2 focus-visible:ring-cyan-300"
+                  [ngClass]="
+                    index === 0 ? 'col-span-2 bg-gradient-to-r from-cyan-300/10 to-transparent' : ''
+                  "
+                  role="menuitem"
+                  (click)="closeServicesMenu()"
+                >
+                  <span
+                    class="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-cyan-300/10 text-cyan-300 ring-1 ring-cyan-300/15 transition group-hover:bg-cyan-300 group-hover:text-slate-950"
+                  >
+                    <svg
+                      class="h-5 w-5"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      stroke-width="1.8"
+                      aria-hidden="true"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="M12 3.75c-3.4 4.1-5.1 7.1-5.1 9.5a5.1 5.1 0 0 0 10.2 0c0-2.4-1.7-5.4-5.1-9.5Z"
+                      ></path>
+                      <path stroke-linecap="round" d="M9.5 14.2a2.8 2.8 0 0 0 2.7 2.1"></path>
+                    </svg>
+                  </span>
+                  <span class="min-w-0">
+                    <span class="flex items-center gap-2 text-sm font-bold text-white">
+                      {{ treatment.title }}
+                      <svg
+                        class="h-3.5 w-3.5 -translate-x-1 text-cyan-300 opacity-0 transition group-hover:translate-x-0 group-hover:opacity-100"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        aria-hidden="true"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          d="m9 5 7 7-7 7"
+                        ></path>
+                      </svg>
+                    </span>
+                    <span class="mt-1 line-clamp-2 block text-xs leading-5 text-slate-400">
+                      {{ treatment.description }}
+                    </span>
+                  </span>
+                </a>
+              </div>
+            </div>
+          </div>
+        </li>
+        <li>
+          <a
+            routerLink="/faq"
+            routerLinkActive="bg-white/10 text-white"
+            #faqLink="routerLinkActive"
+            class="relative inline-flex h-10 items-center rounded-lg px-3 text-sm font-semibold text-slate-300 outline-none transition hover:bg-white/[0.06] hover:text-white focus-visible:ring-2 focus-visible:ring-cyan-300 2xl:px-4"
+          >
+            {{ copy().navbar.faq }}
+            <span
+              [ngClass]="faqLink.isActive ? 'scale-x-100' : 'scale-x-0'"
+              class="absolute inset-x-4 -bottom-px h-0.5 origin-center rounded-full bg-cyan-300 transition-transform"
+            ></span>
+          </a>
+        </li>
+        <li *ngIf="isAuthenticated()">
+          <a
+            routerLink="/appointments"
+            routerLinkActive="bg-white/10 text-white"
+            #appointmentsLink="routerLinkActive"
+            class="relative inline-flex h-10 items-center gap-1.5 rounded-lg px-3 text-sm font-semibold text-slate-300 outline-none transition hover:bg-white/[0.06] hover:text-white focus-visible:ring-2 focus-visible:ring-cyan-300 2xl:px-4"
+          >
+            <svg
+              class="h-4 w-4 text-cyan-300"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              stroke-width="2"
+              aria-hidden="true"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M8 2v3M16 2v3M3.5 9h17M5 4.5h14a2 2 0 0 1 2 2V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6.5a2 2 0 0 1 2-2Z"
+              ></path>
+            </svg>
+            {{ copy().home.appointments.eyebrow }}
+            <span
+              [ngClass]="appointmentsLink.isActive ? 'scale-x-100' : 'scale-x-0'"
+              class="absolute inset-x-4 -bottom-px h-0.5 origin-center rounded-full bg-cyan-300 transition-transform"
+            ></span>
+          </a>
+        </li>
+      </ul>
+
+      <div class="ml-auto hidden shrink-0 items-center gap-1.5 xl:flex 2xl:gap-2">
+        <a
+          *ngIf="dealershipUrl"
+          [href]="dealershipUrl"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="inline-flex h-10 items-center gap-2 whitespace-nowrap rounded-lg border border-cyan-300/30 bg-cyan-300/10 px-3 text-sm font-bold text-cyan-100 outline-none transition hover:border-cyan-200/60 hover:bg-cyan-300/20 hover:text-white focus-visible:ring-2 focus-visible:ring-cyan-300"
+          [attr.aria-label]="copy().navbar.dealership"
+        >
+          <svg
+            class="h-4 w-4 text-cyan-300"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            stroke-width="2"
+            aria-hidden="true"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M3 17h18M5 17l1.5-6h11L19 17M7.5 11l1.25-4h6.5l1.25 4M7 17v2M17 17v2"
+            ></path>
+            <circle cx="7.5" cy="15" r="1"></circle>
+            <circle cx="16.5" cy="15" r="1"></circle>
+          </svg>
+          <span>{{ copy().navbar.dealership }}</span>
+          <svg
+            class="h-3.5 w-3.5 text-cyan-300/70"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            stroke-width="2"
+            aria-hidden="true"
+          >
+            <path stroke-linecap="round" stroke-linejoin="round" d="M14 5h5v5M19 5l-8 8"></path>
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M19 13v5a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h5"
+            ></path>
+          </svg>
+        </a>
+
+        <div class="relative">
+          <button
+            type="button"
+            class="inline-flex h-10 items-center gap-1.5 rounded-lg px-2.5 text-sm font-semibold text-slate-300 outline-none transition hover:bg-white/[0.06] hover:text-white focus-visible:ring-2 focus-visible:ring-cyan-300 2xl:px-3"
+            [ngClass]="language_shift_window() ? 'bg-white/10 text-white' : ''"
+            [attr.aria-label]="copy().navbar.langLabel"
+            [attr.aria-expanded]="language_shift_window()"
+            aria-haspopup="menu"
+            (click)="toggleLanguageMenu()"
+          >
+            <svg
+              class="h-4 w-4 text-cyan-300"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              stroke-width="2"
+              aria-hidden="true"
+            >
+              <circle cx="12" cy="12" r="9"></circle>
+              <path
+                stroke-linecap="round"
+                d="M3 12h18M12 3c2.2 2.5 3.3 5.5 3.3 9S14.2 18.5 12 21M12 3c-2.2 2.5-3.3 5.5-3.3 9S9.8 18.5 12 21"
+              ></path>
+            </svg>
+            {{ selectedLanguage() | uppercase }}
+            <svg
+              class="h-3.5 w-3.5 transition-transform"
+              [ngClass]="language_shift_window() ? 'rotate-180' : ''"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              stroke-width="2"
+              aria-hidden="true"
+            >
+              <path stroke-linecap="round" stroke-linejoin="round" d="m6 9 6 6 6-6"></path>
+            </svg>
+          </button>
+
+          <ul
+            *ngIf="language_shift_window()"
+            class="absolute right-0 top-full mt-2 w-48 rounded-xl border border-white/10 bg-slate-900/95 p-2 shadow-2xl shadow-black/40 ring-1 ring-black/20 backdrop-blur-xl"
+            role="menu"
+          >
+            <li *ngFor="let locale of languages">
+              <button
+                type="button"
+                class="flex h-10 w-full items-center justify-between rounded-lg px-3 text-sm font-medium text-slate-300 outline-none transition hover:bg-white/[0.07] hover:text-white focus-visible:ring-2 focus-visible:ring-cyan-300"
+                [ngClass]="locale === selectedLanguage() ? 'bg-cyan-300/10 text-cyan-200' : ''"
+                role="menuitem"
+                (click)="setLanguage(locale)"
+              >
+                {{ copy().navbar.langNames[locale] }}
+                <svg
+                  *ngIf="locale === selectedLanguage()"
+                  class="h-4 w-4"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  stroke-width="2.5"
+                  aria-hidden="true"
+                >
+                  <path stroke-linecap="round" stroke-linejoin="round" d="m5 12 4 4L19 6"></path>
+                </svg>
               </button>
             </li>
           </ul>
-
         </div>
 
-        <a *ngIf="!isAuthenticated()" routerLink="/login" routerLinkActive="border-cyan-200/50 bg-cyan-200/10 text-cyan-100"
-          class="inline-flex h-11 items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/[0.04] px-3 text-sm font-semibold text-slate-200 outline-none transition hover:border-cyan-200/30 hover:bg-white/[0.08] hover:text-white focus-visible:ring-2 focus-visible:ring-cyan-200 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 2xl:px-4">
-          <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"
-            aria-hidden="true">
-            <path stroke-linecap="round" stroke-linejoin="round"
-              d="M15.75 6.75V5.25A2.25 2.25 0 0 0 13.5 3h-6A2.25 2.25 0 0 0 5.25 5.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25v-1.5M12 8.25 15.75 12 12 15.75M15.75 12H21" />
+        <a
+          *ngIf="!isAuthenticated()"
+          routerLink="/login"
+          routerLinkActive="bg-white/10 text-white"
+          class="inline-flex h-10 items-center gap-2 rounded-lg px-3 text-sm font-semibold text-slate-300 outline-none transition hover:bg-white/[0.06] hover:text-white focus-visible:ring-2 focus-visible:ring-cyan-300"
+        >
+          <svg
+            class="h-4 w-4"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            stroke-width="2"
+            aria-hidden="true"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M15.75 6.75V5.25A2.25 2.25 0 0 0 13.5 3h-6A2.25 2.25 0 0 0 5.25 5.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25v-1.5M12 8.25 15.75 12 12 15.75M15.75 12H21"
+            ></path>
           </svg>
           {{ copy().navbar.loginLabel }}
         </a>
 
-        <a *ngIf="isAuthenticated()" routerLink="/profile"
-          routerLinkActive="border-cyan-200/50 bg-cyan-200/10 text-cyan-100"
-          class="inline-flex h-11 items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/[0.04] px-3 text-sm font-semibold text-slate-200 outline-none transition hover:border-cyan-200/30 hover:bg-white/[0.08] hover:text-white focus-visible:ring-2 focus-visible:ring-cyan-200 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 2xl:px-4">
-          <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M5.121 17.804A13.937 13.937 0 0 1 12 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
-          </svg>
-          {{ userName() }}
+        <a
+          *ngIf="isAuthenticated()"
+          routerLink="/profile"
+          routerLinkActive="bg-white/10 text-white"
+          class="inline-flex h-10 max-w-44 items-center gap-2 rounded-lg px-2 text-sm font-semibold text-slate-300 outline-none transition hover:bg-white/[0.06] hover:text-white focus-visible:ring-2 focus-visible:ring-cyan-300 2xl:px-3"
+          [attr.aria-label]="userName()"
+        >
+          <span
+            class="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-cyan-300/15 text-xs font-bold uppercase text-cyan-200"
+            >{{ userName().charAt(0) }}</span
+          >
+          <span class="hidden max-w-28 truncate 2xl:inline">{{ userName() }}</span>
         </a>
 
-        <a routerLink="/book"
-          class="group relative inline-flex h-11 items-center justify-center gap-2 overflow-hidden rounded-xl border border-cyan-100 bg-gradient-to-b from-cyan-100 to-cyan-300 px-4 text-sm font-bold text-slate-950 shadow-lg shadow-cyan-950/30 outline-none transition-all duration-300 hover:-translate-y-0.5 hover:from-white hover:to-cyan-100 hover:shadow-cyan-400/20 focus-visible:ring-2 focus-visible:ring-cyan-200 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 2xl:px-5">
-          <span
-            class="absolute inset-y-0 -left-8 w-8 rotate-12 bg-white/60 blur-md transition-transform duration-700 group-hover:translate-x-36"></span>
-          <svg class="relative z-10 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"
-            aria-hidden="true">
-            <path stroke-linecap="round" stroke-linejoin="round"
-              d="M8 2v3M16 2v3M3.5 9h17M5 4.5h14a2 2 0 0 1 2 2V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6.5a2 2 0 0 1 2-2Z" />
+        <a
+          routerLink="/book"
+          class="group ml-0.5 inline-flex h-11 items-center gap-2 whitespace-nowrap rounded-xl bg-cyan-300 px-3.5 text-sm font-bold text-slate-950 shadow-lg shadow-cyan-950/40 outline-none transition duration-200 hover:-translate-y-0.5 hover:bg-cyan-200 hover:shadow-cyan-400/15 focus-visible:ring-2 focus-visible:ring-cyan-200 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 2xl:ml-1 2xl:px-5"
+        >
+          <svg
+            class="h-4 w-4"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            stroke-width="2"
+            aria-hidden="true"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M8 2v3M16 2v3M3.5 9h17M5 4.5h14a2 2 0 0 1 2 2V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6.5a2 2 0 0 1 2-2Z"
+            ></path>
           </svg>
-          <span class="relative z-10">{{ copy().navbar.ctaPrimary }}</span>
+          {{ copy().navbar.ctaPrimary }}
         </a>
       </div>
 
-      <button type="button"
-        class="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-white/10 bg-white/[0.05] text-slate-200 shadow-sm outline-none transition-colors hover:border-cyan-200/30 hover:bg-white/10 hover:text-white focus-visible:ring-2 focus-visible:ring-cyan-200 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 xl:hidden"
-        [attr.aria-expanded]="mobileMenuOpen()" aria-controls="mobile-navigation"
-        [attr.aria-label]="copy().navbar.menuToggle" (click)="toggleMobileMenu()">
-        <span class="sr-only">{{ copy().navbar.menuToggle }}</span>
-        <svg *ngIf="!mobileMenuOpen()" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"
-          stroke-width="2">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M4 7h16M4 12h16M4 17h16" />
+      <button
+        type="button"
+        class="ml-auto inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-white/10 bg-white/[0.05] text-slate-200 outline-none transition hover:border-cyan-300/30 hover:bg-white/10 hover:text-white focus-visible:ring-2 focus-visible:ring-cyan-300 xl:hidden"
+        [attr.aria-expanded]="mobileMenuOpen()"
+        aria-controls="mobile-navigation"
+        [attr.aria-label]="copy().navbar.menuToggle"
+        (click)="toggleMobileMenu()"
+      >
+        <svg
+          *ngIf="!mobileMenuOpen()"
+          class="h-5 w-5"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          stroke-width="2"
+          aria-hidden="true"
+        >
+          <path stroke-linecap="round" d="M4 7h16M4 12h16M4 17h16"></path>
         </svg>
-        <svg *ngIf="mobileMenuOpen()" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"
-          stroke-width="2">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+        <svg
+          *ngIf="mobileMenuOpen()"
+          class="h-5 w-5"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          stroke-width="2"
+          aria-hidden="true"
+        >
+          <path stroke-linecap="round" d="m6 6 12 12M18 6 6 18"></path>
         </svg>
       </button>
     </nav>
+  </div>
 
-    <div id="mobile-navigation" class="grid transition-all duration-300 xl:hidden"
-      [ngClass]="mobileMenuOpen() ? 'grid-rows-[1fr] pb-4 opacity-100' : 'grid-rows-[0fr] opacity-0'">
-      <div class="overflow-hidden">
-        <div class="border-t border-white/10 pt-4">
-          <div
-            class="grid gap-1 rounded-xl border border-white/10 bg-white/[0.04] p-2 shadow-xl shadow-slate-950/20 sm:grid-cols-2">
-            <a *ngFor="let item of navItems()" [routerLink]="item.routerLink" routerLinkActive="bg-white/5 text-white"
-              [routerLinkActiveOptions]="{ exact: item.routerLink === '/' }"
-              class="flex items-center justify-between rounded-lg px-3 py-3 text-sm font-semibold text-slate-300 transition-colors hover:bg-white/[0.08] hover:text-white"
-              (click)="closeMobileMenu()">
-              <span>{{ item.label }}</span>
-              <svg class="h-4 w-4 text-cyan-200/70" fill="none" viewBox="0 0 24 24" stroke="currentColor"
-                stroke-width="2" aria-hidden="true">
-                <path stroke-linecap="round" stroke-linejoin="round" d="m9 5 7 7-7 7" />
-              </svg>
+  <div
+    id="mobile-navigation"
+    class="grid border-white/10 bg-slate-950/95 transition-all duration-300 xl:hidden"
+    [ngClass]="
+      mobileMenuOpen()
+        ? 'grid-rows-[1fr] border-t opacity-100'
+        : 'grid-rows-[0fr] border-t-0 opacity-0'
+    "
+  >
+    <div class="max-h-[calc(100vh-4rem)] overflow-y-auto overscroll-contain">
+      <div class="mx-auto max-w-7xl space-y-5 px-4 py-5 sm:px-6">
+        <div class="grid gap-2 sm:grid-cols-2">
+          <a
+            routerLink="/"
+            routerLinkActive="border-cyan-300/20 bg-cyan-300/10 text-cyan-100"
+            [routerLinkActiveOptions]="{ exact: true }"
+            class="flex min-h-12 items-center justify-between rounded-xl border border-white/10 bg-white/[0.03] px-4 text-sm font-semibold text-slate-200 transition hover:bg-white/[0.07] hover:text-white"
+            (click)="closeMobileMenu()"
+          >
+            {{ copy().navbar.home }}
+            <svg
+              class="h-4 w-4 text-cyan-300"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              stroke-width="2"
+              aria-hidden="true"
+            >
+              <path stroke-linecap="round" stroke-linejoin="round" d="m9 5 7 7-7 7"></path>
+            </svg>
+          </a>
+          <a
+            routerLink="/services"
+            routerLinkActive="border-cyan-300/20 bg-cyan-300/10 text-cyan-100"
+            class="flex min-h-12 items-center justify-between rounded-xl border border-white/10 bg-white/[0.03] px-4 text-sm font-semibold text-slate-200 transition hover:bg-white/[0.07] hover:text-white"
+            (click)="closeMobileMenu()"
+          >
+            {{ copy().navbar.collections }}
+            <svg
+              class="h-4 w-4 text-cyan-300"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              stroke-width="2"
+              aria-hidden="true"
+            >
+              <path stroke-linecap="round" stroke-linejoin="round" d="m9 5 7 7-7 7"></path>
+            </svg>
+          </a>
+          <a
+            routerLink="/faq"
+            routerLinkActive="border-cyan-300/20 bg-cyan-300/10 text-cyan-100"
+            class="flex min-h-12 items-center justify-between rounded-xl border border-white/10 bg-white/[0.03] px-4 text-sm font-semibold text-slate-200 transition hover:bg-white/[0.07] hover:text-white sm:col-span-2"
+            (click)="closeMobileMenu()"
+          >
+            {{ copy().navbar.faq }}
+            <svg
+              class="h-4 w-4 text-cyan-300"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              stroke-width="2"
+              aria-hidden="true"
+            >
+              <path stroke-linecap="round" stroke-linejoin="round" d="m9 5 7 7-7 7"></path>
+            </svg>
+          </a>
+          <a
+            *ngIf="isAuthenticated()"
+            routerLink="/appointments"
+            routerLinkActive="border-cyan-300/20 bg-cyan-300/10 text-cyan-100"
+            class="flex min-h-12 items-center justify-between rounded-xl border border-white/10 bg-white/[0.03] px-4 text-sm font-semibold text-slate-200 transition hover:bg-white/[0.07] hover:text-white sm:col-span-2"
+            (click)="closeMobileMenu()"
+          >
+            {{ copy().home.appointments.eyebrow }}
+            <svg
+              class="h-4 w-4 text-cyan-300"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              stroke-width="2"
+              aria-hidden="true"
+            >
+              <path stroke-linecap="round" stroke-linejoin="round" d="m9 5 7 7-7 7"></path>
+            </svg>
+          </a>
+          <a
+            *ngIf="dealershipUrl"
+            [href]="dealershipUrl"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="flex min-h-12 items-center justify-between rounded-xl border border-cyan-300/30 bg-cyan-300/10 px-4 text-sm font-bold text-cyan-100 transition hover:border-cyan-200/60 hover:bg-cyan-300/20 hover:text-white sm:col-span-2"
+            (click)="closeMobileMenu()"
+          >
+            {{ copy().navbar.dealership }}
+            <svg
+              class="h-4 w-4 text-cyan-300"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              stroke-width="2"
+              aria-hidden="true"
+            >
+              <path stroke-linecap="round" stroke-linejoin="round" d="M14 5h5v5M19 5l-8 8"></path>
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M19 13v5a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h5"
+              ></path>
+            </svg>
+          </a>
+        </div>
+
+        <div>
+          <p class="mb-2 text-[11px] font-bold uppercase tracking-[0.2em] text-slate-500">
+            {{ copy().services.treatments.eyebrow }}
+          </p>
+          <div class="grid gap-2 sm:grid-cols-2">
+            <a
+              *ngFor="let treatment of treatments()"
+              [routerLink]="['/services', treatment.slug]"
+              class="flex min-h-12 items-center gap-3 rounded-xl border border-white/10 bg-white/[0.03] px-3 text-sm font-semibold text-slate-200 transition hover:border-cyan-300/20 hover:bg-cyan-300/10 hover:text-white"
+              (click)="closeMobileMenu()"
+            >
+              <span
+                class="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-cyan-300/10 text-cyan-300"
+              >
+                <svg
+                  class="h-4 w-4"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                  aria-hidden="true"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M12 3.75c-3.4 4.1-5.1 7.1-5.1 9.5a5.1 5.1 0 0 0 10.2 0c0-2.4-1.7-5.4-5.1-9.5Z"
+                  ></path>
+                </svg>
+              </span>
+              {{ treatment.title }}
             </a>
           </div>
+        </div>
 
-          <div class="mt-3 flex flex-wrap items-center gap-2 border-t border-white/10 pt-3">
-            <button *ngFor="let locale of languages" type="button" (click)="setLanguage(locale)"
-              class="rounded-md border px-3 py-2 text-sm font-semibold outline-none transition focus-visible:ring-2 focus-visible:ring-cyan-200"
-              [ngClass]="locale === selectedLanguage() ? 'border-cyan-200 bg-cyan-200 text-slate-950' : 'border-white/10 text-slate-300 hover:bg-white/5 hover:text-white'">
-              {{ copy().navbar.langNames[locale] }}
+        <div>
+          <p class="mb-2 text-[11px] font-bold uppercase tracking-[0.2em] text-slate-500">
+            {{ copy().navbar.langLabel }}
+          </p>
+          <div class="grid grid-cols-3 gap-2">
+            <button
+              *ngFor="let locale of languages"
+              type="button"
+              class="min-h-11 rounded-xl border px-2 text-sm font-semibold outline-none transition focus-visible:ring-2 focus-visible:ring-cyan-300"
+              [ngClass]="
+                locale === selectedLanguage()
+                  ? 'border-cyan-300 bg-cyan-300 text-slate-950'
+                  : 'border-white/10 bg-white/[0.03] text-slate-300 hover:bg-white/[0.07] hover:text-white'
+              "
+              (click)="setLanguage(locale)"
+            >
+              {{ locale | uppercase }}
             </button>
           </div>
+        </div>
 
-          <div>
-            <a *ngIf="!isAuthenticated()" routerLink="/login"
-              class="mt-3 inline-flex h-12 w-full items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/[0.05] px-5 text-sm font-semibold text-slate-200 transition hover:border-cyan-200/30 hover:bg-white/10 hover:text-white"
-              (click)="closeMobileMenu()">
-              <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"
-                aria-hidden="true">
-                <path stroke-linecap="round" stroke-linejoin="round"
-                  d="M15.75 6.75V5.25A2.25 2.25 0 0 0 13.5 3h-6A2.25 2.25 0 0 0 5.25 5.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25v-1.5M12 8.25 15.75 12 12 15.75M15.75 12H21" />
-              </svg>
-              {{ copy().navbar.loginLabel }}
-            </a>
-            <a *ngIf="isAuthenticated()" routerLink="/profile"
-              class="mt-3 inline-flex h-12 w-full items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/[0.05] px-5 text-sm font-semibold text-slate-200 transition hover:border-cyan-200/30 hover:bg-white/10 hover:text-white"
-              (click)="closeMobileMenu()">
-              <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"
-                aria-hidden="true">
-                <path stroke-linecap="round" stroke-linejoin="round"
-                  d="M5.121 17.804A13.937 13.937 0 0 1 12 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
-              </svg>
-              {{ userName() }}
-            </a>
-          </div>
-
-
-          <a routerLink="/book"
-            class="mt-3 inline-flex h-12 w-full items-center justify-center gap-2 rounded-xl border border-cyan-100 bg-gradient-to-b from-cyan-100 to-cyan-300 px-5 text-sm font-bold text-slate-950 shadow-lg shadow-cyan-950/20 transition hover:from-white hover:to-cyan-100"
-            (click)="closeMobileMenu()">
-            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"
-              aria-hidden="true">
-              <path stroke-linecap="round" stroke-linejoin="round"
-                d="M8 2v3M16 2v3M3.5 9h17M5 4.5h14a2 2 0 0 1 2 2V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6.5a2 2 0 0 1 2-2Z" />
+        <div class="grid gap-2 sm:grid-cols-2">
+          <a
+            *ngIf="!isAuthenticated()"
+            routerLink="/login"
+            class="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/[0.04] px-4 text-sm font-semibold text-white transition hover:bg-white/[0.08]"
+            (click)="closeMobileMenu()"
+          >
+            {{ copy().navbar.loginLabel }}
+          </a>
+          <a
+            *ngIf="isAuthenticated()"
+            routerLink="/profile"
+            class="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/[0.04] px-4 text-sm font-semibold text-white transition hover:bg-white/[0.08]"
+            (click)="closeMobileMenu()"
+          >
+            <span
+              class="grid h-6 w-6 place-items-center rounded-full bg-cyan-300/15 text-xs font-bold uppercase text-cyan-200"
+              >{{ userName().charAt(0) }}</span
+            >
+            <span class="truncate">{{ userName() }}</span>
+          </a>
+          <a
+            routerLink="/book"
+            class="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-cyan-300 px-5 text-sm font-bold text-slate-950 shadow-lg shadow-cyan-950/30 transition hover:bg-cyan-200"
+            (click)="closeMobileMenu()"
+          >
+            <svg
+              class="h-4 w-4"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              stroke-width="2"
+              aria-hidden="true"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M8 2v3M16 2v3M3.5 9h17M5 4.5h14a2 2 0 0 1 2 2V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6.5a2 2 0 0 1 2-2Z"
+              ></path>
             </svg>
             {{ copy().navbar.ctaPrimary }}
           </a>

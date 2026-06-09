@@ -12,7 +12,8 @@ export const enBookingCopy: BookingCopy = {
   passwordLabel: 'Password',
   retypePasswordLabel: 'Confirm password',
   passwordLengthMessage: 'Password must be between 12 and 30 characters.',
-  passwordPatternMessage: 'Password must include uppercase, lowercase, number, and special character.',
+  passwordPatternMessage:
+    'Password must include uppercase, lowercase, number, and special character.',
   passwordMismatchMessage: 'Passwords do not match.',
   phoneLabel: 'Phone number',
   phoneLengthMessage: 'Phone number must be between 8 and 30 characters.',
@@ -35,6 +36,15 @@ export const enBookingCopy: BookingCopy = {
   timeRequiredMessage: 'Select a time.',
   successHeading: 'Appointment request received',
   successMessage: 'We will contact you to confirm the selected appointment.',
+  confirmationEyebrow: 'Booking confirmation',
+  confirmationAppointmentLabel: 'Appointment',
+  confirmationTreatmentsLabel: 'Selected treatments',
+  confirmationCustomerLabel: 'Booked for',
+  confirmationNextStepsHeading: 'What happens next?',
+  confirmationNextStepsMessage:
+    'Your request is saved in your profile. We will contact you if any appointment details need clarification.',
+  viewBookingsLabel: 'View my bookings',
+  bookAnotherLabel: 'Book another appointment',
   weekdays: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
   timeSlots: ['09:00', '10:30', '12:00', '13:30', '15:00', '16:30'],
 };

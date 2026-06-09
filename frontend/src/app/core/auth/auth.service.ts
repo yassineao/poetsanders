@@ -5,7 +5,7 @@ import { environment } from '../../../environments/environment';
 import { AuthUser } from '../interfaces/AuthUser';
 import { LoginCredentials } from '../interfaces/loginCridentials';
 import { RegisterCredentials } from '../interfaces/registerCredentials';
-
+import { UpdateProfileRequest } from '../interfaces/updateProfile';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
@@ -29,6 +29,12 @@ export class AuthService {
   register(credentials: RegisterCredentials): Observable<AuthUser> {
     return this.http
       .post<AuthUser>(`${this.apiBaseUrl}/auth/register`, credentials, { withCredentials: true })
+      .pipe(tap((user) => this.currentUser.set(user)));
+  }
+
+  updateProfile(profile: UpdateProfileRequest): Observable<AuthUser> {
+    return this.http
+      .patch<AuthUser>(`${this.apiBaseUrl}/auth/update`, profile, { withCredentials: true })
       .pipe(tap((user) => this.currentUser.set(user)));
   }
 

@@ -10,14 +10,16 @@ public record WashCalendarResponse(
         UUID id,
         WashType washType,
         UUID userId,
-        LocalDateTime localDateTime
+        LocalDateTime localDateTime,
+        boolean accepted
 ) {
     public static WashCalendarResponse from(WashCalendar washCalendar) {
         return new WashCalendarResponse(
                 washCalendar.getId(),
                 washCalendar.getWashType(),
                 washCalendar.getUser().getId(),
-                washCalendar.getLocalDateTime()
+                washCalendar.getLocalDateTime(),
+                washCalendar.isAccepted()
         );
     }
 }

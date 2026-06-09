@@ -59,9 +59,25 @@ export interface HomeTestimonialsSectionCopy {
   }>;
 }
 
+export interface HomeAppointmentsCopy {
+  eyebrow: string;
+  heading: string;
+  description: string;
+  loadingLabel: string;
+  errorLabel: string;
+  emptyLabel: string;
+  acceptedLabel: string;
+  pendingLabel: string;
+  partiallyAcceptedLabel: string;
+  cancelLabel: string;
+  cancellingLabel: string;
+  profileLabel: string;
+}
+
 export interface HomeCopy {
   meta: HomeMetaCopy;
   hero: HomeHeroCopy;
+  appointments: HomeAppointmentsCopy;
   cards: HomeCardsSectionCopy;
   testimonials: HomeTestimonialsSectionCopy;
   maps: HomeCopyMap;

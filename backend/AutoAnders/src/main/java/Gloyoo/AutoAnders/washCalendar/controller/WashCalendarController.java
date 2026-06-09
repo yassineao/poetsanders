@@ -40,18 +40,18 @@ public class WashCalendarController {
 
     @GetMapping
     public ResponseEntity<List<WashCalendarResponse>> getWashCalendar() {
-        return ResponseEntity.ok(toResponses(washCalendarService.findAllWashCalendar()));
+        List<WashCalendarResponse> washCalendars = toResponses(
+                washCalendarService.findAllWashCalendar()
+        );
+        return ResponseEntity.ok(washCalendars);
     }
 
     @DeleteMapping("/{uuid}")
     public ResponseEntity<Void> deleteWashCalendar(
-            @PathVariable UUID uuid,
-            Authentication authentication
+            @PathVariable UUID uuid
+
     ) {
-        washCalendarService.deleteWashCalendar(
-                uuid,
-                authenticatedUserId(authentication)
-        );
+        washCalendarService.deleteWashCalendar(uuid);
         return ResponseEntity.noContent().build();
     }
 
@@ -61,22 +61,45 @@ public class WashCalendarController {
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
             LocalDateTime localDateTime
     ) {
-        return ResponseEntity.ok(
-                toResponses(washCalendarService.getWashCalendarByDate(localDateTime))
+        List<WashCalendarResponse> washCalendars = toResponses(
+                washCalendarService.getWashCalendarByDate(localDateTime)
         );
+
+        return ResponseEntity.ok(washCalendars);
     }
+
+    @GetMapping("/accepted/{TF}")
+    public ResponseEntity<List<WashCalendarResponse>> getAcceptedWashCalendar(
+            @PathVariable boolean TF,
+            Authentication authentication
+    ) {
+        UUID uuid = authenticatedUserId(authentication);
+        List<WashCalendarResponse> washCalendars = toResponses(
+                washCalendarService.findByAccepted(TF, uuid)
+        );
+        return ResponseEntity.ok(washCalendars);
+    }
+
+    @PostMapping("/accept/{uuid}")
+    public ResponseEntity<Void> acceptWashCalendar(
+            @PathVariable UUID uuid
+    ) {
+        washCalendarService.accept(uuid);
+        return ResponseEntity.ok().build();
+    }
+
 
     @GetMapping("/by_user")
     public ResponseEntity<List<WashCalendarResponse>> getWashCalendarByUser(
             Authentication authentication
     ) {
-        return ResponseEntity.ok(
-                toResponses(
-                        washCalendarService.getWashCalendarByUser(
-                                authenticatedUserId(authentication)
-                        )
+        List<WashCalendarResponse> washCalendars = toResponses(
+                washCalendarService.getWashCalendarByUser(
+                        authenticatedUserId(authentication)
                 )
         );
+
+        return ResponseEntity.ok(washCalendars);
     }
 
     private List<WashCalendarResponse> toResponses(List<WashCalendar> washCalendars) {

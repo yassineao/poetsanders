@@ -1,7 +1,7 @@
 package Gloyoo.AutoAnders.washCalendar.service;
 
 import Gloyoo.AutoAnders.user.entity.User;
-import Gloyoo.AutoAnders.user.repository.UserRepository;
+import Gloyoo.AutoAnders.user.service.UserService;
 import Gloyoo.AutoAnders.washCalendar.dto.WashCalendarRequest;
 import Gloyoo.AutoAnders.washCalendar.entity.WashCalendar;
 import Gloyoo.AutoAnders.washCalendar.entity.WashType;
@@ -23,9 +23,9 @@ class WashCalendarServiceTest {
     @Test
     void bookingAssignsAuthenticatedUserBeforeSaving() {
         WashCalendarRepository washCalendarRepository = mock(WashCalendarRepository.class);
-        UserRepository userRepository = mock(UserRepository.class);
+        UserService userService = mock(UserService.class);
         WashCalendarService service =
-                new WashCalendarService(washCalendarRepository, userRepository);
+                new WashCalendarService(washCalendarRepository, userService);
 
         UUID userId = UUID.randomUUID();
         User user = User.builder().id(userId).build();
@@ -34,14 +34,14 @@ class WashCalendarServiceTest {
                 LocalDateTime.of(2026, 6, 8, 14, 30)
         );
 
-        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+        when(userService.findByIdOrThrow(userId)).thenReturn((user));
         when(washCalendarRepository.save(any(WashCalendar.class)))
                 .thenAnswer(invocation -> invocation.getArgument(0));
 
         WashCalendar saved = service.book_a_wash_calendar(request, userId);
 
         assertSame(user, saved.getUser());
-        verify(userRepository).findById(userId);
+        verify(userService).findByIdOrThrow(userId);
         verify(washCalendarRepository).save(saved);
     }
 }

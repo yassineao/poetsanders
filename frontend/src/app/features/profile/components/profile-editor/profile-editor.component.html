@@ -1,0 +1,118 @@
+<div>
+  <div *ngIf="!editing(); else editForm" class="space-y-4">
+    <div class="rounded-lg border border-white/10 bg-slate-950/50 p-4">
+      <p class="text-xs uppercase tracking-wide text-slate-500">{{ copy().nameLabel }}</p>
+      <p class="mt-1 font-semibold text-white">{{ user.user }}</p>
+    </div>
+    <div class="rounded-lg border border-white/10 bg-slate-950/50 p-4">
+      <p class="text-xs uppercase tracking-wide text-slate-500">{{ copy().emailLabel }}</p>
+      <p class="mt-1 font-semibold text-white">{{ user.email }}</p>
+    </div>
+    <div class="rounded-lg border border-white/10 bg-slate-950/50 p-4">
+      <p class="text-xs uppercase tracking-wide text-slate-500">{{ copy().phoneLabel }}</p>
+      <p class="mt-1 font-semibold text-white">{{ user.phoneNumber || '-' }}</p>
+    </div>
+
+    <p
+      *ngIf="saved()"
+      role="status"
+      class="rounded-lg border border-emerald-300/20 bg-emerald-300/10 p-3 text-sm text-emerald-100"
+    >
+      {{ copy().savedLabel }}
+    </p>
+
+    <button
+      type="button"
+      class="h-11 rounded-lg border border-cyan-300/25 bg-cyan-300/10 px-5 text-sm font-bold text-cyan-100 transition hover:bg-cyan-300/20"
+      (click)="startEditing()"
+    >
+      {{ copy().editLabel }}
+    </button>
+  </div>
+
+  <ng-template #editForm>
+    <form class="space-y-5" [formGroup]="profileForm" (ngSubmit)="save()">
+      <div class="rounded-lg border border-white/10 bg-slate-950/50 p-4">
+        <p class="text-xs uppercase tracking-wide text-slate-500">{{ copy().emailLabel }}</p>
+        <p class="mt-1 font-semibold text-white">{{ user.email }}</p>
+      </div>
+
+      <label class="block">
+        <span class="text-sm font-semibold text-slate-200">{{ copy().nameLabel }}</span>
+        <input
+          type="text"
+          formControlName="name"
+          autocomplete="name"
+          class="mt-2 h-11 w-full rounded-lg border border-white/10 bg-slate-950 px-3 text-white outline-none transition focus:border-cyan-300/50"
+        />
+        <span
+          *ngIf="profileForm.controls.name.touched && profileForm.controls.name.invalid"
+          class="mt-1 block text-sm text-rose-300"
+        >
+          {{ copy().requiredError }}
+        </span>
+      </label>
+
+      <label class="block">
+        <span class="text-sm font-semibold text-slate-200">{{ copy().phoneLabel }}</span>
+        <input
+          type="tel"
+          formControlName="phoneNumber"
+          autocomplete="tel"
+          class="mt-2 h-11 w-full rounded-lg border border-white/10 bg-slate-950 px-3 text-white outline-none transition focus:border-cyan-300/50"
+        />
+        <span
+          *ngIf="
+            profileForm.controls.phoneNumber.touched && profileForm.controls.phoneNumber.invalid
+          "
+          class="mt-1 block text-sm text-rose-300"
+        >
+          {{ copy().phoneError }}
+        </span>
+      </label>
+
+      <label class="block">
+        <span class="text-sm font-semibold text-slate-200">{{ copy().passwordLabel }}</span>
+        <input
+          type="password"
+          formControlName="password"
+          autocomplete="new-password"
+          class="mt-2 h-11 w-full rounded-lg border border-white/10 bg-slate-950 px-3 text-white outline-none transition focus:border-cyan-300/50"
+        />
+        <span class="mt-1 block text-xs text-slate-500">{{ copy().passwordHint }}</span>
+        <span
+          *ngIf="profileForm.controls.password.touched && profileForm.controls.password.invalid"
+          class="mt-1 block text-sm text-rose-300"
+        >
+          {{ copy().passwordError }}
+        </span>
+      </label>
+
+      <p
+        *ngIf="errorMessage()"
+        role="alert"
+        class="rounded-lg border border-rose-300/20 bg-rose-300/10 p-3 text-sm text-rose-100"
+      >
+        {{ errorMessage() }}
+      </p>
+
+      <div class="flex flex-wrap gap-3">
+        <button
+          type="submit"
+          [disabled]="saving()"
+          class="h-11 rounded-lg bg-cyan-200 px-5 text-sm font-bold text-slate-950 transition hover:bg-cyan-100 disabled:cursor-wait disabled:opacity-70"
+        >
+          {{ saving() ? copy().savingLabel : copy().saveLabel }}
+        </button>
+        <button
+          type="button"
+          [disabled]="saving()"
+          class="h-11 rounded-lg border border-white/10 px-5 text-sm font-bold text-slate-200 transition hover:bg-white/5 disabled:opacity-70"
+          (click)="cancelEditing()"
+        >
+          {{ copy().cancelLabel }}
+        </button>
+      </div>
+    </form>
+  </ng-template>
+</div>

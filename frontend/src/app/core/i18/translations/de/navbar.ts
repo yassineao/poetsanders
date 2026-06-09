@@ -3,6 +3,8 @@ import type { NavbarCopy } from '../../../interfaces/types';
 export const deNavbarCopy: NavbarCopy = {
   home: 'Startseite',
   collections: 'Services',
+  faq: 'Häufige Fragen',
+  dealership: 'Autohaus',
   ctaPrimary: 'Wäsche buchen',
   loginLabel: 'Anmelden',
   langLabel: 'Sprache',
