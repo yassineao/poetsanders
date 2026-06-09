@@ -3,6 +3,8 @@ export interface BookingCopy {
   heading: string;
   description: string;
   formHeading: string;
+  existingAccountPrompt: string;
+  loginLabel: string;
   calendarHeading: string;
   calendarDescription: string;
   nameLabel: string;

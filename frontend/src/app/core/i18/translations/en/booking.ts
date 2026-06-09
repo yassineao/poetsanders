@@ -5,6 +5,8 @@ export const enBookingCopy: BookingCopy = {
   heading: 'Choose the right moment for your car',
   description: 'Tell us what your vehicle needs, then select an available date and time.',
   formHeading: 'Your details',
+  existingAccountPrompt: 'Already have an account?',
+  loginLabel: 'Log in',
   calendarHeading: 'Choose a date and time',
   calendarDescription: 'Select a day in the calendar and then choose a preferred time.',
   nameLabel: 'Name',

@@ -151,9 +151,19 @@
       (ngSubmit)="submit()"
     >
       <div
-        class="rounded-xl border border-white/10 bg-slate-900/80 p-6 shadow-xl shadow-slate-950/30 sm:p-8"
+        class="self-start rounded-xl border border-white/10 bg-slate-900/80 p-6 shadow-xl shadow-slate-950/30 sm:p-8"
       >
         <h2 class="text-2xl font-semibold text-white">{{ copy().formHeading }}</h2>
+
+        <div *ngIf="!isAuthenticated()" class="mt-4 flex flex-wrap items-center gap-3">
+          <p class="text-sm text-slate-400">{{ copy().existingAccountPrompt }}</p>
+          <a
+            routerLink="/login"
+            class="inline-flex min-h-10 items-center justify-center rounded-md border border-cyan-200/30 px-4 text-sm font-bold text-cyan-200 transition hover:border-cyan-200 hover:bg-cyan-200/10"
+          >
+            {{ copy().loginLabel }}
+          </a>
+        </div>
 
         <div *ngIf="!isAuthenticated()" class="mt-7 grid gap-5 sm:grid-cols-2">
           <label class="block">
@@ -368,14 +378,7 @@
           </div>
         </fieldset>
 
-        <label class="mt-5 block">
-          <span class="text-sm font-medium text-slate-200">{{ copy().messageLabel }}</span>
-          <textarea
-            formControlName="message"
-            rows="5"
-            class="mt-2 w-full resize-none rounded-md border border-white/10 bg-slate-950/70 px-4 py-3 text-white outline-none transition focus:border-cyan-200 focus:ring-2 focus:ring-cyan-200/20"
-          ></textarea>
-        </label>
+
       </div>
 
       <div
