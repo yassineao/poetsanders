@@ -1,6 +1,7 @@
 package Gloyoo.AutoAnders.washCalendar.controller;
 
 import Gloyoo.AutoAnders.washCalendar.dto.WashCalendarRequest;
+import Gloyoo.AutoAnders.washCalendar.dto.WashCalendarResponse;
 import Gloyoo.AutoAnders.washCalendar.entity.WashCalendar;
 import Gloyoo.AutoAnders.washCalendar.service.WashCalendarService;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -24,7 +25,7 @@ public class WashCalendarController {
     }
 
     @PostMapping
-    public ResponseEntity<WashCalendar> addWashCalendar(
+    public ResponseEntity<WashCalendarResponse> addWashCalendar(
             @RequestBody WashCalendarRequest washCalendarRequest,
             Authentication authentication
     ) {
@@ -34,12 +35,14 @@ public class WashCalendarController {
                         authenticatedUserId(authentication)
                 );
 
-        return ResponseEntity.ok(washCalendar);
+        return ResponseEntity.ok(WashCalendarResponse.from(washCalendar));
     }
 
     @GetMapping
-    public ResponseEntity<List<WashCalendar>> getWashCalendar() {
-        List<WashCalendar> washCalendars = washCalendarService.findAllWashCalendar();
+    public ResponseEntity<List<WashCalendarResponse>> getWashCalendar() {
+        List<WashCalendarResponse> washCalendars = toResponses(
+                washCalendarService.findAllWashCalendar()
+        );
         return ResponseEntity.ok(washCalendars);
     }
 
@@ -53,47 +56,56 @@ public class WashCalendarController {
     }
 
     @GetMapping("/date/{localDateTime}")
-    public ResponseEntity<List<WashCalendar>> getWashCalendarByDate(
+    public ResponseEntity<List<WashCalendarResponse>> getWashCalendarByDate(
             @PathVariable
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
             LocalDateTime localDateTime
     ) {
-        List<WashCalendar> washCalendars =
-                washCalendarService.getWashCalendarByDate(localDateTime);
+        List<WashCalendarResponse> washCalendars = toResponses(
+                washCalendarService.getWashCalendarByDate(localDateTime)
+        );
 
         return ResponseEntity.ok(washCalendars);
     }
 
     @GetMapping("/accepted/{TF}")
-    public ResponseEntity<List<WashCalendar>> getAcceptedWashCalendar(
+    public ResponseEntity<List<WashCalendarResponse>> getAcceptedWashCalendar(
             @PathVariable boolean TF,
             Authentication authentication
     ) {
         UUID uuid = authenticatedUserId(authentication);
-        List<WashCalendar> washCalendars = washCalendarService.findByAccepted(TF, uuid);
+        List<WashCalendarResponse> washCalendars = toResponses(
+                washCalendarService.findByAccepted(TF, uuid)
+        );
         return ResponseEntity.ok(washCalendars);
     }
 
     @PostMapping("/accept/{uuid}")
-    public ResponseEntity<WashCalendar> acceptWashCalendar(
+    public ResponseEntity<Void> acceptWashCalendar(
             @PathVariable UUID uuid
     ) {
         washCalendarService.accept(uuid);
         return ResponseEntity.ok().build();
-
     }
 
 
     @GetMapping("/by_user")
-    public ResponseEntity<List<WashCalendar>> getWashCalendarByUser(
+    public ResponseEntity<List<WashCalendarResponse>> getWashCalendarByUser(
             Authentication authentication
     ) {
-        List<WashCalendar> washCalendars =
+        List<WashCalendarResponse> washCalendars = toResponses(
                 washCalendarService.getWashCalendarByUser(
                         authenticatedUserId(authentication)
-                );
+                )
+        );
 
         return ResponseEntity.ok(washCalendars);
+    }
+
+    private List<WashCalendarResponse> toResponses(List<WashCalendar> washCalendars) {
+        return washCalendars.stream()
+                .map(WashCalendarResponse::from)
+                .toList();
     }
 
     private UUID authenticatedUserId(Authentication authentication) {

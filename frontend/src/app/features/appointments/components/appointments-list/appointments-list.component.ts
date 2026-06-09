@@ -53,7 +53,12 @@ export class AppointmentsListComponent {
     const grouped = this.bookings().reduce<
       Record<string, { ids: string[]; washTypes: WashType[]; accepted: boolean[] }>
     >((appointments, booking) => {
-      if (!this.pageMode && new Date(booking.localDateTime).getTime() < now) {
+      const appointmentTime = new Date(booking.localDateTime).getTime();
+      if (Number.isNaN(appointmentTime)) {
+        return appointments;
+      }
+
+      if (!this.pageMode && appointmentTime < now) {
         return appointments;
       }
 
