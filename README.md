@@ -1,154 +1,208 @@
 # Poets Anders
 
-Poets Anders is a full-stack car cleaning and detailing application for a
-business in Papendrecht, the Netherlands.
+Full-stack website and appointment platform for **Poets Anders**, a vehicle
+cleaning and detailing business in Papendrecht, the Netherlands.
 
-Customers can browse treatments, switch languages, create an account, log in,
-book one or more treatments, review their appointments, and cancel bookings.
-The repository also contains backend support for cars and car pictures.
+The public website presents detailing treatments in English, German, and Dutch.
+Customers can create an account, log in, request one or more treatments for a
+selected date and time, review appointment status, cancel appointment rows, and
+update their profile. The backend also contains a separate dealership domain
+for cars and Supabase-hosted car pictures.
 
-## Contents
+> This README documents the code as it currently exists. The
+> [Known Issues and Security Gaps](#known-issues-and-security-gaps) section
+> distinguishes implemented behavior from behavior that still needs hardening.
 
-- [Features](#features)
+## Table of Contents
+
+- [Feature Overview](#feature-overview)
+- [Technology Stack](#technology-stack)
 - [System Architecture](#system-architecture)
+- [Repository Structure](#repository-structure)
 - [Frontend Architecture](#frontend-architecture)
 - [Backend Architecture](#backend-architecture)
-- [Authentication Flow](#authentication-flow)
-- [Booking Flow](#booking-flow)
-- [Profile and Cancellation Flow](#profile-and-cancellation-flow)
+- [Authentication and Authorization](#authentication-and-authorization)
+- [Booking and Appointment Logic](#booking-and-appointment-logic)
+- [Car and Picture Logic](#car-and-picture-logic)
 - [Database Model](#database-model)
-- [Rendering and Environment Flow](#rendering-and-environment-flow)
-- [Local Development](#local-development)
 - [API Reference](#api-reference)
-- [Testing and Builds](#testing-and-builds)
+- [Environment Variables](#environment-variables)
+- [Local Development](#local-development)
+- [Testing and Verification](#testing-and-verification)
+- [Build and Rendering](#build-and-rendering)
 - [Deployment](#deployment)
-- [Current Limitations](#current-limitations)
+- [Known Issues and Security Gaps](#known-issues-and-security-gaps)
+- [Development Guidelines](#development-guidelines)
 
-## Features
+## Feature Overview
 
-- Responsive home, services, booking, login, and profile pages
-- English, German, and Dutch translations
-- Five detailing treatments
-- Angular reactive forms and client-side validation
-- Registration and login with JWT cookies
-- Automatic login after registration
-- Booking for authenticated and new customers
-- Multiple treatments at one appointment time
-- Customer profile with grouped appointment history
-- Appointment cancellation with ownership checks
-- Angular SSR, prerendering, and client hydration
-- Spring Security role-based authorization
-- PostgreSQL persistence
-- Supabase-compatible database and picture storage configuration
-- Docker support for the backend
-- Vercel configuration for the frontend
+### Customer Website
 
-## Technology
+- Responsive home page with business details, treatments, testimonials, FAQ,
+  location, contact information, and an authenticated appointment preview
+- Treatment overview and dynamic treatment detail pages
+- English (`en`), German (`de`), and Dutch (`nl`) translations
+- Runtime language switching through Angular signals
+- Booking calendar with future-date selection and fixed time slots
+- Multi-treatment appointment requests
+- Account creation during the booking flow
+- Login with HTTP-only JWT cookies
+- Profile editing for name, phone number, and password
+- Appointment history and upcoming appointment display
+- Pending, partially accepted, and accepted appointment states
+- Appointment cancellation
+- Link to a separate dealership website through `DEALERSHIP_URL`
 
-| Area | Technology |
+### Backend Domains
+
+- User registration, login, refresh, logout, profile loading, and profile update
+- Wash appointment creation, listing, filtering, acceptance, and deletion
+- Car inventory creation, reading, updating, status updates, and deletion
+- Car picture metadata and Supabase Storage uploads
+- PostgreSQL persistence with Spring Data JPA
+- Flyway migration files plus Hibernate schema updates
+- Stateless Spring Security with role-based endpoint rules
+
+## Technology Stack
+
+| Layer | Technology |
 | --- | --- |
-| Frontend | Angular 21, TypeScript, RxJS, Reactive Forms |
+| Frontend framework | Angular 21 standalone components |
+| Frontend language | TypeScript 5.9 |
+| State management | Angular signals and computed signals |
+| Forms | Angular Reactive Forms |
+| HTTP and async logic | Angular `HttpClient`, RxJS |
+| Routing | Angular Router |
 | Styling | Tailwind CSS 4 |
-| Rendering | Angular SSR, prerendering, hydration with event replay |
-| Frontend tests | Vitest through the Angular test builder |
-| Backend | Java 21, Spring Boot 3.5 |
+| Rendering | Angular SSR, prerendering, hydration, event replay |
+| Frontend tests | Angular unit-test builder and Vitest |
+| Backend framework | Spring Boot 3.5 snapshot parent |
+| Backend language | Java 21 |
 | Security | Spring Security, BCrypt, JJWT |
 | Persistence | Spring Data JPA, Hibernate, PostgreSQL |
-| Database migration | Flyway dependencies are included |
-| Backend tests | JUnit, Spring Boot Test, Testcontainers |
+| Database migrations | Flyway |
+| File storage | Supabase Storage REST API |
+| Backend tests | JUnit 5, Mockito, Spring Boot Test, Testcontainers |
 | Packaging | npm, Maven Wrapper, Docker |
+| Frontend hosting config | Vercel |
 
 ## System Architecture
 
 ```mermaid
 flowchart LR
-    User[Browser user]
+    Customer[Customer browser]
+    Admin[Administrative API client]
 
     subgraph Frontend["Angular frontend"]
         Router[Angular Router]
-        Pages[Standalone pages and components]
+        Pages[Standalone pages]
+        Components[Feature and shared components]
         Signals[Signals and computed state]
         Forms[Reactive Forms]
-        Services[AuthService and BookingService]
+        AuthClient[AuthService]
+        BookingClient[BookingService]
         I18n[I18nService]
     end
 
     subgraph Backend["Spring Boot API"]
-        Security[Spring Security filter chain]
+        CORS[CORS]
+        JWT[JwtAuthFilter]
+        Rules[Spring authorization rules]
         Controllers[REST controllers]
-        DomainServices[Application services]
+        Services[Domain services]
         Repositories[Spring Data repositories]
-        Storage[Supabase picture storage client]
+        StorageClient[Supabase Storage client]
     end
 
-    DB[(PostgreSQL)]
+    PostgreSQL[(PostgreSQL)]
     Supabase[(Supabase Storage)]
+    Dealership[External dealership site]
 
-    User --> Router
+    Customer --> Router
     Router --> Pages
-    Pages --> Signals
-    Pages --> Forms
-    Pages --> I18n
-    Pages --> Services
-    Services -->|HTTPS and cookies| Security
-    Security --> Controllers
-    Controllers --> DomainServices
-    DomainServices --> Repositories
-    Repositories --> DB
-    DomainServices --> Storage
-    Storage --> Supabase
+    Pages --> Components
+    Components --> Signals
+    Components --> Forms
+    Components --> I18n
+    Components --> AuthClient
+    Components --> BookingClient
+    Customer -->|Dealership link| Dealership
+
+    AuthClient -->|HTTPS + credentials| CORS
+    BookingClient -->|HTTPS + credentials| CORS
+    Admin -->|HTTPS + JWT cookie or Bearer token| CORS
+    CORS --> JWT
+    JWT --> Rules
+    Rules --> Controllers
+    Controllers --> Services
+    Services --> Repositories
+    Repositories --> PostgreSQL
+    Services --> StorageClient
+    StorageClient --> Supabase
 ```
 
 ### Request Boundaries
 
-1. Angular components never access PostgreSQL directly.
-2. Components call injectable frontend services.
-3. Frontend services use Angular `HttpClient` with `withCredentials: true`.
-4. Spring Security validates the access token before protected controllers run.
-5. Controllers convert HTTP requests into service calls.
-6. Backend services apply domain checks and use repositories.
-7. JPA repositories read and write PostgreSQL entities.
+1. Angular components do not access the database directly.
+2. Components call frontend services.
+3. Frontend services send JSON requests with `withCredentials: true`.
+4. Spring Security extracts an access token from a Bearer header or cookie.
+5. Controllers translate HTTP requests into domain service calls.
+6. Services implement domain operations and call repositories.
+7. JPA repositories persist entities in PostgreSQL.
+8. Car picture bytes are uploaded separately to Supabase Storage.
 
 ## Repository Structure
 
 ```text
 poetsanders/
 |-- frontend/
-|   |-- public/                       Static assets
+|   |-- public/                         Static images and public assets
 |   |-- scripts/
-|   |   `-- generate-environment.mjs  Generates Angular environment code
+|   |   `-- generate-environment.mjs    Generates Angular environment code
 |   |-- src/
-|   |   |-- environments/             Generated/runtime build configuration
-|   |   `-- app/
-|   |       |-- core/
-|   |       |   |-- auth/             Authentication HTTP service
-|   |       |   |-- booking/          Booking HTTP service
-|   |       |   |-- i18/              Language state and translations
-|   |       |   `-- interfaces/       Shared TypeScript contracts
-|   |       |-- features/
-|   |       |   |-- form/             Booking feature
-|   |       |   |-- home/             Home feature
-|   |       |   |-- login/            Login feature
-|   |       |   |-- profile/          Profile and appointments
-|   |       |   `-- services/         Treatment overview and details
-|   |       `-- shared/                Navbar and footer
+|   |   |-- environments/
+|   |   |   |-- environment.ts
+|   |   |   `-- environment.generated.ts  Generated and gitignored
+|   |   |-- app/
+|   |   |   |-- core/
+|   |   |   |   |-- auth/              Authentication HTTP client
+|   |   |   |   |-- booking/           Appointment HTTP client
+|   |   |   |   |-- i18/               Locale state and translations
+|   |   |   |   `-- interfaces/        TypeScript contracts
+|   |   |   |-- features/
+|   |   |   |   |-- appointments/      Appointment cards and history
+|   |   |   |   |-- faq/               FAQ page
+|   |   |   |   |-- form/              Booking form and calendar
+|   |   |   |   |-- home/              Landing page sections
+|   |   |   |   |-- login/             Login page
+|   |   |   |   |-- profile/           Profile view and editor
+|   |   |   |   `-- services/          Treatment pages
+|   |   |   `-- shared/
+|   |   |       `-- components/         Navbar and footer
+|   |   `-- server.ts                   Angular SSR Express server
+|   |-- .env.example
 |   |-- angular.json
 |   |-- package.json
 |   `-- proxy.conf.cjs
 |-- backend/
 |   `-- AutoAnders/
 |       |-- src/main/java/Gloyoo/AutoAnders/
-|       |   |-- config/               Security, JWT, CORS, datasource
-|       |   |-- user/                 Accounts and authentication
-|       |   |-- washCalendar/         Appointment domain
-|       |   |-- Cars/                 Car domain
-|       |   |-- CarPictures/          Picture metadata
-|       |   `-- storage/              Supabase upload client
+|       |   |-- config/                 Security, JWT, datasource
+|       |   |-- user/                   Accounts and authentication
+|       |   |-- washCalendar/           Detailing appointments
+|       |   |-- Cars/                   Dealership inventory
+|       |   |-- CarPictures/            Picture metadata
+|       |   `-- storage/                Supabase Storage integration
 |       |-- src/main/resources/
+|       |   |-- db/migration/           Flyway SQL migrations
 |       |   `-- application.yaml
+|       |-- src/test/                    Unit and integration tests
 |       |-- compose.yaml
 |       |-- Dockerfile
+|       |-- mvnw / mvnw.cmd
 |       `-- pom.xml
+|-- .gitignore
 |-- README.md
 `-- vercel.json
 ```
@@ -156,738 +210,744 @@ poetsanders/
 ## Frontend Architecture
 
 The frontend uses standalone Angular components. There is no root NgModule.
-Application providers are registered in `app.config.ts`.
+Global providers are registered in `app.config.ts`.
 
 ```mermaid
 flowchart TD
-    Config[app.config.ts]
+    AppConfig[app.config.ts]
     RouterProvider[provideRouter]
     HttpProvider[provideHttpClient with fetch]
     Hydration[provideClientHydration with event replay]
 
-    Config --> RouterProvider
-    Config --> HttpProvider
-    Config --> Hydration
+    AppConfig --> RouterProvider
+    AppConfig --> HttpProvider
+    AppConfig --> Hydration
 
     RouterProvider --> Routes[app.routes.ts]
     Routes --> Home[HomePageComponent]
-    Routes --> Services[Services pages]
-    Routes --> Booking[BookingPageComponent]
+    Routes --> Services[ServicesPageComponent]
+    Routes --> Detail[ServiceDetailPageComponent]
+    Routes --> Book[BookingPageComponent]
     Routes --> Login[LoginPageComponent]
     Routes --> Profile[ProfilePageComponent]
+    Routes --> Appointments[AppointmentsPageComponent]
+    Routes --> FAQ[FaqPageComponent]
 
-    Booking --> BookingForm[BookingFormComponent]
+    Home --> Preview[AppointmentsListComponent pageMode=false]
+    Book --> BookingForm[BookingFormComponent]
     Login --> LoginForm[LoginFormComponent]
-    Profile --> Details[ProfileDetailsComponent]
-    Profile --> Appointments[ProfileBookingsComponent]
+    Profile --> ProfileEditor[ProfileEditorComponent]
+    Appointments --> History[AppointmentsListComponent pageMode=true]
 ```
 
-### Frontend State
+### Frontend Routes
 
-Angular signals hold local and shared state:
+| Route | Component | Rendering | Purpose |
+| --- | --- | --- | --- |
+| `/` | `HomePageComponent` | Prerender | Landing page and upcoming bookings |
+| `/appointments` | `AppointmentsPageComponent` | Prerender | Full appointment history |
+| `/book` | `BookingPageComponent` | Prerender | Registration and booking |
+| `/faq` | `FaqPageComponent` | Prerender | Frequently asked questions |
+| `/login` | `LoginPageComponent` | Prerender | Existing customer login |
+| `/profile` | `ProfilePageComponent` | Prerender | Profile editing and logout |
+| `/services` | `ServicesPageComponent` | Prerender | Treatment overview |
+| `/services/:slug` | `ServiceDetailPageComponent` | Server render | Dynamic treatment details |
+| Any unknown route | Redirect to `/` | N/A | Fallback |
+
+Routes are not protected with Angular route guards. Components restore the
+session in the browser and redirect to `/login` after a `401` where required.
+
+### Core Frontend Services
+
+#### `AuthService`
+
+`AuthService` owns the shared in-memory `currentUser` signal.
+
+| Method | HTTP request | State effect |
+| --- | --- | --- |
+| `register()` | `POST /auth/register` | Stores returned user |
+| `login()` | `POST /auth/login` | Stores returned user |
+| `me()` | `GET /auth/me` | Restores returned user |
+| `updateProfile()` | `PATCH /auth/update` | Replaces stored user |
+| `logout()` | `POST /auth/logout` | Clears stored user |
+
+The signal is memory-only. It is restored after a browser refresh by calls to
+`GET /auth/me` from the navbar, profile, and appointment components.
+
+#### `BookingService`
+
+`BookingService` maps public treatment slugs to backend enum names:
+
+| Frontend slug | Backend `WashType` |
+| --- | --- |
+| `total-treatment` | `Total_Treatment` |
+| `interior-treatment` | `Interior_Treatment` |
+| `exterior-treatment` | `Exterior_Treatment` |
+| `ozone-treatment` | `Ozone_Treatment` |
+| `headlight-treatment` | `Headlight_Treatment` |
+
+It creates one HTTP request per treatment and combines requests with
+`forkJoin`. It also normalizes backend date values because `LocalDateTime` may
+arrive as an ISO string or a numeric date array.
+
+#### `I18nService`
+
+`I18nService` stores the active locale in a signal:
+
+```text
+en -> English
+de -> German
+nl -> Dutch
+```
+
+Translation files are type-checked through shared interfaces. Components read
+copy through a computed signal, and date labels use `Intl.DateTimeFormat` with
+the active locale.
+
+The selected language is not currently persisted to local storage or a cookie.
+A full page reload resets it to English.
+
+### Frontend State Model
 
 | State | Owner | Purpose |
 | --- | --- | --- |
-| `currentUser` | `AuthService` | Shared authenticated user |
+| `currentUser` | `AuthService` | Current authenticated identity |
+| `language` | `I18nService` | Current locale |
+| `selectedDate` | Booking form | Appointment calendar date |
+| `selectedTime` | Booking form | Appointment time |
+| `services` form control | Booking form | Selected treatment slugs |
 | `submitting` | Form components | Prevent duplicate submissions |
-| `selectedDate` | Booking form | Chosen calendar date |
-| `selectedTime` | Booking form | Chosen appointment time |
-| `bookings` | Profile page | Raw booking rows returned by the API |
-| `appointments` | Profile page | Computed groups of booking rows |
-| `cancellingIds` | Profile page | IDs currently being deleted |
-| `language` | `I18nService` | Active locale and translated copy |
+| `bookings` | Appointment list | Raw booking rows from API |
+| `appointments` | Computed appointment state | Grouped visual appointments |
+| `cancellingIds` | Appointment list | Rows currently being deleted |
 
-Computed signals derive display data without storing duplicate state. For
-example, the profile converts raw `UserBooking[]` records into localized
-appointment cards.
+### Booking Form Validation
 
-```mermaid
-flowchart LR
-    Raw[bookings signal]
-    Language[language signal]
-    Group[Group by localDateTime]
-    Translate[Map WashType to localized title]
-    Format[Format localized date and time]
-    Sort[Sort newest first]
-    Cards[Appointment card input]
+Anonymous customers must provide:
 
-    Raw --> Group
-    Language --> Translate
-    Language --> Format
-    Group --> Translate
-    Translate --> Format
-    Format --> Sort
-    Sort --> Cards
-```
+| Field | Client and backend rules |
+| --- | --- |
+| Name | Required, maximum 255 characters |
+| Email | Required, valid email |
+| Password | Required, 12-30 characters |
+| Password composition | Uppercase, lowercase, digit, and `@$!%*?&` |
+| Password confirmation | Must match password |
+| Phone | Required, 8-30 characters |
+| Treatments | At least one treatment |
+| Date | Today or a future date |
+| Time | One configured time slot |
 
-### Frontend Service Layer
-
-`AuthService` owns authentication HTTP calls and the shared user signal:
-
-```text
-login()    -> POST /auth/login    -> set currentUser
-register() -> POST /auth/register -> set currentUser
-me()       -> GET  /auth/me       -> set currentUser
-logout()   -> POST /auth/logout   -> clear currentUser
-```
-
-`BookingService` maps frontend treatment slugs to backend enum values:
-
-```text
-total-treatment     -> Total_Treatment
-interior-treatment  -> Interior_Treatment
-exterior-treatment  -> Exterior_Treatment
-ozone-treatment     -> Ozone_Treatment
-headlight-treatment -> Headlight_Treatment
-```
-
-For multiple treatments, `BookingService` creates one HTTP request per
-treatment and combines them with RxJS `forkJoin`.
+Authenticated customers only need treatments, date, and time. The identity
+fields remain in the form model but are hidden and ignored by submission
+validation.
 
 ### Booking Form State Machine
 
 ```mermaid
 stateDiagram-v2
     [*] --> Editing
-    Editing --> Invalid: Submit with missing or invalid data
-    Invalid --> Editing: User corrects fields
-    Editing --> Submitting: Valid submit
-    Submitting --> Success: All API calls complete
-    Submitting --> Conflict: Registration returns 409
-    Submitting --> Unavailable: Other API failure
+    Editing --> Invalid: Submit invalid form
+    Invalid --> Editing: Correct fields
+    Editing --> Registering: Anonymous valid submit
+    Editing --> Booking: Authenticated valid submit
+    Registering --> Booking: Registration succeeds
+    Registering --> Conflict: Email already exists
+    Registering --> Unavailable: Other registration error
+    Booking --> Confirmed: Every treatment request succeeds
+    Booking --> Unavailable: Any treatment request fails
     Conflict --> Editing
     Unavailable --> Editing
-    Success --> Editing: User changes selection
+    Confirmed --> Editing: Book another appointment
 ```
 
-The booking form behaves differently based on authentication:
+### Appointment Grouping
 
-- Existing customer: book treatments immediately.
-- Anonymous customer: validate account fields, register, then book treatments.
+The database stores one row per treatment. The frontend groups rows with an
+identical `localDateTime` into one appointment card.
 
-### Localization
+```mermaid
+flowchart LR
+    Rows[WashCalendar rows]
+    Validate[Discard invalid dates]
+    Filter[Hide past rows on home page]
+    Group[Group by localDateTime]
+    Treatments[Translate WashType values]
+    Status[Calculate accepted / partial / pending]
+    Format[Format localized date and time]
+    Sort[Sort by page mode]
+    Cards[Appointment cards]
 
-Translations live in:
-
-```text
-frontend/src/app/core/i18/translations/
-|-- en/
-|-- de/
-`-- nl/
+    Rows --> Validate --> Filter --> Group
+    Group --> Treatments
+    Group --> Status
+    Treatments --> Format
+    Status --> Format
+    Format --> Sort --> Cards
 ```
 
-Page components read translated content from `I18nService`. Date formatting
-uses `Intl.DateTimeFormat` with the active locale, so month, weekday, date, and
-time labels update reactively.
+- Home page mode shows future appointments, oldest first.
+- Appointment page mode shows past and future appointments, newest first.
+- All rows accepted means `accepted`.
+- Some rows accepted means `partial`.
+- No rows accepted means `pending`.
 
 ## Backend Architecture
 
-The backend follows controller, service, repository, and entity layers.
+The backend uses controller, service, repository, and entity layers.
 
 ```mermaid
 flowchart TD
     Request[HTTP request]
-    Cors[CORS configuration]
-    JwtFilter[JwtAuthFilter]
-    Authorization[Spring authorization rules]
+    Cors[CORS processing]
+    Filter[JwtAuthFilter]
+    Authorization[SecurityFilterChain]
     Controller[REST controller]
     Service[Domain service]
     Repository[JPA repository]
     Entity[JPA entity]
     DB[(PostgreSQL)]
 
-    Request --> Cors
-    Cors --> JwtFilter
-    JwtFilter --> Authorization
-    Authorization --> Controller
-    Controller --> Service
-    Service --> Repository
-    Repository --> Entity
-    Entity --> DB
+    Request --> Cors --> Filter --> Authorization
+    Authorization --> Controller --> Service --> Repository --> Entity --> DB
 ```
 
-### Security Rules
+### Backend Packages
 
-The API is stateless. Spring does not create an HTTP session.
-
-| Request | Access |
+| Package | Responsibility |
 | --- | --- |
-| `OPTIONS /**` | Public for CORS preflight |
-| `/`, `/health`, `/auth/**` | Public |
-| `/admin/**` | `ADMIN` role |
-| Write operations under `/cars/**` | `ADMIN` role |
-| `GET /cars/**` | Public |
-| Remaining endpoints | Authenticated user |
+| `config` | JWT parsing, Spring Security, CORS, datasource resolution |
+| `user` | Accounts, password hashing, authentication, profile update |
+| `washCalendar` | Detailing appointment rows and acceptance state |
+| `Cars` | Dealership vehicle inventory |
+| `CarPictures` | Picture metadata linked to cars |
+| `storage` | Uploading picture bytes to Supabase Storage |
 
-CSRF is disabled because authentication is stateless and API-oriented. CORS
-allows credentials, so the backend must explicitly permit frontend origins.
+### Service Responsibilities
 
-### JWT Filter Logic
+#### `UserService`
+
+- Reject duplicate email addresses during registration
+- Hash passwords with BCrypt
+- Assign the `USER` role to new accounts
+- Load users by email or UUID
+- Verify login passwords
+- Load cars owned by a user
+- Update nonblank name, phone number, and password values
+
+#### `WashCalendarService`
+
+- Load the authenticated user before booking
+- Create one appointment row per request
+- List rows by user, date, acceptance state, or globally
+- Delete a row by UUID
+- Set the `accepted` flag to `true`
+
+#### `CarService`
+
+- Reject duplicate license plates
+- Associate new cars with the authenticated administrator
+- Read all cars or one car
+- Replace all editable car fields during update
+- Update a car status
+- Delete a car
+
+#### `CarPictureService`
+
+- Verify that the target car exists
+- Upload picture bytes to Supabase Storage
+- Persist picture metadata and the returned storage path
+- List picture metadata for a car
+
+## Authentication and Authorization
+
+### Token Model
+
+The backend issues two signed HS256 JWTs:
+
+| Token | Lifetime | Cookie | Purpose |
+| --- | --- | --- | --- |
+| Access token | 15 minutes | `accessToken` | Authenticate API requests |
+| Refresh token | 7 days | `refreshToken` | Issue a new access token |
+
+JWT claims include:
+
+```json
+{
+  "sub": "customer@example.com",
+  "uid": "user-uuid",
+  "role": "USER",
+  "user": "Customer Name",
+  "type": "refresh only on refresh tokens"
+}
+```
+
+The JWT secret must contain at least 32 bytes.
+
+### Cookie Behavior
+
+Both cookies are:
+
+- HTTP-only
+- Available under path `/`
+- `SameSite=Lax` and not secure for detected local HTTP requests
+- `SameSite=None; Secure` for detected HTTPS requests
+
+HTTPS detection checks:
+
+- Servlet request security
+- `X-Forwarded-Proto`
+- `Forwarded`
+- `X-Forwarded-Ssl`
+- `Origin`
+- `Referer`
+
+The browser stores the cookies. Angular sends them by setting
+`withCredentials: true`.
+
+### Authentication Filter
 
 ```mermaid
 flowchart TD
     Start[Incoming request]
-    Skip{Public auth endpoint?}
-    Source{Bearer header exists?}
+    Skip{Login, register, refresh, or logout?}
+    Bearer{Bearer token present?}
     Cookie[Read accessToken cookie]
-    Header[Read Bearer token]
-    Present{Token present?}
-    Parse[Parse and validate JWT]
+    Parse[Parse and verify JWT]
     Refresh{Token type is refresh?}
-    Claims[Read uid role user email]
+    Claims[Read uid, role, user, subject]
     Context[Create Spring Authentication]
-    Chain[Continue filter chain]
+    Rules[Apply endpoint authorization]
+    Continue[Continue request]
     Reject[Return 401 JSON]
 
     Start --> Skip
-    Skip -->|Yes| Chain
-    Skip -->|No| Source
-    Source -->|Yes| Header
-    Source -->|No| Cookie
-    Header --> Present
-    Cookie --> Present
-    Present -->|No| Chain
-    Present -->|Yes| Parse
+    Skip -->|Yes| Rules
+    Skip -->|No| Bearer
+    Bearer -->|Yes| Parse
+    Bearer -->|No| Cookie
+    Cookie --> Parse
+    Parse -->|Missing token| Rules
     Parse -->|Invalid or expired| Reject
     Parse --> Refresh
     Refresh -->|Yes| Reject
-    Refresh -->|No| Claims
-    Claims --> Context
-    Context --> Chain
+    Refresh -->|No| Claims --> Context --> Rules --> Continue
 ```
 
-The authenticated identity is stored in `Authentication.details` as:
+The authenticated principal is the user's display name. Additional identity
+data is stored in `Authentication.details`:
 
 ```json
 {
-  "uid": "user UUID",
+  "uid": "user-uuid",
   "role": "USER",
-  "user": "display name",
+  "user": "Customer Name",
   "email": "customer@example.com"
 }
 ```
 
-Controllers use the `uid` value to load or modify records belonging to the
-current user.
-
-### Backend Service Responsibilities
-
-`UserService`:
-
-- Rejects duplicate email addresses.
-- Hashes passwords with BCrypt.
-- Creates users with the `USER` role.
-- Looks up users by email or ID.
-- Verifies raw passwords against stored hashes.
-
-`WashCalendarService`:
-
-- Loads the authenticated user.
-- Creates one `WashCalendar` entity per treatment.
-- Finds bookings for the current user or date.
-- Verifies ownership before deletion.
-
-`SupaBasePictureStorage`:
-
-- Creates a unique object path per car and file.
-- Uploads bytes through the Supabase Storage REST API.
-- Returns stored object paths and public URLs.
-
-## Authentication Flow
-
-### Registration
+### Registration Sequence
 
 ```mermaid
 sequenceDiagram
     actor Customer
-    participant Angular as Angular form
-    participant AuthService
-    participant AuthController
-    participant UserService
-    participant Users as UserRepository
+    participant Form as Angular booking form
+    participant Auth as AuthService
+    participant Controller as AuthController
+    participant Users as UserService
+    participant DB as UserRepository
     participant JWT as JwtService
 
-    Customer->>Angular: Submit registration data
-    Angular->>AuthService: register(credentials)
-    AuthService->>AuthController: POST /auth/register
-    AuthController->>UserService: register(request)
-    UserService->>Users: existsByEmail(email)
+    Customer->>Form: Submit account and booking data
+    Form->>Auth: register(credentials)
+    Auth->>Controller: POST /auth/register
+    Controller->>Users: register(request)
+    Users->>DB: existsByEmail(email)
 
-    alt Email already exists
-        Users-->>UserService: true
-        UserService-->>AuthController: IllegalArgumentException
-        AuthController-->>AuthService: 409 ProblemDetail
-        AuthService-->>Angular: HttpErrorResponse
+    alt Email exists
+        DB-->>Users: true
+        Users-->>Controller: IllegalArgumentException
+        Controller-->>Auth: 409 ProblemDetail
+        Auth-->>Form: Conflict error
     else New email
-        Users-->>UserService: false
-        UserService->>UserService: BCrypt encode password
-        UserService->>Users: save USER entity
-        Users-->>UserService: persisted user
-        UserService-->>AuthController: user
-        AuthController->>JWT: generate access token for 15 minutes
-        AuthController->>JWT: generate refresh token for 7 days
-        AuthController-->>AuthService: 201 + HttpOnly cookies + user payload
-        AuthService->>AuthService: currentUser.set(user)
-        AuthService-->>Angular: authenticated user
+        DB-->>Users: false
+        Users->>Users: BCrypt encode password
+        Users->>DB: Save USER account
+        DB-->>Users: Persisted user
+        Users-->>Controller: User
+        Controller->>JWT: Generate access token
+        Controller->>JWT: Generate refresh token
+        Controller-->>Auth: 201 + cookies + AuthUser
+        Auth->>Auth: currentUser.set(user)
     end
 ```
 
-### Login
+### Login Sequence
 
 ```mermaid
 sequenceDiagram
     actor Customer
-    participant LoginForm
-    participant AuthService
-    participant AuthController
-    participant UserService
+    participant Login as LoginFormComponent
+    participant Auth as AuthService
+    participant Controller as AuthController
+    participant Users as UserService
     participant JWT as JwtService
-    participant Browser
 
-    Customer->>LoginForm: Enter email and password
-    LoginForm->>LoginForm: Validate required fields and email
-    LoginForm->>AuthService: login(credentials)
-    AuthService->>AuthController: POST /auth/login
-    AuthController->>UserService: findByEmailOrThrow(email)
-    AuthController->>UserService: checkPassword(user, password)
+    Customer->>Login: Enter email and password
+    Login->>Login: Validate form
+    Login->>Auth: login(credentials)
+    Auth->>Controller: POST /auth/login
+    Controller->>Users: findByEmailOrThrow(email)
+    Controller->>Users: checkPassword(user, password)
 
     alt Invalid credentials
-        AuthController-->>AuthService: 401
-        AuthService-->>LoginForm: credentials error
+        Controller-->>Auth: 401
+        Auth-->>Login: Show credentials error
     else Valid credentials
-        AuthController->>JWT: Create access and refresh tokens
-        AuthController-->>Browser: Set-Cookie accessToken and refreshToken
-        AuthController-->>AuthService: AuthUser payload
-        AuthService->>AuthService: currentUser.set(user)
-        AuthService-->>LoginForm: Success
+        Controller->>JWT: Generate access and refresh tokens
+        Controller-->>Auth: Cookies + AuthUser
+        Auth->>Auth: currentUser.set(user)
+        Auth-->>Login: Success
+        Login->>Login: Navigate to /
     end
 ```
 
-### Cookie Behavior
+### Access Rules
 
-| Cookie | Lifetime | Purpose |
-| --- | --- | --- |
-| `accessToken` | 15 minutes | Authenticate API requests |
-| `refreshToken` | 7 days | Request a new access token |
+The Spring session policy is `STATELESS`, CSRF is disabled, and CORS allows
+credentialed requests.
 
-Both cookies are HTTP-only and use path `/`.
+| Request pattern | Security rule |
+| --- | --- |
+| `OPTIONS /**` | Public |
+| `/`, `/health`, `/auth/**` | Public at the authorization-rule level |
+| `/admin/**` | Requires `ADMIN` |
+| `POST`, `PUT`, `PATCH`, `DELETE /cars/**` | Requires `ADMIN` |
+| `GET /cars/**` | Public |
+| Everything else | Requires authentication |
 
-- Local HTTP requests use `Secure=false` and `SameSite=Lax`.
-- HTTPS requests use `Secure=true` and `SameSite=None`.
-- The backend checks proxy and origin headers to detect HTTPS deployments.
+Some `/auth/**` controller methods still perform their own authentication
+checks. The JWT filter only skips login, register, refresh, and logout.
 
-The browser stores and sends these cookies. Angular cannot read HTTP-only
-cookies directly, which reduces exposure to client-side JavaScript attacks.
+### CORS Origins
 
-### Session Restoration
+The current backend allows credentialed requests from:
 
-The shared Angular signal is memory-only. A browser refresh clears it.
-Protected UI flows restore the user by calling `GET /auth/me`.
-
-```mermaid
-flowchart LR
-    Refresh[Browser refresh]
-    Empty[currentUser is null]
-    Me[GET /auth/me with cookie]
-    Filter[JwtAuthFilter]
-    Details[Authentication details]
-    Signal[currentUser.set user]
-
-    Refresh --> Empty
-    Empty --> Me
-    Me --> Filter
-    Filter --> Details
-    Details --> Signal
+```text
+http://localhost:3000
+http://localhost:4200
+http://localhost:5173
+https://poetsanders.nl
+https://www.poetsanders.nl
+https://guitar-io.vercel.app
+https://*.vercel.app
 ```
 
-## Booking Flow
+Allowed methods are `GET`, `POST`, `PUT`, `DELETE`, `PATCH`, and `OPTIONS`.
 
-### Existing Customer
+## Booking and Appointment Logic
+
+### Existing Customer Booking
 
 ```mermaid
 sequenceDiagram
     actor Customer
     participant Form as BookingFormComponent
-    participant BookingService
+    participant Client as BookingService
     participant Security as JwtAuthFilter
     participant Controller as WashCalendarController
     participant Service as WashCalendarService
     participant DB as PostgreSQL
 
     Customer->>Form: Select treatments, date, and time
-    Form->>Form: Build localDateTime string
-    Form->>BookingService: bookTreatments(slugs, localDateTime)
+    Form->>Form: Build YYYY-MM-DDTHH:mm:00
+    Form->>Client: bookTreatments(slugs, localDateTime)
 
-    loop Once per selected treatment
-        BookingService->>Security: POST /wash_calendar + cookies
-        Security->>Security: Validate access token
+    loop One request per treatment
+        Client->>Security: POST /wash_calendar + access cookie
         Security->>Controller: Authenticated request
-        Controller->>Service: book request + authenticated user ID
-        Service->>DB: Find user
+        Controller->>Service: book request + user UUID
+        Service->>DB: Load user
         Service->>DB: Insert wash_calendar row
         DB-->>Service: Saved row
-        Service-->>Controller: Entity
-        Controller-->>BookingService: WashCalendarResponse
+        Service-->>Controller: WashCalendar
+        Controller-->>Client: WashCalendarResponse
     end
 
-    BookingService-->>Form: forkJoin completes
-    Form-->>Customer: Show success state
+    Client-->>Form: forkJoin completes
+    Form-->>Customer: Show confirmation
 ```
 
-### New Customer Booking
+### Anonymous Customer Booking
 
 ```mermaid
 flowchart TD
-    Submit[Submit booking form]
-    Validate[Validate account, treatments, date, and time]
+    Submit[Submit form]
+    Validate[Validate account and appointment]
     Register[POST /auth/register]
     Cookies[Receive auth cookies]
-    Book[POST one booking per treatment]
+    Book[POST one row per treatment]
     Success[Show confirmation]
-    Conflict[Show email conflict]
-    Failure[Show unavailable message]
+    Conflict[Show account already exists]
+    Error[Show service unavailable]
 
     Submit --> Validate
     Validate -->|Invalid| Submit
     Validate -->|Valid| Register
-    Register -->|201| Cookies
+    Register -->|201| Cookies --> Book
     Register -->|409| Conflict
-    Register -->|Other error| Failure
-    Cookies --> Book
+    Register -->|Other error| Error
     Book -->|All requests succeed| Success
-    Book -->|Any request fails| Failure
+    Book -->|Any request fails| Error
 ```
 
-### Appointment Storage Model
+### Storage Granularity
 
-One selected treatment equals one `wash_calendar` database row.
-
-For example, selecting Interior and Exterior for the same time creates:
+One treatment equals one `wash_calendar` row. Selecting Interior and Exterior
+at the same time creates two records:
 
 ```text
-Row 1: Interior_Treatment, 2026-06-15T10:00:00, user A
-Row 2: Exterior_Treatment, 2026-06-15T10:00:00, user A
+Interior_Treatment | 2026-06-15T10:00:00 | user A | accepted=false
+Exterior_Treatment | 2026-06-15T10:00:00 | user A | accepted=false
 ```
 
-The backend returns these as separate records. The profile groups records with
-the same `localDateTime` into one visual appointment.
+The frontend groups those rows into one visual appointment.
 
-## Profile and Cancellation Flow
+### Acceptance Logic
 
-The profile page is a smart container:
+Each row has its own `accepted` flag:
 
-- Restores the authenticated user when necessary.
-- Loads raw user booking records.
-- Groups and localizes appointments.
-- Coordinates cancellation and logout.
+```mermaid
+stateDiagram-v2
+    [*] --> Pending: Booking created
+    Pending --> Accepted: POST /wash_calendar/accept/{uuid}
+    Accepted --> Accepted: Repeated acceptance
+```
 
-The child components are presentational:
+There is no endpoint to set acceptance back to `false`.
 
-- `ProfileDetailsComponent` displays customer details.
-- `ProfileBookingsComponent` displays loading, empty, error, and booking states.
-- The bookings component emits selected record IDs to the page.
+For grouped appointments:
+
+- `pending`: every treatment row is false
+- `partial`: a mixture of true and false
+- `accepted`: every treatment row is true
+
+### Cancellation Logic
+
+The UI cancels a grouped appointment by sending one delete request per row:
 
 ```mermaid
 sequenceDiagram
     actor Customer
-    participant Card as ProfileBookingsComponent
-    participant Page as ProfilePageComponent
-    participant BookingService
-    participant Controller as WashCalendarController
-    participant Service as WashCalendarService
+    participant Card as AppointmentCardComponent
+    participant List as AppointmentsListComponent
+    participant Client as BookingService
+    participant API as WashCalendarController
     participant DB as PostgreSQL
 
-    Customer->>Card: Click Cancel appointment
-    Card->>Page: emit cancelAppointment(ids)
-    Page->>Page: Add IDs to cancellingIds
+    Customer->>Card: Click cancel
+    Card->>List: Emit appointment IDs
+    List->>List: Mark all IDs as cancelling
 
-    loop Every treatment row in appointment
-        Page->>BookingService: cancelBookings(ids)
-        BookingService->>Controller: DELETE /wash_calendar/{id}
-        Controller->>Service: delete(id, authenticatedUserId)
-        Service->>DB: Find booking by ID
-
-        alt Booking belongs to user
-            Service->>DB: Delete booking
-            Controller-->>BookingService: 204 No Content
-        else Different owner
-            Service-->>Controller: Reject deletion
-            Controller-->>BookingService: Error response
-        end
+    loop Every treatment row
+        List->>Client: DELETE row
+        Client->>API: DELETE /wash_calendar/{uuid}
+        API->>DB: Delete row by UUID
+        DB-->>API: Deleted
     end
 
-    alt All deletes succeed
-        BookingService-->>Page: forkJoin completes
-        Page->>Page: Remove IDs from local bookings signal
-        Page-->>Card: Appointment disappears
-    else A delete fails
-        BookingService-->>Page: Error
-        Page-->>Card: Display appointments error
-    end
-
-    Page->>Page: Remove IDs from cancellingIds
+    Client-->>List: forkJoin completes
+    List->>List: Remove IDs from local state
 ```
 
+This operation is not atomic. See
+[Known Issues and Security Gaps](#known-issues-and-security-gaps).
+
+## Car and Picture Logic
+
+The car domain is currently exposed through the backend but is not consumed by
+the Poets Anders Angular feature code. The navbar can link to a separate
+dealership site through `DEALERSHIP_URL`.
+
+### Car Lifecycle
+
+```mermaid
+flowchart TD
+    Admin[Authenticated ADMIN]
+    Create[POST /cars]
+    Unique{License plate unique?}
+    Owner[Load administrator user]
+    Save[Save car]
+    Update[POST /cars/{id}]
+    Status[POST /cars/statusUpdate/{id}]
+    Delete[DELETE /cars/{id}]
+    Public[Public GET /cars and /cars/{id}]
+
+    Admin --> Create --> Unique
+    Unique -->|No| Error[400 response]
+    Unique -->|Yes| Owner --> Save
+    Admin --> Update
+    Admin --> Status
+    Admin --> Delete
+    Public --> Save
+```
+
+Supported enum values include:
+
+| Field | Values |
+| --- | --- |
+| Body type | `MPV`, `SUV`, `SEDAN`, `HATCHBACK`, `STATION_WAGON`, `COUPE`, `CABRIOLET`, `VAN` |
+| Gearbox | `MANUAL`, `AUTOMATIC`, `SEMI_AUTOMATIC` |
+| Fuel | `PETROL`, `DIESEL`, `ELECTRIC`, `HYBRID`, `LPG`, `CNG` |
+| Emission class | `EURO_1` through `EURO_6` |
+| Energy label | `A` through `G` |
+| Paint | `BASIC`, `METALLIC`, `PEARL`, `MATTE` |
+| Upholstery | `FABRIC`, `LEATHER`, `PART_LEATHER`, `ALCANTARA` |
+| Status | `Available`, `Pending_Confirmation`, `Booked`, `Cancelled` |
+
+### Picture Upload
+
+```mermaid
+sequenceDiagram
+    actor Admin
+    participant API as CarPictureController
+    participant Service as CarPictureService
+    participant Cars as CarRepository
+    participant Storage as Supabase Storage
+    participant Pictures as CarPictureRepository
+
+    Admin->>API: Multipart POST /cars/{carId}/pictures
+    API->>Service: File and metadata
+    Service->>Cars: Find car
+    Service->>Storage: Upload bytes
+    Storage-->>Service: cars/{carId}/{uuid}.{ext}
+    Service->>Pictures: Save metadata and storage path
+    Pictures-->>API: CarPicture
+    API-->>Admin: 200 response
+```
+
+The upload request contains:
+
+```text
+file          required binary file
+title         optional request field
+description   optional request field
+width         required integer
+height        required integer
+```
+
+Supabase receives:
+
+- `Authorization: Bearer <service-role-key>`
+- `apikey: <service-role-key>`
+- Original content type
+- `x-upsert: false`
+
 ## Database Model
+
+### Entity Relationship Diagram
 
 ```mermaid
 erDiagram
     USERS ||--o{ WASH_CALENDAR : books
     USERS ||--o{ CARS : owns
-    CARS ||--o{ CAR_PICTURES : contains
+    CARS ||--o{ CAR_PICTURES : has
 
     USERS {
         uuid id PK
-        string email UK
-        string name
-        string password
-        string phone_number
-        string role
-        instant created_at
-        instant updated_at
+        varchar email UK
+        varchar name
+        varchar password
+        varchar phone_number
+        varchar role
+        timestamp created_at
+        timestamp updated_at
     }
 
     WASH_CALENDAR {
         uuid id PK
-        string wash_type
+        varchar wash_type
         uuid user_id FK
-        datetime local_date_time
+        timestamp local_date_time
+        boolean accepted
     }
 
     CARS {
         uuid id PK
-        string title
-        string license_plate UK
-        decimal price
-        string status
+        varchar title
+        varchar subtitle
+        integer year_of_manufacture
+        integer mileage
+        varchar license_plate UK
+        numeric price
+        varchar status
         uuid user_id FK
     }
 
     CAR_PICTURES {
         uuid id PK
-        string storage_path
-        string title
-        string description
+        varchar storage_path UK
+        varchar title
+        varchar description
         integer width
         integer height
         uuid car_id FK
     }
 ```
 
-### Entity Relationships
+### JPA Relationships
 
-- Deleting a user cascades to owned cars and bookings.
-- Deleting a car cascades to its picture metadata.
-- `WashCalendar.user` is loaded lazily.
-- DTO responses prevent recursive entity serialization.
+- `User -> Car`: one-to-many, cascade all, orphan removal
+- `User -> WashCalendar`: one-to-many, cascade all, orphan removal
+- `Car -> User`: many-to-one, lazy, required
+- `WashCalendar -> User`: many-to-one, lazy, required
+- `Car -> CarPicture`: one-to-many, cascade all, orphan removal
+- `CarPicture -> Car`: many-to-one, lazy, required
 
-## Rendering and Environment Flow
+### Migration History
 
-### Angular Rendering
+| Migration | Purpose |
+| --- | --- |
+| `V1__extensions.sql` | Enable `pgcrypto` and `uuid-ossp` |
+| `V2__create_users_table.sql` | Create users |
+| `V3__create_cars_table.sql` | Create cars and indexes |
+| `V4__add_unique_license_plate_to_cars.sql` | Add unique plate constraint |
+| `V5__add_user_id_to_cars.sql` | Delete existing cars and add required owner |
+| `V6__create_car_pictures_table.sql` | Create picture metadata |
+| `V7__create_wash_calendar_table.sql` | Create appointment rows |
 
-```mermaid
-flowchart TD
-    Build[npm run build]
-    Generate[Generate environment.generated.ts]
-    AngularBuild[Angular application build]
-    Routes{Route type}
-    SSR[Server render services/:slug]
-    Prerender[Prerender all other routes]
-    Browser[Browser bundle]
-    Hydrate[Client hydration and event replay]
+The migration files do not fully describe the current JPA entities:
 
-    Build --> Generate
-    Generate --> AngularBuild
-    AngularBuild --> Routes
-    Routes -->|services/:slug| SSR
-    Routes -->|all other routes| Prerender
-    AngularBuild --> Browser
-    SSR --> Hydrate
-    Prerender --> Hydrate
-    Browser --> Hydrate
-```
+- `users.phone_number` is missing from migrations.
+- `wash_calendar.accepted` is missing from migrations.
+- `cars.status` is missing from the original car migration.
+- Hibernate is configured with `ddl-auto: update`, so Hibernate currently
+  fills some migration gaps at startup.
 
-The Express SSR server listens on `PORT`, defaulting to `4000`.
-
-### Frontend Environment Generation
-
-Angular does not read `.env` files directly in browser code. A Node script
-loads `.env` before start, build, watch, and test commands.
-
-```mermaid
-flowchart LR
-    DotEnv[frontend/.env]
-    Script[generate-environment.mjs]
-    Generated[environment.generated.ts]
-    Environment[environment.ts]
-    Services[AuthService and BookingService]
-
-    DotEnv --> Script
-    Script --> Generated
-    Generated --> Environment
-    Environment --> Services
-```
-
-Development environment:
-
-```dotenv
-API_BASE_URL=
-API_PROXY_TARGET=http://localhost:8080
-```
-
-- Empty `API_BASE_URL` makes requests relative, such as `/auth/login`.
-- Angular's development proxy forwards `/auth` and `/wash_calendar`.
-- `API_PROXY_TARGET` controls the proxy destination.
-
-Production environment:
-
-```dotenv
-API_BASE_URL=https://your-api-domain.example
-```
-
-The URL is compiled into the frontend during the production build.
-
-## Local Development
-
-### Requirements
-
-- Node.js supported by Angular 21
-- npm 11.6.1
-- Java 21
-- PostgreSQL
-- Docker for containerized backend runs and backend tests
-
-### 1. Clone
-
-```bash
-git clone https://github.com/yassineao/poetsanders.git
-cd poetsanders
-```
-
-### 2. Configure the Backend
-
-The current `application.yaml` maps these variables:
-
-```dotenv
-SUPABASE_DB_URL=jdbc:postgresql://localhost:5432/autoanders
-SUPABASE_DB_USERNAME=postgres
-SUPABASE_DB_PASSWORD=your-password
-SUPABASE_JWT_SECRET=replace-with-a-long-random-secret
-
-SUPABASE_URL=https://your-project.supabase.co
-SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
-SUPABASE_STORAGE_BUCKET=car-pictures
-```
-
-Database configuration also supports deployment-style alternatives:
-
-```text
-SPRING_DATASOURCE_URL
-SPRING_DATASOURCE_USERNAME
-SPRING_DATASOURCE_PASSWORD
-
-DATABASE_URL
-
-PGHOST
-PGPORT
-PGDATABASE
-PGUSER
-PGPASSWORD
-```
-
-`DATABASE_URL` may include credentials:
-
-```text
-postgresql://username:password@host:5432/database
-```
-
-### 3. Start the Backend
-
-Linux or macOS:
-
-```bash
-cd backend/AutoAnders
-./mvnw spring-boot:run
-```
-
-Windows PowerShell:
-
-```powershell
-cd backend/AutoAnders
-.\mvnw.cmd spring-boot:run
-```
-
-The backend runs at [http://localhost:8080](http://localhost:8080).
-
-### 4. Configure the Frontend
-
-```bash
-cd frontend
-cp .env.example .env
-```
-
-Windows PowerShell:
-
-```powershell
-Copy-Item .env.example .env
-```
-
-### 5. Start the Frontend
-
-```bash
-npm ci
-npm start
-```
-
-Open [http://localhost:4200](http://localhost:4200).
-
-### Docker Backend
-
-Create `backend/AutoAnders/.env`, then run:
-
-```bash
-cd backend/AutoAnders
-docker compose up --build
-```
-
-The compose file builds the API image and publishes port `8080`.
-
-## Application Routes
-
-| Route | Component | Description |
-| --- | --- | --- |
-| `/` | `HomePageComponent` | Landing page |
-| `/services` | `ServicesPageComponent` | Treatment overview |
-| `/services/:slug` | `ServiceDetailPageComponent` | Treatment details |
-| `/book` | `BookingPageComponent` | Account creation and booking |
-| `/login` | `LoginPageComponent` | Existing customer login |
-| `/profile` | `ProfilePageComponent` | User details and appointments |
-
-Treatment slugs:
-
-```text
-total-treatment
-interior-treatment
-exterior-treatment
-headlight-treatment
-ozone-treatment
-```
+For production, choose one schema authority and bring the migrations up to date.
 
 ## API Reference
 
-### Authentication
+Unless stated otherwise, request and response bodies use JSON.
 
-| Method | Endpoint | Authentication | Purpose |
+### Authentication API
+
+| Method | Endpoint | Effective access | Purpose |
 | --- | --- | --- | --- |
-| `POST` | `/auth/register` | Public | Create user and issue cookies |
-| `POST` | `/auth/login` | Public | Verify credentials and issue cookies |
-| `POST` | `/auth/refresh` | Refresh token | Issue a new access cookie |
-| `GET` | `/auth/me` | Access token | Return authenticated user details |
+| `POST` | `/auth/register` | Public | Register and issue both cookies |
+| `POST` | `/auth/login` | Public | Validate credentials and issue cookies |
+| `POST` | `/auth/refresh` | Public route; requires refresh token | Replace access cookie |
+| `GET` | `/auth/me` | Valid access token | Return current user |
+| `PATCH` | `/auth/update` | Valid access token | Update profile and rotate both tokens |
 | `POST` | `/auth/logout` | Public | Expire both cookies |
-| `GET` | `/auth/getUserCars` | Access token | Return cars for current user |
-| `GET` | `/auth/health` | Public | Authentication controller health |
+| `GET` | `/auth/getUserCars` | Intended authenticated access | Return current user's cars |
+| `GET` | `/auth/health` | Public | Return `OK` |
 
-Example registration request:
+#### Register
+
+```http
+POST /auth/register
+Content-Type: application/json
+```
 
 ```json
 {
@@ -898,28 +958,74 @@ Example registration request:
 }
 ```
 
-Example authenticated user response:
+Success: `201 Created`, access and refresh cookies, and:
 
 ```json
 {
   "uid": "3e8cfad6-228c-46bc-ae43-afd905914df2",
   "role": "USER",
   "user": "Jane Customer",
-  "email": "jane@example.com"
+  "email": "jane@example.com",
+  "phoneNumber": "+31 6 12345678"
 }
 ```
 
-### Booking
+Duplicate email: `409 Conflict` with a Spring `ProblemDetail`.
 
-| Method | Endpoint | Authentication | Purpose |
-| --- | --- | --- | --- |
-| `POST` | `/wash_calendar` | Required | Create one treatment booking |
-| `GET` | `/wash_calendar` | Required | List all bookings |
-| `GET` | `/wash_calendar/by_user` | Required | Current user's bookings |
-| `GET` | `/wash_calendar/date/{dateTime}` | Required | Bookings at a date and time |
-| `DELETE` | `/wash_calendar/{id}` | Required | Delete an owned booking |
+#### Login
 
-Example booking request:
+```json
+{
+  "email": "jane@example.com",
+  "password": "StrongPass12!"
+}
+```
+
+Success returns the same user payload as registration. Invalid credentials
+return `401 Unauthorized`.
+
+#### Refresh
+
+The refresh token may be supplied through the `refreshToken` cookie or body:
+
+```json
+{
+  "refreshToken": "optional-token-value"
+}
+```
+
+Success replaces only the access cookie. The refresh response is built from JWT
+claims and currently omits `phoneNumber`.
+
+#### Update Profile
+
+```json
+{
+  "name": "Jane Updated",
+  "phoneNumber": "+31 6 87654321",
+  "password": "OptionalNew12!"
+}
+```
+
+Blank values are ignored by `UserService`. A successful update rotates both
+JWTs so the name claim stays current.
+
+### Wash Calendar API
+
+Every wash calendar route requires authentication through the global security
+rule.
+
+| Method | Endpoint | Purpose |
+| --- | --- | --- |
+| `POST` | `/wash_calendar` | Create one treatment row |
+| `GET` | `/wash_calendar` | List every appointment row |
+| `GET` | `/wash_calendar/by_user` | List current user's rows |
+| `GET` | `/wash_calendar/date/{localDateTime}` | List rows at exact date/time |
+| `GET` | `/wash_calendar/accepted/{TF}` | Current user's rows by status |
+| `POST` | `/wash_calendar/accept/{uuid}` | Mark one row accepted |
+| `DELETE` | `/wash_calendar/{uuid}` | Delete one row |
+
+#### Create Booking
 
 ```json
 {
@@ -928,49 +1034,396 @@ Example booking request:
 }
 ```
 
-Example booking response:
+Response:
 
 ```json
 {
   "id": "fc912912-310d-4d1d-822f-a5ada79d3528",
   "washType": "Interior_Treatment",
   "userId": "3e8cfad6-228c-46bc-ae43-afd905914df2",
-  "localDateTime": "2026-06-15T10:00:00"
+  "localDateTime": "2026-06-15T10:00:00",
+  "accepted": false
 }
 ```
 
-### Cars and Pictures
+`{TF}` accepts standard boolean path values such as `true` and `false`.
+`{localDateTime}` must be an ISO date-time accepted by Spring.
 
-The backend contains additional APIs for car records and picture uploads:
+### Cars API
 
-```text
-GET    /cars
-GET    /cars/{id}
-POST   /cars
-DELETE /cars/{id}
-POST   /cars/{id}
-POST   /cars/statusUpdate/{id}
+| Method | Endpoint | Access | Purpose |
+| --- | --- | --- | --- |
+| `GET` | `/cars` | Public | List cars |
+| `GET` | `/cars/{id}` | Public | Get one car |
+| `POST` | `/cars` | `ADMIN` | Create car |
+| `POST` | `/cars/{id}` | `ADMIN` | Update car |
+| `POST` | `/cars/statusUpdate/{id}` | `ADMIN` | Update only status |
+| `DELETE` | `/cars/{id}` | `ADMIN` | Delete car |
 
-GET    /cars/{carId}/pictures
-POST   /cars/{carId}/pictures
+The update endpoint uses `POST`, not `PUT` or `PATCH`.
+
+Example status body:
+
+```json
+"Available"
 ```
 
-Car reads are public. Car writes require the `ADMIN` role.
+The full `CarRequest` supports:
 
-## Testing and Builds
+```text
+title, subtitle, yearOfManufacture, mileage, power, referenceNumber, price,
+firstRegistrationDate, numberOfDoors, wheelbase, numberOfCylinders,
+motorVehicleTax, modelDateFrom, modelDateTo, maxTowingWeight,
+maxTowingWeightUnbraked, urbanFuelConsumption, combinedFuelConsumption,
+motorwayFuelConsumption, co2Emissions, taxDeductible, chassisNumber,
+numberOfKeys, licensePlate, engineDisplacement, colour, emptyWeight,
+taxAdditionPercentage, apkMotDate, serviceDocumentation, location,
+financialLeasePricePerMonth, leasePrice60Months, leasePrice48Months,
+leasePrice36Months, bodyType, gearbox, fuel, emissionClass, energyLabel,
+paintType, upholstery, status
+```
+
+### Car Pictures API
+
+| Method | Endpoint | Access | Purpose |
+| --- | --- | --- | --- |
+| `GET` | `/cars/{carId}/pictures` | Public | List picture metadata |
+| `POST` | `/cars/{carId}/pictures` | `ADMIN` | Upload picture and metadata |
+
+Upload content type: `multipart/form-data`.
+
+## Environment Variables
+
+Never commit real passwords, JWT secrets, or Supabase service-role keys.
+Both frontend and backend `.env` files are ignored by Git.
+
+### Frontend
+
+Create `frontend/.env` from `frontend/.env.example`:
+
+```dotenv
+API_BASE_URL=
+API_PROXY_TARGET=http://localhost:8080
+DEALERSHIP_URL=
+```
+
+| Variable | Required | Description |
+| --- | --- | --- |
+| `API_BASE_URL` | Production | Backend origin compiled into Angular |
+| `API_PROXY_TARGET` | Local development | Target for `/auth` and `/wash_calendar` |
+| `DEALERSHIP_URL` | Optional | External dealership link in navbar |
+
+Recommended local values:
+
+```dotenv
+API_BASE_URL=
+API_PROXY_TARGET=http://localhost:8080
+DEALERSHIP_URL=https://your-dealership.example
+```
+
+An empty `API_BASE_URL` produces relative API calls. Angular's development
+proxy then forwards supported paths to `API_PROXY_TARGET`.
+
+Before start, build, watch, and test, `generate-environment.mjs` creates:
+
+```text
+frontend/src/environments/environment.generated.ts
+```
+
+That generated file is gitignored.
+
+> The development proxy currently forwards only `/auth` and
+> `/wash_calendar`. It does not proxy `/cars`.
+
+### Backend
+
+Minimum application configuration:
+
+```dotenv
+SUPABASE_DB_URL=jdbc:postgresql://localhost:5432/autoanders
+SUPABASE_DB_USERNAME=postgres
+SUPABASE_DB_PASSWORD=replace-me
+SUPABASE_JWT_SECRET=replace-with-at-least-32-bytes
+
+SUPABASE_URL=https://your-project.supabase.co
+SUPABASE_SERVICE_ROLE_KEY=replace-me
+SUPABASE_STORAGE_BUCKET=car-pictures
+```
+
+Spring's relaxed environment binding maps the Supabase storage variables to:
+
+```text
+supabase.url
+supabase.service-role-key
+supabase.storage.bucket
+```
+
+### Datasource Resolution
+
+`DataSourceConfig` supports several deployment formats.
+
+Priority for URL:
+
+1. `spring.datasource.url`
+2. `SPRING_DATASOURCE_URL`
+3. `URLDATABASE`
+4. `DATABASE_URL`
+5. `PGHOST` plus `PGDATABASE`
+
+Username candidates:
+
+```text
+spring.datasource.username
+SPRING_DATASOURCE_USERNAME
+PGUSER
+POSTGRES_USER
+```
+
+Password candidates:
+
+```text
+spring.datasource.password
+SPRING_DATASOURCE_PASSWORD
+PGPASSWORD
+POSTGRES_PASSWORD
+```
+
+Supported `DATABASE_URL` format:
+
+```text
+postgresql://username:password@host:5432/database
+```
+
+The datasource appends `prepareThreshold=0` to PostgreSQL JDBC URLs unless it
+is already present.
+
+Default Hikari settings:
+
+| Setting | Default |
+| --- | --- |
+| Maximum pool size | `10` |
+| Minimum idle | `2` |
+| Keepalive time | `300000 ms` |
+| Idle timeout | `600000 ms` |
+
+## Local Development
+
+### Requirements
+
+- Git
+- Node.js supported by Angular 21
+- npm 11.6.1 or a compatible npm 11 release
+- Java 21
+- PostgreSQL
+- Docker Desktop or another Docker runtime for Testcontainers and Docker runs
+
+### 1. Clone the Repository
+
+```bash
+git clone https://github.com/yassineao/poetsanders.git
+cd poetsanders
+```
+
+### 2. Create a PostgreSQL Database
+
+Example:
+
+```sql
+CREATE DATABASE autoanders;
+```
+
+The configured database user must be able to create extensions, tables,
+indexes, and constraints when migrations run.
+
+### 3. Configure the Backend
+
+Create:
+
+```text
+backend/AutoAnders/.env
+```
+
+Use the backend variables described above. Maven does not automatically load a
+plain `.env` file by itself. Export the variables in your shell, configure them
+in your IDE run configuration, or run through Docker Compose, which reads the
+backend `.env`.
+
+PowerShell example:
+
+```powershell
+$env:SUPABASE_DB_URL = "jdbc:postgresql://localhost:5432/autoanders"
+$env:SUPABASE_DB_USERNAME = "postgres"
+$env:SUPABASE_DB_PASSWORD = "replace-me"
+$env:SUPABASE_JWT_SECRET = "replace-with-at-least-32-bytes"
+$env:SUPABASE_URL = "https://your-project.supabase.co"
+$env:SUPABASE_SERVICE_ROLE_KEY = "replace-me"
+$env:SUPABASE_STORAGE_BUCKET = "car-pictures"
+```
+
+### 4. Start the Backend
+
+PowerShell:
+
+```powershell
+cd backend/AutoAnders
+.\mvnw.cmd spring-boot:run
+```
+
+Linux or macOS:
+
+```bash
+cd backend/AutoAnders
+./mvnw spring-boot:run
+```
+
+Default URL:
+
+```text
+http://localhost:8080
+```
+
+Health check:
+
+```text
+GET http://localhost:8080/auth/health
+```
+
+### 5. Configure the Frontend
+
+PowerShell:
+
+```powershell
+cd frontend
+Copy-Item .env.example .env
+```
+
+Linux or macOS:
+
+```bash
+cd frontend
+cp .env.example .env
+```
+
+For local development, keep `API_BASE_URL` empty and set
+`API_PROXY_TARGET=http://localhost:8080`.
+
+### 6. Install and Start the Frontend
+
+```bash
+npm ci
+npm start
+```
+
+Open:
+
+```text
+http://localhost:4200
+```
+
+### Docker Backend
+
+The backend image uses a two-stage Java 21 build:
+
+1. Maven compiles and packages the application.
+2. Eclipse Temurin JRE 21 runs `app.jar`.
+
+Start through Compose:
+
+```bash
+cd backend/AutoAnders
+docker compose up --build
+```
+
+Compose:
+
+- Builds the local Dockerfile
+- Names the container `autoanders-api`
+- Tags the image `gloyoo/autoanders-api:latest`
+- Publishes `8080:8080`
+- Reads `backend/AutoAnders/.env`
+
+## Testing and Verification
 
 ### Frontend Commands
 
 Run from `frontend`:
 
-| Command | Description |
+| Command | Purpose |
 | --- | --- |
-| `npm ci` | Reproduce the lockfile exactly |
-| `npm start` | Generate environment and start development server |
-| `npm run build` | Generate environment and build browser plus SSR output |
+| `npm ci` | Install exactly from `package-lock.json` |
+| `npm start` | Generate environment and run development server |
+| `npm run build` | Generate environment and build browser plus SSR bundles |
 | `npm run watch` | Development build in watch mode |
-| `npm test` | Run Angular unit tests |
+| `npm test` | Generate environment and run unit tests |
 | `npm run serve:ssr:frontend` | Serve an existing SSR build |
+
+Current frontend test coverage is small and mainly contains the generated root
+application test. Booking, login, profile, and appointment flows need dedicated
+unit and integration coverage.
+
+### Backend Commands
+
+Run from `backend/AutoAnders`:
+
+PowerShell:
+
+```powershell
+.\mvnw.cmd test
+.\mvnw.cmd package
+```
+
+Linux or macOS:
+
+```bash
+./mvnw test
+./mvnw package
+```
+
+Existing backend tests include:
+
+- Spring application context loading with a PostgreSQL Testcontainer
+- User repository email lookup
+- Booking service assignment of the authenticated user
+
+Docker must be running for Testcontainers-based tests.
+
+### Suggested Manual Smoke Test
+
+1. Start PostgreSQL and the backend.
+2. Start Angular at `http://localhost:4200`.
+3. Register through `/book`.
+4. Select two treatments at one date and time.
+5. Verify two `wash_calendar` rows are created.
+6. Reload the browser and verify `/auth/me` restores the session.
+7. Verify one grouped appointment appears on `/appointments`.
+8. Update name or phone on `/profile`.
+9. Log out and verify protected pages redirect or hide authenticated content.
+10. Log in again and cancel the grouped appointment.
+
+## Build and Rendering
+
+### Frontend Build Pipeline
+
+```mermaid
+flowchart TD
+    Command[npm run build]
+    Prebuild[prebuild hook]
+    DotEnv[Read frontend/.env]
+    Generated[Write environment.generated.ts]
+    Angular[ng build]
+    Browser[Browser bundle]
+    Server[SSR server bundle]
+    Routes{Server route mode}
+    Dynamic[Server render services/:slug]
+    Static[Prerender all other routes]
+
+    Command --> Prebuild --> DotEnv --> Generated --> Angular
+    Angular --> Browser
+    Angular --> Server
+    Angular --> Routes
+    Routes --> Dynamic
+    Routes --> Static
+```
 
 Build output:
 
@@ -980,121 +1433,216 @@ frontend/dist/frontend/
 `-- server/
 ```
 
-The production build currently warns when the initial bundle exceeds the
-configured `500 kB` warning budget. The error threshold is `1 MB`.
+The Express SSR server:
 
-### Backend Commands
+- Serves browser assets with a one-year cache duration
+- Delegates other requests to `AngularNodeAppEngine`
+- Uses `PORT` or defaults to `4000`
 
-Run from `backend/AutoAnders`:
+### Bundle Budgets
 
-| Command | Description |
-| --- | --- |
-| `./mvnw spring-boot:run` | Start the API |
-| `./mvnw test` | Compile and run tests |
-| `./mvnw package` | Build the JAR |
-| `docker compose up --build` | Build and run the API container |
+| Budget | Warning | Error |
+| --- | --- | --- |
+| Initial bundle | `500 kB` | `1 MB` |
+| Any component style | `4 kB` | `8 kB` |
 
-Windows uses `.\mvnw.cmd` instead of `./mvnw`.
-
-Backend tests use Testcontainers with PostgreSQL. Docker must be running or
-the Spring context tests will fail before reaching application assertions.
+The production build currently completes with an initial bundle-size warning.
 
 ## Deployment
 
-### Deployment Architecture
+### Deployment Diagram
 
 ```mermaid
 flowchart LR
     Browser[Customer browser]
-    Vercel[Vercel Angular frontend]
-    API[Deployed Spring Boot API]
-    Postgres[(Hosted PostgreSQL)]
+    Vercel[Vercel static Angular browser output]
+    API[Spring Boot API]
+    DB[(Hosted PostgreSQL)]
     Storage[(Supabase Storage)]
+    Dealer[External dealership frontend]
 
     Browser -->|HTTPS| Vercel
-    Browser -->|HTTPS API calls and cookies| API
-    API --> Postgres
-    API --> Storage
+    Browser -->|HTTPS + cookies| API
+    Browser -->|External link| Dealer
+    API -->|JDBC TLS as configured| DB
+    API -->|Storage REST API| Storage
 ```
 
 ### Vercel Frontend
 
-Configure the Vercel project root as `frontend`.
-
-The repository `vercel.json` defines:
+The root `vercel.json` configures:
 
 ```text
-Install command: npm ci
-Build command: npm run build
-Output directory: dist/frontend/browser
+Install: npm ci
+Build: npm run build
+Output: dist/frontend/browser
+Fallback rewrite: /(.*) -> /index.html
 ```
 
-Configure:
+Configure the Vercel project root as `frontend`, or adjust paths if deploying
+from the repository root.
+
+Production frontend variables:
 
 ```dotenv
-API_BASE_URL=https://your-api-domain.example
+API_BASE_URL=https://your-api.example
+DEALERSHIP_URL=https://your-dealership.example
 ```
 
-`package.json` and `package-lock.json` must always be committed together.
-Vercel uses `npm ci`, which fails when they are out of sync.
+`API_BASE_URL` is compiled into the frontend during the build. Changing it
+requires a new frontend deployment.
 
-### Backend Deployment
+### Backend Deployment Requirements
 
-The backend deployment must provide:
+- Java 21 or Docker
+- Public HTTPS API origin
+- PostgreSQL connection values
+- JWT secret of at least 32 bytes
+- Supabase URL, service-role key, and bucket
+- Frontend origin allowed by CORS
 
-- A Java 21 runtime or Docker runtime
-- PostgreSQL connection variables
-- JWT secret
-- Supabase storage variables
-- HTTPS
-- A public API domain
+For cross-origin cookie authentication:
 
-The frontend domain must be present in the backend CORS configuration.
-Credentialed CORS requires an explicit allowed origin; wildcard-only origins
-cannot be used with cookies.
+1. Frontend and backend must use HTTPS.
+2. Backend must detect HTTPS and issue `Secure; SameSite=None` cookies.
+3. Angular must use `withCredentials: true`.
+4. CORS must allow credentials.
+5. The exact frontend origin or matching allowed-origin pattern must be present.
 
-### Production Cookie Requirements
+## Known Issues and Security Gaps
 
-For cross-origin frontend and backend domains:
+These items describe the current implementation and should be reviewed before
+production use.
 
-1. Both services must use HTTPS.
-2. The backend detects HTTPS and issues `Secure; SameSite=None` cookies.
-3. The frontend must use `withCredentials: true`.
-4. CORS must use `allowCredentials=true`.
-5. The exact frontend origin must be allowed.
+### High Priority
 
-## Security Notes
+1. **Appointment deletion has no ownership check.**
+   `DELETE /wash_calendar/{uuid}` deletes any row found by UUID. Any
+   authenticated user who learns another booking UUID can delete it.
 
-- Passwords are BCrypt hashes, not plaintext.
-- JWTs contain user identity and role claims.
-- Access and refresh tokens are HTTP-only cookies.
-- Refresh tokens cannot authenticate protected endpoints.
-- Booking cancellation checks authenticated ownership.
-- Administrative car mutations require `ROLE_ADMIN`.
-- Never commit `.env` files, database passwords, JWT secrets, or service keys.
-- The Supabase service-role key must only exist on the backend.
+2. **Appointment acceptance is not restricted to administrators.**
+   `POST /wash_calendar/accept/{uuid}` is available to every authenticated user
+   and does not verify ownership or role.
 
-## Current Limitations
+3. **All appointment rows are visible to every authenticated user.**
+   `GET /wash_calendar` returns the complete table.
 
-These are current implementation details, not completed features:
+4. **Exact-date appointment queries are visible to every authenticated user.**
+   `GET /wash_calendar/date/{localDateTime}` can expose other users' rows.
 
-- Angular does not automatically refresh expired access tokens. The backend
-  provides `/auth/refresh`, but no frontend interceptor currently calls it.
-- The login form sets authenticated state but does not automatically redirect
-  to the profile.
-- Appointment availability conflicts are not enforced atomically in the
-  current booking service.
-- Multi-treatment booking uses separate HTTP requests. If one request fails
-  after another succeeds, the operation is not rolled back as one transaction.
-- Multi-row cancellation also uses separate requests and is not atomic.
-- Several profile and authentication labels are still hardcoded in English.
-- The profile route redirects after an API `401`; there is no route guard.
-- Flyway dependencies exist, while Hibernate is currently configured with
-  `ddl-auto: update`.
-- The Maven file contains duplicate JJWT dependency declarations and should be
-  cleaned up.
-- The configured Spring Boot parent is a snapshot version and may be less
-  reproducible than a stable release.
+5. **Multi-treatment creation is not transactional.**
+   Each treatment is a separate request. If request two fails after request one
+   succeeds, a partial appointment remains.
+
+6. **Grouped cancellation is not transactional.**
+   Each row is deleted separately. A partial cancellation can occur.
+
+### Correctness and Runtime Risks
+
+1. `GET /auth/getUserCars` casts `Authentication.getPrincipal()` to `User`, but
+   `JwtAuthFilter` stores the display name string as the principal. This endpoint
+   is likely to fail with `ClassCastException`.
+
+2. The frontend has no automatic access-token refresh interceptor. After the
+   15-minute access token expires, requests return `401` until login or an
+   explicit refresh call.
+
+3. There is no database constraint preventing two users from booking the same
+   date, time, or treatment.
+
+4. Past dates are blocked in the browser but not validated by the backend.
+
+5. Wash request DTO fields have no bean-validation annotations, so null values
+   are rejected only later by persistence constraints.
+
+6. `CarPictureRepository` declares `Long` as its ID type while `CarPicture.id`
+   is a UUID.
+
+7. Picture request fields `title` and `description` are optional at the HTTP
+   layer, while migration V6 declares them `NOT NULL`.
+
+8. Car entities are returned directly from controllers. Lazy relationships and
+   bidirectional references can create serialization or session-boundary
+   problems. Dedicated response DTOs are safer.
+
+9. The registration flow detects duplicate email addresses before insert, but a
+   concurrent duplicate can still rely on the database unique constraint and
+   may not be converted to the intended `409`.
+
+### Schema and Build Maintenance
+
+1. Flyway migrations and `hibernate.ddl-auto=update` are both active design
+   mechanisms. Production should use one authoritative schema strategy.
+
+2. Migrations are missing current columns such as `phone_number`, `accepted`,
+   and `status`.
+
+3. Migration V5 executes `DELETE FROM cars` before adding a required owner
+   column. This is destructive for an existing database.
+
+4. `pom.xml` declares JJWT dependencies twice and mixes versions `0.12.6` and
+   `0.11.5`.
+
+5. The Spring Boot parent is `3.5.15-SNAPSHOT` and uses the Spring snapshots
+   repository, which reduces build reproducibility.
+
+6. The frontend production deployment serves only `dist/frontend/browser`.
+   This means Vercel uses SPA fallback behavior rather than running the Angular
+   Express SSR server produced by the build.
+
+7. The frontend development proxy does not include `/cars`.
+
+### UX and State Limitations
+
+1. Language selection is not persisted across reloads.
+2. There are no Angular route guards.
+3. Appointment availability is based on fixed translated time slots, not live
+   backend availability.
+4. A booking confirmation means the request was stored, not that every row was
+   accepted by the business.
+5. The booking form still contains an unused `message` form control while its
+   textarea is not rendered.
+6. The standalone `ProfileDetailsComponent` contains hardcoded English labels
+   and is currently not used by the profile page.
+
+## Development Guidelines
+
+### Adding a Treatment
+
+1. Add the treatment to all three translation sets.
+2. Add its slug and content to the service interfaces if needed.
+3. Add a matching backend `WashType` enum value.
+4. Add the slug-to-enum mapping in `BookingService`.
+5. Add the enum-to-slug mapping in `AppointmentsListComponent`.
+6. Test booking, grouping, translation, and service-detail routing.
+
+### Adding a Frontend Locale
+
+1. Add the locale to the `Locale` type.
+2. Add it to `I18nService.languages`.
+3. Create the complete translation directory.
+4. Register the copy in the translation map.
+5. Verify date formatting and all shared interface requirements.
+
+### Adding a Database Field
+
+1. Update the JPA entity.
+2. Add a new Flyway migration; never rewrite an applied migration.
+3. Update request and response DTOs.
+4. Update frontend interfaces if the field crosses the API boundary.
+5. Add repository or service tests.
+6. Verify against a clean database and a migrated existing database.
+
+### Recommended Production Hardening Order
+
+1. Enforce booking ownership and admin-only acceptance.
+2. Add transactional batch booking and cancellation endpoints.
+3. Add backend date and conflict validation.
+4. Complete Flyway migrations and disable Hibernate schema mutation.
+5. Clean and pin Maven dependency versions.
+6. Add automatic token refresh or a clear re-authentication strategy.
+7. Replace entity responses with DTOs.
+8. Add frontend route guards and broader automated tests.
 
 ## Repository
 
