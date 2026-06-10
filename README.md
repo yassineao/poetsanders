@@ -1729,6 +1729,12 @@ production use.
 - Hibernate now uses `ddl-auto: validate`; it no longer mutates the schema.
 - Wash-calendar controllers return response DTOs instead of serializing the
   bidirectional JPA user relationship.
+- The frontend now includes an automatic access-token refresh interceptor
+  (`TokenRefreshInterceptor`). When a 401 response is received, the interceptor
+  automatically calls `/auth/refresh` to obtain a new token and retries the
+  original request. Multiple simultaneous 401s are queued to avoid race
+  conditions. The access token expiration (15 minutes) is now transparent to the
+  user.
 
 ### Correctness and Runtime Risks
 
@@ -1736,26 +1742,22 @@ production use.
    `JwtAuthFilter` stores the display name string as the principal. This endpoint
    is likely to fail with `ClassCastException`.
 
-2. The frontend has no automatic access-token refresh interceptor. After the
-   15-minute access token expires, requests return `401` until login or an
-   explicit refresh call.
-
-3. There is no database constraint preventing two users from booking the same
+2. There is no database constraint preventing two users from booking the same
    date, time, or treatment.
 
-4. Past dates are blocked in the browser but not validated by the backend.
+3. Past dates are blocked in the browser but not validated by the backend.
 
-5. `CarPictureRepository` declares `Long` as its ID type while `CarPicture.id`
+4. `CarPictureRepository` declares `Long` as its ID type while `CarPicture.id`
    is a UUID.
 
-6. Picture request fields `title` and `description` are optional at the HTTP
+5. Picture request fields `title` and `description` are optional at the HTTP
    layer, while migration V6 declares them `NOT NULL`.
 
-7. Car entities are returned directly from controllers. Lazy relationships and
+6. Car entities are returned directly from controllers. Lazy relationships and
    bidirectional references can create serialization or session-boundary
    problems. Dedicated response DTOs are safer.
 
-8. The registration flow detects duplicate email addresses before insert, but a
+7. The registration flow detects duplicate email addresses before insert, but a
    concurrent duplicate can still rely on the database unique constraint and
    may not be converted to the intended `409`.
 
