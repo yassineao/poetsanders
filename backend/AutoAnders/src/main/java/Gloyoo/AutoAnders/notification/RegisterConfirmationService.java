@@ -55,6 +55,7 @@ public class RegisterConfirmationService {
 
         try {
             mailSender.send(message);
+            log.info("Sent registration confirmation email to {}", user.getEmail());
         } catch (MailException exception) {
             log.error(
                     "User {} was saved, but confirmation email delivery to {} failed",

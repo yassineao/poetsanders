@@ -22,4 +22,8 @@ public interface WashCalendarRepository extends JpaRepository<WashCalendar, UUID
 
     long countByUserAndIdNotIn(User user, List<UUID> ids);
 
+    List<WashCalendar> findByLocalDateTimeBefore(LocalDateTime cutoff);
+
+    long countByUser(User user);
+
 }

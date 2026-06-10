@@ -368,4 +368,86 @@ class WashCalendarServiceTest {
         );
         verify(washCalendarRepository, never()).deleteAll(any());
     }
+
+    @Test
+    void expiredCleanupDeletesRowsAndAnEmptyGuestAccount() {
+        WashCalendarRepository washCalendarRepository = mock(WashCalendarRepository.class);
+        UserService userService = mock(UserService.class);
+        WashCalendarService service =
+                new WashCalendarService(washCalendarRepository, userService);
+        User guest = User.builder()
+                .id(UUID.randomUUID())
+                .email("guest::customer@example.com")
+                .build();
+        LocalDateTime cutoff = LocalDateTime.of(2026, 6, 12, 11, 0);
+        List<WashCalendar> expired = List.of(
+                WashCalendar.builder()
+                        .id(UUID.randomUUID())
+                        .user(guest)
+                        .localDateTime(cutoff.minusMinutes(30))
+                        .build(),
+                WashCalendar.builder()
+                        .id(UUID.randomUUID())
+                        .user(guest)
+                        .localDateTime(cutoff.minusMinutes(30))
+                        .build()
+        );
+
+        when(washCalendarRepository.findByLocalDateTimeBefore(cutoff))
+                .thenReturn(expired);
+        when(userService.isGuest(guest)).thenReturn(true);
+        when(washCalendarRepository.countByUser(guest)).thenReturn(0L);
+
+        int deleted = service.deleteExpiredAppointments(cutoff);
+
+        assertEquals(2, deleted);
+        verify(washCalendarRepository).deleteAll(expired);
+        verify(washCalendarRepository).flush();
+        verify(userService).deleteGuest(guest);
+    }
+
+    @Test
+    void expiredCleanupKeepsGuestWithFutureAppointments() {
+        WashCalendarRepository washCalendarRepository = mock(WashCalendarRepository.class);
+        UserService userService = mock(UserService.class);
+        WashCalendarService service =
+                new WashCalendarService(washCalendarRepository, userService);
+        User guest = User.builder()
+                .id(UUID.randomUUID())
+                .email("guest::customer@example.com")
+                .build();
+        LocalDateTime cutoff = LocalDateTime.of(2026, 6, 12, 11, 0);
+        List<WashCalendar> expired = List.of(
+                WashCalendar.builder()
+                        .id(UUID.randomUUID())
+                        .user(guest)
+                        .localDateTime(cutoff.minusMinutes(30))
+                        .build()
+        );
+
+        when(washCalendarRepository.findByLocalDateTimeBefore(cutoff))
+                .thenReturn(expired);
+        when(userService.isGuest(guest)).thenReturn(true);
+        when(washCalendarRepository.countByUser(guest)).thenReturn(1L);
+
+        int deleted = service.deleteExpiredAppointments(cutoff);
+
+        assertEquals(1, deleted);
+        verify(userService, never()).deleteGuest(any());
+    }
+
+    @Test
+    void expiredCleanupDoesNothingWhenNoAppointmentsHavePassed() {
+        WashCalendarRepository washCalendarRepository = mock(WashCalendarRepository.class);
+        WashCalendarService service =
+                new WashCalendarService(washCalendarRepository, mock(UserService.class));
+        LocalDateTime cutoff = LocalDateTime.of(2026, 6, 12, 11, 0);
+
+        when(washCalendarRepository.findByLocalDateTimeBefore(cutoff))
+                .thenReturn(List.of());
+
+        assertEquals(0, service.deleteExpiredAppointments(cutoff));
+        verify(washCalendarRepository, never()).deleteAll(any());
+        verify(washCalendarRepository, never()).flush();
+    }
 }

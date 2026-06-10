@@ -73,6 +73,10 @@ public class AppointmentCancellationEmailService {
 
         try {
             mailSender.send(message);
+            log.info(
+                    "Sent appointment cancellation email to {}",
+                    cancellation.customerEmail()
+            );
         } catch (MailException exception) {
             log.error(
                     "Appointment was cancelled, but cancellation email delivery to {} failed",

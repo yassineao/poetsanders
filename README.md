@@ -774,6 +774,12 @@ mail. When the cancelled rows are the guest's final appointment rows, the
 temporary guest user is also deleted. Registered accounts are never
 automatically deleted.
 
+Past appointment rows are automatically removed by a Spring scheduler every 15
+minutes. The cutoff uses `Europe/Amsterdam` by default. If expired rows belonged
+to a guest with no future appointments, that temporary guest account is also
+removed. Registered accounts remain intact, and automatic expiry does not send
+a cancellation email.
+
 New customers also receive a welcome email immediately after successful
 registration. Guest users are created through the guest-booking endpoint and
 therefore do not receive the registration welcome email.
@@ -1317,7 +1323,9 @@ clients cannot choose how guest identities are stored.
 
 Set `MAIL_ENABLED=true` only after configuring valid SMTP credentials. For
 Gmail, `MAIL_PASSWORD` must be an app password rather than the normal account
-password.
+password. Enter the 16-character app password without spaces. On startup, the
+backend logs whether email delivery is enabled and warns when SMTP settings are
+missing or malformed.
 
 Spring's relaxed environment binding maps the Supabase storage variables to:
 

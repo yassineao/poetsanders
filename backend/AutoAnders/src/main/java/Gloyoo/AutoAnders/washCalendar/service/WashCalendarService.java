@@ -20,8 +20,10 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.util.Base64;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @Service
@@ -155,6 +157,34 @@ public class WashCalendarService {
 
     public List<WashCalendar> findAllWashCalendar() {
         return washCalendarRepository.findAll();
+    }
+
+    @Transactional
+    public int deleteExpiredAppointments(LocalDateTime cutoff) {
+        List<WashCalendar> expiredAppointments =
+                washCalendarRepository.findByLocalDateTimeBefore(cutoff);
+        if (expiredAppointments.isEmpty()) {
+            return 0;
+        }
+
+        Map<UUID, User> guestUsers = new LinkedHashMap<>();
+        for (WashCalendar appointment : expiredAppointments) {
+            User user = appointment.getUser();
+            if (userService.isGuest(user)) {
+                guestUsers.putIfAbsent(user.getId(), user);
+            }
+        }
+
+        washCalendarRepository.deleteAll(expiredAppointments);
+        washCalendarRepository.flush();
+
+        for (User guest : guestUsers.values()) {
+            if (washCalendarRepository.countByUser(guest) == 0) {
+                userService.deleteGuest(guest);
+            }
+        }
+
+        return expiredAppointments.size();
     }
 
 

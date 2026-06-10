@@ -81,6 +81,7 @@ public class BookingConfirmationEmailService {
 
         try {
             mailSender.send(message);
+            log.info("Sent booking confirmation email to {}", user.getEmail());
         } catch (MailException exception) {
             log.error(
                     "Appointment {} was saved, but confirmation email delivery to {} failed",
