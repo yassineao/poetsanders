@@ -363,6 +363,10 @@ independent. Appointment filtering and search happen before pagination.
 
 ### Booking Form Validation
 
+The booking form is **fully connected** to the backend API, database, and email
+service. Form submissions are validated, processed, and saved to PostgreSQL.
+Email confirmations are sent when SMTP is configured (MAIL_ENABLED=true).
+
 Anonymous customers must provide:
 
 | Field | Client and backend rules |
@@ -377,9 +381,10 @@ Anonymous customers must provide:
 | Date | Today or a future date |
 | Time | One configured time slot |
 
-Authenticated customers only need treatments, date, and time. The identity
-fields remain in the form model but are hidden and ignored by submission
-validation.
+Both the frontend (Angular Reactive Forms) and backend (Spring Boot validation)
+enforce these rules. Authenticated customers only need treatments, date, and time.
+The identity fields remain in the form model but are hidden and ignored by
+submission validation.
 
 ### Booking Form State Machine
 
