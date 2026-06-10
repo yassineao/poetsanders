@@ -62,7 +62,7 @@ for cars and Supabase-hosted car pictures.
 - Car inventory creation, reading, updating, status updates, and deletion
 - Car picture metadata and Supabase Storage uploads
 - PostgreSQL persistence with Spring Data JPA
-- Flyway migration files plus Hibernate schema updates
+- Flyway-managed schema migrations with Hibernate startup validation
 - Stateless Spring Security with role-based endpoint rules
 
 ## Technology Stack
@@ -78,7 +78,7 @@ for cars and Supabase-hosted car pictures.
 | Styling | Tailwind CSS 4 |
 | Rendering | Angular SSR, prerendering, hydration, event replay |
 | Frontend tests | Angular unit-test builder and Vitest |
-| Backend framework | Spring Boot 3.5 snapshot parent |
+| Backend framework | Spring Boot 3.5.14 |
 | Backend language | Java 21 |
 | Security | Spring Security, BCrypt, JJWT |
 | Persistence | Spring Data JPA, Hibernate, PostgreSQL |
@@ -955,16 +955,11 @@ erDiagram
 | `V5__add_user_id_to_cars.sql` | Delete existing cars and add required owner |
 | `V6__create_car_pictures_table.sql` | Create picture metadata |
 | `V7__create_wash_calendar_table.sql` | Create appointment rows |
+| `V8__align_schema_with_entities.sql` | Add user phone numbers, appointment acceptance, and car status |
 
-The migration files do not fully describe the current JPA entities:
-
-- `users.phone_number` is missing from migrations.
-- `wash_calendar.accepted` is missing from migrations.
-- `cars.status` is missing from the original car migration.
-- Hibernate is configured with `ddl-auto: update`, so Hibernate currently
-  fills some migration gaps at startup.
-
-For production, choose one schema authority and bring the migrations up to date.
+Flyway is the schema authority. Hibernate uses `ddl-auto: validate`, so startup
+fails when the migrated database no longer matches the JPA mappings instead of
+silently changing production tables.
 
 ## API Reference
 
@@ -1619,6 +1614,18 @@ For cross-origin cookie authentication:
 These items describe the current implementation and should be reviewed before
 production use.
 
+### Recently Resolved
+
+- Spring Boot is pinned to stable version `3.5.14`; snapshot repositories are
+  no longer configured.
+- JJWT dependencies use one version (`0.12.6`), are declared only once, and
+  `JwtService` uses the matching parser API.
+- Flyway migration V8 adds the previously missing `phone_number`, `accepted`,
+  and `status` columns.
+- Hibernate now uses `ddl-auto: validate`; it no longer mutates the schema.
+- Wash-calendar controllers return response DTOs instead of serializing the
+  bidirectional JPA user relationship.
+
 ### Correctness and Runtime Risks
 
 1. `GET /auth/getUserCars` casts `Authentication.getPrincipal()` to `User`, but
@@ -1650,30 +1657,21 @@ production use.
 
 ### Schema and Build Maintenance
 
-1. Flyway migrations and `hibernate.ddl-auto=update` are both active design
-   mechanisms. Production should use one authoritative schema strategy.
-
-2. Migrations are missing current columns such as `phone_number`, `accepted`,
-   and `status`.
-
-3. Migration V5 executes `DELETE FROM cars` before adding a required owner
+1. Migration V5 executes `DELETE FROM cars` before adding a required owner
    column. This is destructive for an existing database.
 
-4. `pom.xml` declares JJWT dependencies twice and mixes versions `0.12.6` and
-   `0.11.5`.
-
-5. The Spring Boot parent is `3.5.15-SNAPSHOT` and uses the Spring snapshots
-   repository, which reduces build reproducibility.
-
-6. The frontend production deployment serves only `dist/frontend/browser`.
+2. The frontend production deployment serves only `dist/frontend/browser`.
    This means Vercel uses SPA fallback behavior rather than running the Angular
    Express SSR server produced by the build.
 
-7. The frontend development proxy does not include `/cars`.
+3. The frontend development proxy does not include `/admin` or `/cars`.
 
-8. `UserRepositoryTest` is configured as `@DataJpaTest` without an embedded
+4. `UserRepositoryTest` is configured as `@DataJpaTest` without an embedded
    database dependency or imported Testcontainer configuration, so it cannot
    currently initialize its datasource.
+
+5. Full Flyway migration and Hibernate validation tests require a running
+   PostgreSQL database. The Testcontainers suite also requires Docker.
 
 ### UX and State Limitations
 
@@ -1719,11 +1717,10 @@ production use.
 ### Recommended Production Hardening Order
 
 1. Add backend date and conflict validation.
-2. Complete Flyway migrations and disable Hibernate schema mutation.
-3. Clean and pin Maven dependency versions.
-4. Add automatic token refresh or a clear re-authentication strategy.
-5. Replace entity responses with DTOs.
-6. Add frontend route guards and broader automated tests.
+2. Add automatic token refresh or a clear re-authentication strategy.
+3. Replace remaining car entity responses with DTOs.
+4. Repair repository and Testcontainers test configuration.
+5. Add frontend route guards and broader automated tests.
 
 ## Repository
 
