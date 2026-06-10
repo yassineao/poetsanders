@@ -62,7 +62,7 @@ for cars and Supabase-hosted car pictures.
 - Car inventory creation, reading, updating, status updates, and deletion
 - Car picture metadata and Supabase Storage uploads
 - PostgreSQL persistence with Spring Data JPA
-- Flyway migration files plus Hibernate schema updates
+- Flyway-managed schema migrations with Hibernate startup validation
 - Stateless Spring Security with role-based endpoint rules
 
 ## Technology Stack
@@ -78,7 +78,7 @@ for cars and Supabase-hosted car pictures.
 | Styling | Tailwind CSS 4 |
 | Rendering | Angular SSR, prerendering, hydration, event replay |
 | Frontend tests | Angular unit-test builder and Vitest |
-| Backend framework | Spring Boot 3.5 snapshot parent |
+| Backend framework | Spring Boot 3.5.14 |
 | Backend language | Java 21 |
 | Security | Spring Security, BCrypt, JJWT |
 | Persistence | Spring Data JPA, Hibernate, PostgreSQL |
@@ -720,7 +720,7 @@ sequenceDiagram
     Form-->>Customer: Show confirmation
 ```
 
-### Anonymous Customer Booking
+### New Account Booking
 
 ```mermaid
 flowchart TD
@@ -742,6 +742,52 @@ flowchart TD
     Book -->|All requests succeed| Success
     Book -->|Any request fails| Error
 ```
+
+### Guest Booking
+
+Guests can choose the guest option instead of creating an account. The frontend
+sends name, email, phone number, treatments, and date/time to
+`POST /wash_calendar/guest`.
+
+The backend prefixes the normalized email with `GUEST_EMAIL_PREFIX`, generates
+and hashes an inaccessible random password, creates the guest user, and saves
+all selected treatment rows in one transaction. The unique prefixed email
+limits an email address to one guest appointment. Guest bookings do not create
+an authenticated session and cannot be managed online.
+
+Authenticated registered customers receive an email after a successful
+appointment request when SMTP delivery is enabled. Guest users do not receive
+this registered-account confirmation email. A mail delivery failure is logged
+without rolling back the saved appointment.
+
+Every appointment receives a cryptographically random cancellation token. All
+treatment rows in one grouped appointment share that token. Only its SHA-256
+hash is stored in PostgreSQL, while the raw token is included in the registered
+customer's booking email and the booking creation response. Later appointment
+reads do not expose it because the raw token is not persisted. Calling
+`DELETE /wash_calendar/cancel/{cancellationToken}` removes the entire grouped
+appointment and makes the token unusable.
+
+Successful cancellation sends an email to the customer's real address. For
+guest users, the backend removes the configured `guest::` prefix before sending
+mail. When the cancelled rows are the guest's final appointment rows, the
+temporary guest user is also deleted. Registered accounts are never
+automatically deleted.
+
+Past appointment rows are automatically removed by a Spring scheduler every 15
+minutes. The cutoff uses `Europe/Amsterdam` by default. If expired rows belonged
+to a guest with no future appointments, that temporary guest account is also
+removed. Registered accounts remain intact, and automatic expiry does not send
+a cancellation email.
+
+New customers also receive a welcome email immediately after successful
+registration. Guest users are created through the guest-booking endpoint and
+therefore do not receive the registration welcome email.
+
+When a customer later registers with an email previously used for a guest
+booking, registration upgrades the existing `guest::email` user row instead of
+creating a second user. The user UUID stays unchanged, so all guest
+appointments automatically become visible under the new registered account.
 
 ### Storage Granularity
 
@@ -955,16 +1001,48 @@ erDiagram
 | `V5__add_user_id_to_cars.sql` | Delete existing cars and add required owner |
 | `V6__create_car_pictures_table.sql` | Create picture metadata |
 | `V7__create_wash_calendar_table.sql` | Create appointment rows |
+| `V8__align_schema_with_entities.sql` | Add user phone numbers, appointment acceptance, and car status |
+| `V9__add_appointment_cancellation_tokens.sql` | Add hashed cancellation tokens for grouped appointments |
 
-The migration files do not fully describe the current JPA entities:
+Applied Flyway migrations are immutable. Never edit an existing migration after
+it has run in any shared environment; add a new version instead. SQL migration
+files are forced to LF line endings through `.gitattributes`.
 
-- `users.phone_number` is missing from migrations.
-- `wash_calendar.accepted` is missing from migrations.
-- `cars.status` is missing from the original car migration.
-- Hibernate is configured with `ddl-auto: update`, so Hibernate currently
-  fills some migration gaps at startup.
+The `Car.co2Emissions` property is explicitly mapped to the existing
+`cars.co2_emissions` column. Hibernate otherwise derives `co2emissions` for this
+digit-and-acronym property and fails schema validation even though `V3` created
+the correct database column. The numbered lease fields are likewise explicitly
+mapped to `lease_price_60_months`, `lease_price_48_months`, and
+`lease_price_36_months`.
 
-For production, choose one schema authority and bring the migrations up to date.
+If production reports a checksum mismatch for `V8`, first verify that its
+schema changes are present:
+
+```sql
+SELECT table_name, column_name
+FROM information_schema.columns
+WHERE (table_name, column_name) IN (
+  ('users', 'phone_number'),
+  ('wash_calendar', 'accepted'),
+  ('cars', 'status')
+);
+```
+
+When all three rows are returned and the deployed `V8` is the intended
+migration, repair the Flyway history once:
+
+```sql
+UPDATE flyway_schema_history
+SET checksum = 1320712067
+WHERE version = '8'
+  AND checksum = -842893664;
+```
+
+Restart the backend afterward. Do not disable Flyway validation.
+
+Flyway is the schema authority. Hibernate uses `ddl-auto: validate`, so startup
+fails when the migrated database no longer matches the JPA mappings instead of
+silently changing production tables.
 
 ## API Reference
 
@@ -1227,11 +1305,27 @@ SUPABASE_DB_URL=jdbc:postgresql://localhost:5432/autoanders
 SUPABASE_DB_USERNAME=postgres
 SUPABASE_DB_PASSWORD=replace-me
 SUPABASE_JWT_SECRET=replace-with-at-least-32-bytes
+GUEST_EMAIL_PREFIX=guest::
+MAIL_ENABLED=false
+MAIL_HOST=smtp.gmail.com
+MAIL_PORT=587
+MAIL_USERNAME=your-email@example.com
+MAIL_PASSWORD=your-smtp-app-password
+MAIL_FROM=your-email@example.com
 
 SUPABASE_URL=https://your-project.supabase.co
 SUPABASE_SERVICE_ROLE_KEY=replace-me
 SUPABASE_STORAGE_BUCKET=car-pictures
 ```
+
+`GUEST_EMAIL_PREFIX` is server-side configuration. Keep it on the backend so
+clients cannot choose how guest identities are stored.
+
+Set `MAIL_ENABLED=true` only after configuring valid SMTP credentials. For
+Gmail, `MAIL_PASSWORD` must be an app password rather than the normal account
+password. Enter the 16-character app password without spaces. On startup, the
+backend logs whether email delivery is enabled and warns when SMTP settings are
+missing or malformed.
 
 Spring's relaxed environment binding maps the Supabase storage variables to:
 
@@ -1619,6 +1713,18 @@ For cross-origin cookie authentication:
 These items describe the current implementation and should be reviewed before
 production use.
 
+### Recently Resolved
+
+- Spring Boot is pinned to stable version `3.5.14`; snapshot repositories are
+  no longer configured.
+- JJWT dependencies use one version (`0.12.6`), are declared only once, and
+  `JwtService` uses the matching parser API.
+- Flyway migration V8 adds the previously missing `phone_number`, `accepted`,
+  and `status` columns.
+- Hibernate now uses `ddl-auto: validate`; it no longer mutates the schema.
+- Wash-calendar controllers return response DTOs instead of serializing the
+  bidirectional JPA user relationship.
+
 ### Correctness and Runtime Risks
 
 1. `GET /auth/getUserCars` casts `Authentication.getPrincipal()` to `User`, but
@@ -1650,30 +1756,21 @@ production use.
 
 ### Schema and Build Maintenance
 
-1. Flyway migrations and `hibernate.ddl-auto=update` are both active design
-   mechanisms. Production should use one authoritative schema strategy.
-
-2. Migrations are missing current columns such as `phone_number`, `accepted`,
-   and `status`.
-
-3. Migration V5 executes `DELETE FROM cars` before adding a required owner
+1. Migration V5 executes `DELETE FROM cars` before adding a required owner
    column. This is destructive for an existing database.
 
-4. `pom.xml` declares JJWT dependencies twice and mixes versions `0.12.6` and
-   `0.11.5`.
-
-5. The Spring Boot parent is `3.5.15-SNAPSHOT` and uses the Spring snapshots
-   repository, which reduces build reproducibility.
-
-6. The frontend production deployment serves only `dist/frontend/browser`.
+2. The frontend production deployment serves only `dist/frontend/browser`.
    This means Vercel uses SPA fallback behavior rather than running the Angular
    Express SSR server produced by the build.
 
-7. The frontend development proxy does not include `/cars`.
+3. The frontend development proxy does not include `/admin` or `/cars`.
 
-8. `UserRepositoryTest` is configured as `@DataJpaTest` without an embedded
+4. `UserRepositoryTest` is configured as `@DataJpaTest` without an embedded
    database dependency or imported Testcontainer configuration, so it cannot
    currently initialize its datasource.
+
+5. Full Flyway migration and Hibernate validation tests require a running
+   PostgreSQL database. The Testcontainers suite also requires Docker.
 
 ### UX and State Limitations
 
@@ -1719,11 +1816,10 @@ production use.
 ### Recommended Production Hardening Order
 
 1. Add backend date and conflict validation.
-2. Complete Flyway migrations and disable Hibernate schema mutation.
-3. Clean and pin Maven dependency versions.
-4. Add automatic token refresh or a clear re-authentication strategy.
-5. Replace entity responses with DTOs.
-6. Add frontend route guards and broader automated tests.
+2. Add automatic token refresh or a clear re-authentication strategy.
+3. Replace remaining car entity responses with DTOs.
+4. Repair repository and Testcontainers test configuration.
+5. Add frontend route guards and broader automated tests.
 
 ## Repository
 

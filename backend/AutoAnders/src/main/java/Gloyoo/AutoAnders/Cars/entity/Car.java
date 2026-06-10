@@ -49,6 +49,7 @@ public class Car {
     private BigDecimal urbanFuelConsumption;
     private BigDecimal combinedFuelConsumption;
     private BigDecimal motorwayFuelConsumption;
+    @Column(name = "co2_emissions")
     private Integer co2Emissions;
     private Boolean taxDeductible;
     private String chassisNumber;
@@ -65,8 +66,11 @@ public class Car {
     private String location;
 
     private BigDecimal financialLeasePricePerMonth;
+    @Column(name = "lease_price_60_months")
     private BigDecimal leasePrice60Months;
+    @Column(name = "lease_price_48_months")
     private BigDecimal leasePrice48Months;
+    @Column(name = "lease_price_36_months")
     private BigDecimal leasePrice36Months;
 
     @Enumerated(EnumType.STRING)

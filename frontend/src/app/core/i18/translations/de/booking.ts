@@ -8,6 +8,40 @@ export const deBookingCopy: BookingCopy = {
   formHeading: 'Ihre Angaben',
   existingAccountPrompt: 'Sie haben bereits ein Konto?',
   loginLabel: 'Anmelden',
+  bookingModeHeading: 'Wie möchten Sie buchen?',
+  registerModeLabel: 'Konto erstellen',
+  registerModeDescription: 'Empfohlen, um diesen und künftige Termine zu verwalten.',
+  guestModeLabel: 'Als Gast buchen',
+  guestModeDescription: 'Schnelle Buchung ohne Konto.',
+  existingGuestHeading: 'Bereits als Gast gebucht?',
+  existingGuestDescription:
+    'Erstellen Sie ein Konto mit derselben E-Mail-Adresse. Ihr Gasttermin wird automatisch verknüpft.',
+  existingGuestAction: 'Gasttermin registrieren',
+  existingGuestActiveMessage:
+    'Geben Sie dieselbe E-Mail-Adresse wie bei der Gastbuchung ein, wählen Sie ein Passwort und erstellen Sie Ihr Konto.',
+  existingGuestBackLabel: 'Stattdessen neuen Termin buchen',
+  registerBenefitsHeading: 'Vorteile eines Kontos',
+  registerBenefits: [
+    'Sehen, ob Ihr Termin angenommen wurde',
+    'Termine ansehen und stornieren',
+    'Profil und Buchungsverlauf verwalten',
+  ],
+  registerOnlyHint:
+    'Wählen Sie Behandlungen, Datum und Uhrzeit vollständig aus, um einen Termin anzufragen. Andernfalls wird nur Ihr Konto erstellt.',
+  registerSubmitLabel: 'Konto erstellen',
+  registerSubmittingLabel: 'Konto wird erstellt...',
+  registerSuccessEyebrow: 'Registrierung abgeschlossen',
+  registerSuccessHeading: 'Ihr Konto ist bereit',
+  registerSuccessMessage: 'Sie können sich jetzt anmelden und zukünftige Termine verwalten.',
+  registerNextStepsMessage:
+    'Es wurde kein Termin erstellt. Wählen Sie Behandlungen, Datum und Uhrzeit aus, sobald Sie buchen möchten.',
+  guestLimitationMessage:
+    'Gastbuchungen sind auf einen Termin pro E-Mail-Adresse begrenzt und können nicht online verwaltet werden.',
+  guestConflictMessage:
+    'Diese E-Mail-Adresse wurde bereits für einen Gasttermin verwendet.',
+  guestConfirmationNextStepsMessage:
+    'Wir haben Ihre Gastanfrage gespeichert und kontaktieren Sie direkt. Dieser Termin kann nicht online verwaltet werden.',
+  guestCreateAccountLabel: 'Für das nächste Mal ein Konto erstellen',
   calendarHeading: 'Datum und Uhrzeit wählen',
   calendarDescription:
     'Wählen Sie zuerst einen Tag im Kalender und danach Ihre bevorzugte Uhrzeit.',

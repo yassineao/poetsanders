@@ -7,6 +7,39 @@ export const nlBookingCopy: BookingCopy = {
   formHeading: 'Uw gegevens',
   existingAccountPrompt: 'Heeft u al een account?',
   loginLabel: 'Inloggen',
+  bookingModeHeading: 'Hoe wilt u boeken?',
+  registerModeLabel: 'Account aanmaken',
+  registerModeDescription: 'Aanbevolen om deze en toekomstige afspraken te beheren.',
+  guestModeLabel: 'Boeken als gast',
+  guestModeDescription: 'Snel boeken zonder account.',
+  existingGuestHeading: 'Al als gast geboekt?',
+  existingGuestDescription:
+    'Maak een account met hetzelfde e-mailadres. Uw gastafspraak wordt automatisch gekoppeld.',
+  existingGuestAction: 'Mijn gastafspraak registreren',
+  existingGuestActiveMessage:
+    'Gebruik hetzelfde e-mailadres als bij uw gastboeking, kies een wachtwoord en maak uw account aan.',
+  existingGuestBackLabel: 'In plaats daarvan een nieuwe afspraak boeken',
+  registerBenefitsHeading: 'Voordelen van een account',
+  registerBenefits: [
+    'Bekijk of uw afspraak is geaccepteerd',
+    'Bekijk en annuleer uw afspraken',
+    'Beheer uw profiel en boekingsgeschiedenis',
+  ],
+  registerOnlyHint:
+    'Kies behandelingen, een datum en een tijd om een afspraak aan te vragen. Anders wordt alleen uw account aangemaakt.',
+  registerSubmitLabel: 'Account aanmaken',
+  registerSubmittingLabel: 'Account aanmaken...',
+  registerSuccessEyebrow: 'Registratie voltooid',
+  registerSuccessHeading: 'Uw account is klaar',
+  registerSuccessMessage: 'U kunt nu inloggen en toekomstige afspraken beheren.',
+  registerNextStepsMessage:
+    'Er is geen afspraak aangemaakt. Kies behandelingen, een datum en een tijd wanneer u wilt boeken.',
+  guestLimitationMessage:
+    'Boeken als gast is beperkt tot één afspraak per e-mailadres en kan niet online worden beheerd.',
+  guestConflictMessage: 'Dit e-mailadres is al gebruikt voor een gastafspraak.',
+  guestConfirmationNextStepsMessage:
+    'We hebben uw gastaanvraag opgeslagen en nemen rechtstreeks contact met u op. Deze afspraak kan niet online worden beheerd.',
+  guestCreateAccountLabel: 'Maak een account voor de volgende keer',
   calendarHeading: 'Kies een datum en tijd',
   calendarDescription: 'Selecteer eerst een dag in de kalender en kies daarna uw gewenste tijd.',
   nameLabel: 'Naam',

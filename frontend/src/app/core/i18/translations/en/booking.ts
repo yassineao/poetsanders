@@ -7,6 +7,39 @@ export const enBookingCopy: BookingCopy = {
   formHeading: 'Your details',
   existingAccountPrompt: 'Already have an account?',
   loginLabel: 'Log in',
+  bookingModeHeading: 'How would you like to book?',
+  registerModeLabel: 'Create an account',
+  registerModeDescription: 'Recommended for managing this and future appointments.',
+  guestModeLabel: 'Book as a guest',
+  guestModeDescription: 'Quick booking without an account.',
+  existingGuestHeading: 'Already booked as a guest?',
+  existingGuestDescription:
+    'Create an account with the same email address and your guest appointment will be linked automatically.',
+  existingGuestAction: 'Register my guest appointment',
+  existingGuestActiveMessage:
+    'Enter the same email used for your guest booking, choose a password, and create your account.',
+  existingGuestBackLabel: 'Book a new appointment instead',
+  registerBenefitsHeading: 'Account benefits',
+  registerBenefits: [
+    'See whether your appointment is accepted',
+    'View and cancel your appointments',
+    'Manage your profile and booking history',
+  ],
+  registerOnlyHint:
+    'Complete treatments, date, and time to request an appointment. Otherwise, only your account will be created.',
+  registerSubmitLabel: 'Create account',
+  registerSubmittingLabel: 'Creating account...',
+  registerSuccessEyebrow: 'Registration complete',
+  registerSuccessHeading: 'Your account is ready',
+  registerSuccessMessage: 'You can now log in and manage future appointments.',
+  registerNextStepsMessage:
+    'No appointment was created. Choose treatments, a date, and a time whenever you are ready to book.',
+  guestLimitationMessage:
+    'Guest booking is limited to one appointment per email and cannot be managed online.',
+  guestConflictMessage: 'This email address has already been used for a guest appointment.',
+  guestConfirmationNextStepsMessage:
+    'We saved your guest request and will contact you directly. This appointment cannot be managed online.',
+  guestCreateAccountLabel: 'Create an account for next time',
   calendarHeading: 'Choose a date and time',
   calendarDescription: 'Select a day in the calendar and then choose a preferred time.',
   nameLabel: 'Name',

@@ -32,5 +32,12 @@ public class WashCalendar {
     private LocalDateTime localDateTime;
     
     @Column(name= "accepted" , nullable = false)
+    @Builder.Default
     private boolean accepted = false;
+
+    @Column(name = "cancellation_token_hash", nullable = false, length = 64)
+    private String cancellationTokenHash;
+
+    @Transient
+    private String cancellationToken;
 }

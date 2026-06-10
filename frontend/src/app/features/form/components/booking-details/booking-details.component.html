@@ -1,0 +1,125 @@
+<div
+  class="self-start rounded-xl border border-white/10 bg-slate-900/80 p-6 shadow-xl shadow-slate-950/30 sm:p-8"
+  [formGroup]="form"
+>
+  <h2 class="text-2xl font-semibold text-white">{{ copy().formHeading }}</h2>
+
+  <div *ngIf="!isAuthenticated" class="mt-4 flex flex-wrap items-center gap-3">
+    <p class="text-sm text-slate-400">{{ copy().existingAccountPrompt }}</p>
+    <a routerLink="/login" class="inline-flex min-h-10 items-center justify-center rounded-md border border-cyan-200/30 px-4 text-sm font-bold text-cyan-200 transition hover:border-cyan-200 hover:bg-cyan-200/10">
+      {{ copy().loginLabel }}
+    </a>
+  </div>
+
+  <div
+    *ngIf="!isAuthenticated && !guestRegistrationMode"
+    class="mt-7 rounded-xl border border-cyan-300/20 bg-cyan-300/[0.06] p-4"
+  >
+    <p class="font-bold text-white">{{ copy().existingGuestHeading }}</p>
+    <p class="mt-1 text-sm leading-6 text-slate-300">{{ copy().existingGuestDescription }}</p>
+    <button
+      type="button"
+      class="mt-4 inline-flex min-h-11 items-center justify-center rounded-lg bg-cyan-200 px-4 text-sm font-bold text-slate-950 transition hover:bg-cyan-100"
+      (click)="guestRegistrationSelected.emit()"
+    >
+      {{ copy().existingGuestAction }}
+    </button>
+  </div>
+
+  <div
+    *ngIf="!isAuthenticated && guestRegistrationMode"
+    class="mt-7 rounded-xl border border-emerald-300/20 bg-emerald-300/[0.06] p-4"
+  >
+    <p class="font-bold text-emerald-200">{{ copy().existingGuestHeading }}</p>
+    <p class="mt-1 text-sm leading-6 text-slate-300">{{ copy().existingGuestActiveMessage }}</p>
+    <button
+      type="button"
+      class="mt-3 text-sm font-semibold text-cyan-200 underline decoration-cyan-200/40 underline-offset-4 hover:text-cyan-100"
+      (click)="guestRegistrationCancelled.emit()"
+    >
+      {{ copy().existingGuestBackLabel }}
+    </button>
+  </div>
+
+  <fieldset *ngIf="!isAuthenticated && !guestRegistrationMode" class="mt-7">
+    <legend class="text-sm font-semibold text-white">{{ copy().bookingModeHeading }}</legend>
+    <div class="mt-3 grid gap-3 sm:grid-cols-2">
+      <button type="button" class="rounded-xl border p-4 text-left transition" [ngClass]="bookingMode === 'register' ? 'border-cyan-200 bg-cyan-200/10' : 'border-white/10 bg-slate-950/50 hover:border-white/20'" (click)="bookingModeChange.emit('register')">
+        <span class="block text-sm font-bold text-white">{{ copy().registerModeLabel }}</span>
+        <span class="mt-1 block text-xs leading-5 text-slate-400">{{ copy().registerModeDescription }}</span>
+      </button>
+      <button type="button" class="rounded-xl border p-4 text-left transition" [ngClass]="bookingMode === 'guest' ? 'border-cyan-200 bg-cyan-200/10' : 'border-white/10 bg-slate-950/50 hover:border-white/20'" (click)="bookingModeChange.emit('guest')">
+        <span class="block text-sm font-bold text-white">{{ copy().guestModeLabel }}</span>
+        <span class="mt-1 block text-xs leading-5 text-slate-400">{{ copy().guestModeDescription }}</span>
+      </button>
+    </div>
+
+    <div *ngIf="bookingMode === 'register'" class="mt-4 rounded-xl border border-emerald-300/20 bg-emerald-300/[0.06] p-4">
+      <p class="text-sm font-bold text-emerald-200">{{ copy().registerBenefitsHeading }}</p>
+      <ul class="mt-3 space-y-2">
+        <li *ngFor="let benefit of copy().registerBenefits" class="flex gap-2 text-sm text-slate-300">
+          <span class="mt-1 text-emerald-300">+</span>
+          <span>{{ benefit }}</span>
+        </li>
+      </ul>
+    </div>
+    <p *ngIf="bookingMode === 'guest'" class="mt-4 rounded-xl border border-amber-300/20 bg-amber-300/[0.06] p-4 text-sm leading-6 text-amber-100">
+      {{ copy().guestLimitationMessage }}
+    </p>
+  </fieldset>
+
+  <div *ngIf="!isAuthenticated" class="mt-7 grid gap-5 sm:grid-cols-2">
+    <label class="block">
+      <span class="text-sm font-medium text-slate-200">{{ copy().nameLabel }}</span>
+      <input formControlName="name" type="text" autocomplete="name" class="mt-2 h-12 w-full rounded-md border border-white/10 bg-slate-950/70 px-4 text-white outline-none transition focus:border-cyan-200 focus:ring-2 focus:ring-cyan-200/20" />
+      <span *ngIf="form.controls.name.touched && form.controls.name.invalid" class="mt-2 block text-xs text-rose-300">{{ copy().requiredMessage }}</span>
+    </label>
+    <label class="block">
+      <span class="text-sm font-medium text-slate-200">{{ copy().emailLabel }}</span>
+      <input formControlName="email" type="email" autocomplete="email" class="mt-2 h-12 w-full rounded-md border border-white/10 bg-slate-950/70 px-4 text-white outline-none transition focus:border-cyan-200 focus:ring-2 focus:ring-cyan-200/20" />
+      <span *ngIf="form.controls.email.touched && form.controls.email.hasError('required')" class="mt-2 block text-xs text-rose-300">{{ copy().requiredMessage }}</span>
+      <span *ngIf="form.controls.email.touched && form.controls.email.hasError('email')" class="mt-2 block text-xs text-rose-300">{{ copy().invalidEmailMessage }}</span>
+    </label>
+    <label *ngIf="bookingMode === 'register'" class="block">
+      <span class="text-sm font-medium text-slate-200">{{ copy().passwordLabel }}</span>
+      <input formControlName="password" type="password" autocomplete="new-password" class="mt-2 h-12 w-full rounded-md border border-white/10 bg-slate-950/70 px-4 text-white outline-none transition focus:border-cyan-200 focus:ring-2 focus:ring-cyan-200/20" />
+      <span *ngIf="form.controls.password.touched && form.controls.password.hasError('required')" class="mt-2 block text-xs text-rose-300">{{ copy().requiredMessage }}</span>
+      <span *ngIf="form.controls.password.touched && !form.controls.password.hasError('required') && (form.controls.password.hasError('minlength') || form.controls.password.hasError('maxlength'))" class="mt-2 block text-xs text-rose-300">{{ copy().passwordLengthMessage }}</span>
+      <span *ngIf="form.controls.password.touched && !form.controls.password.hasError('required') && !form.controls.password.hasError('minlength') && !form.controls.password.hasError('maxlength') && form.controls.password.hasError('pattern')" class="mt-2 block text-xs text-rose-300">{{ copy().passwordPatternMessage }}</span>
+    </label>
+    <label *ngIf="bookingMode === 'register'" class="block">
+      <span class="text-sm font-medium text-slate-200">{{ copy().retypePasswordLabel }}</span>
+      <input formControlName="retypePassword" type="password" autocomplete="new-password" class="mt-2 h-12 w-full rounded-md border border-white/10 bg-slate-950/70 px-4 text-white outline-none transition focus:border-cyan-200 focus:ring-2 focus:ring-cyan-200/20" />
+      <span *ngIf="form.controls.retypePassword.touched && form.controls.retypePassword.hasError('required')" class="mt-2 block text-xs text-rose-300">{{ copy().requiredMessage }}</span>
+      <span *ngIf="form.controls.retypePassword.touched && !form.controls.retypePassword.hasError('required') && form.hasError('passwordMismatch')" class="mt-2 block text-xs text-rose-300">{{ copy().passwordMismatchMessage }}</span>
+    </label>
+    <label class="block">
+      <span class="text-sm font-medium text-slate-200">{{ copy().phoneLabel }}</span>
+      <input formControlName="phone" type="tel" autocomplete="tel" class="mt-2 h-12 w-full rounded-md border border-white/10 bg-slate-950/70 px-4 text-white outline-none transition focus:border-cyan-200 focus:ring-2 focus:ring-cyan-200/20" />
+      <span *ngIf="form.controls.phone.touched && form.controls.phone.hasError('required')" class="mt-2 block text-xs text-rose-300">{{ copy().requiredMessage }}</span>
+      <span *ngIf="form.controls.phone.touched && !form.controls.phone.hasError('required') && (form.controls.phone.hasError('minlength') || form.controls.phone.hasError('maxlength'))" class="mt-2 block text-xs text-rose-300">{{ copy().phoneLengthMessage }}</span>
+    </label>
+  </div>
+
+  <fieldset *ngIf="!guestRegistrationMode" class="mt-6">
+    <legend class="text-sm font-medium text-slate-200">{{ copy().serviceLabel }}</legend>
+    <p class="mt-1 text-xs text-slate-500">{{ copy().selectService }}</p>
+    <div class="mt-3 grid gap-3 sm:grid-cols-2">
+      <label *ngFor="let treatment of treatments" class="group flex cursor-pointer items-start gap-3 rounded-lg border p-4 transition" [ngClass]="isTreatmentSelected(treatment.slug) ? 'border-cyan-200 bg-cyan-200/10' : 'border-white/10 bg-slate-950/50 hover:border-cyan-200/30 hover:bg-white/[0.04]'">
+        <input type="checkbox" class="sr-only" [checked]="isTreatmentSelected(treatment.slug)" (change)="treatmentToggled.emit(treatment.slug)" />
+        <span class="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded border transition" [ngClass]="isTreatmentSelected(treatment.slug) ? 'border-cyan-200 bg-cyan-200 text-slate-950' : 'border-white/20 bg-slate-900 text-transparent'">+</span>
+        <span class="min-w-0">
+          <span class="block text-sm font-semibold text-white">{{ treatment.title }}</span>
+          <span class="mt-1 block text-xs leading-5 text-slate-400">{{ treatment.description }}</span>
+        </span>
+      </label>
+    </div>
+    <span *ngIf="appointmentRequired && form.controls.services.touched && form.controls.services.invalid" class="mt-2 block text-xs text-rose-300">{{ copy().requiredMessage }}</span>
+    <div *ngIf="selectedTreatmentNames.length" class="mt-4 rounded-md border border-cyan-200/20 bg-cyan-200/5 p-4">
+      <p class="text-xs font-semibold uppercase tracking-[0.18em] text-cyan-200">{{ copy().selectedTreatments }}</p>
+      <div class="mt-3 flex flex-wrap gap-2">
+        <span *ngFor="let treatmentName of selectedTreatmentNames" class="rounded-full bg-cyan-200 px-3 py-1 text-xs font-semibold text-slate-950">{{ treatmentName }}</span>
+      </div>
+    </div>
+  </fieldset>
+</div>

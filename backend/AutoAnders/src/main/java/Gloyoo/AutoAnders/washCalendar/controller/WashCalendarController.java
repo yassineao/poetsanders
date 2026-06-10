@@ -1,7 +1,11 @@
 package Gloyoo.AutoAnders.washCalendar.controller;
 
+import Gloyoo.AutoAnders.notification.BookingConfirmationEmailService;
+import Gloyoo.AutoAnders.notification.AppointmentCancellationEmailService;
+import Gloyoo.AutoAnders.washCalendar.dto.AppointmentCancellation;
 import Gloyoo.AutoAnders.washCalendar.dto.WashCalendarBatchDeleteRequest;
 import Gloyoo.AutoAnders.washCalendar.dto.WashCalendarBatchRequest;
+import Gloyoo.AutoAnders.washCalendar.dto.GuestWashCalendarRequest;
 import Gloyoo.AutoAnders.washCalendar.dto.WashCalendarRequest;
 import Gloyoo.AutoAnders.washCalendar.dto.WashCalendarResponse;
 import Gloyoo.AutoAnders.washCalendar.entity.WashCalendar;
@@ -22,9 +26,17 @@ import java.util.UUID;
 public class WashCalendarController {
 
     private final WashCalendarService washCalendarService;
+    private final BookingConfirmationEmailService bookingConfirmationEmailService;
+    private final AppointmentCancellationEmailService appointmentCancellationEmailService;
 
-    public WashCalendarController(WashCalendarService washCalendarService) {
+    public WashCalendarController(
+            WashCalendarService washCalendarService,
+            BookingConfirmationEmailService bookingConfirmationEmailService,
+            AppointmentCancellationEmailService appointmentCancellationEmailService
+    ) {
         this.washCalendarService = washCalendarService;
+        this.bookingConfirmationEmailService = bookingConfirmationEmailService;
+        this.appointmentCancellationEmailService = appointmentCancellationEmailService;
     }
 
     @PostMapping
@@ -37,6 +49,10 @@ public class WashCalendarController {
                         washCalendarRequest,
                         authenticatedUserId(authentication)
                 );
+        bookingConfirmationEmailService.sendBookingConfirmation(
+                washCalendar.getUser(),
+                List.of(washCalendar)
+        );
 
         return ResponseEntity.ok(WashCalendarResponse.from(washCalendar));
     }
@@ -46,11 +62,24 @@ public class WashCalendarController {
             @Valid @RequestBody WashCalendarBatchRequest request,
             Authentication authentication
     ) {
+        List<WashCalendar> washCalendars = washCalendarService.bookWashCalendars(
+                request,
+                authenticatedUserId(authentication)
+        );
+        bookingConfirmationEmailService.sendBookingConfirmation(
+                washCalendars.getFirst().getUser(),
+                washCalendars
+        );
+
+        return ResponseEntity.ok(toResponses(washCalendars));
+    }
+
+    @PostMapping("/guest")
+    public ResponseEntity<List<WashCalendarResponse>> addGuestWashCalendars(
+            @Valid @RequestBody GuestWashCalendarRequest request
+    ) {
         return ResponseEntity.ok(toResponses(
-                washCalendarService.bookWashCalendars(
-                        request,
-                        authenticatedUserId(authentication)
-                )
+                washCalendarService.bookGuestWashCalendars(request)
         ));
     }
 
@@ -67,7 +96,10 @@ public class WashCalendarController {
             @PathVariable UUID uuid,
             Authentication authentication
     ) {
-        washCalendarService.deleteWashCalendar(uuid, authenticatedUserId(authentication));
+        sendCancellationEmail(washCalendarService.deleteWashCalendar(
+                uuid,
+                authenticatedUserId(authentication)
+        ));
         return ResponseEntity.noContent().build();
     }
 
@@ -76,9 +108,19 @@ public class WashCalendarController {
             @Valid @RequestBody WashCalendarBatchDeleteRequest request,
             Authentication authentication
     ) {
-        washCalendarService.deleteWashCalendars(
+        sendCancellationEmail(washCalendarService.deleteWashCalendars(
                 request.ids(),
                 authenticatedUserId(authentication)
+        ));
+        return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping("/cancel/{cancellationToken}")
+    public ResponseEntity<Void> cancelWithToken(
+            @PathVariable String cancellationToken
+    ) {
+        sendCancellationEmail(
+                washCalendarService.deleteWashCalendarsByToken(cancellationToken)
         );
         return ResponseEntity.noContent().build();
     }
@@ -134,6 +176,10 @@ public class WashCalendarController {
         return washCalendars.stream()
                 .map(WashCalendarResponse::from)
                 .toList();
+    }
+
+    private void sendCancellationEmail(AppointmentCancellation cancellation) {
+        appointmentCancellationEmailService.sendCancellationConfirmation(cancellation);
     }
 
     private UUID authenticatedUserId(Authentication authentication) {
