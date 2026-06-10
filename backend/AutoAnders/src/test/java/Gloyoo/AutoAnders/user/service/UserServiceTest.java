@@ -8,6 +8,8 @@ import Gloyoo.AutoAnders.user.repository.UserRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import org.springframework.web.server.ResponseStatusException;
+
 import java.util.Optional;
 import java.util.UUID;
 
@@ -85,6 +87,28 @@ class UserServiceTest {
                 .build();
 
         assertEquals("customer@example.com", service.contactEmail(guest));
+    }
+
+    @Test
+    void guestRegistrationRejectsEmailAlreadyRegisteredAsUser() {
+        UserRepository users = mock(UserRepository.class);
+        PasswordEncoder encoder = mock(PasswordEncoder.class);
+        UserService service = new UserService(
+                users,
+                mock(CarRepository.class),
+                encoder,
+                "guest::"
+        );
+
+        when(users.existsByEmailIgnoreCase("customer@example.com")).thenReturn(true);
+
+        ResponseStatusException ex = assertThrows(
+                ResponseStatusException.class,
+                () -> service.registerGuest("Guest Name", "customer@example.com", "0612345678")
+        );
+
+        assertEquals("This email is already registered as a user account", ex.getReason());
+        verify(users, never()).save(org.mockito.ArgumentMatchers.any(User.class));
     }
 
     private UserCreateRequest registrationRequest(String email) {
