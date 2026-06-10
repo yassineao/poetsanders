@@ -40,6 +40,8 @@ public class SecurityConfig {
                         // Public endpoints
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers("/", "/health", "/auth/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/wash_calendar/guest").permitAll()
+                        .requestMatchers(HttpMethod.DELETE, "/wash_calendar/cancel/**").permitAll()
 
                         // Admin endpoints
                         .requestMatchers("/admin/**").hasRole("ADMIN")

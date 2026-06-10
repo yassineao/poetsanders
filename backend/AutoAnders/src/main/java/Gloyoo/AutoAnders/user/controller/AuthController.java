@@ -2,6 +2,7 @@ package Gloyoo.AutoAnders.user.controller;
 
 import Gloyoo.AutoAnders.Cars.entity.Car;
 import Gloyoo.AutoAnders.config.JwtService;
+import Gloyoo.AutoAnders.notification.RegisterConfirmationService;
 import Gloyoo.AutoAnders.user.dto.AuthRequest;
 import Gloyoo.AutoAnders.user.dto.AuthResponse;
 import Gloyoo.AutoAnders.user.dto.TokenResponse;
@@ -16,6 +17,7 @@ import jakarta.validation.Valid;
 import org.springframework.http.*;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+
 
 import java.time.Duration;
 import java.util.HashMap;
@@ -34,10 +36,16 @@ public class AuthController {
     private static final Duration REFRESH_TTL = Duration.ofDays(7);
     private final UserService userService;
     private final JwtService jwt;
+    private final RegisterConfirmationService registerConfirmationService;
 
-    public AuthController(UserService userService, JwtService jwt) {
+    public AuthController(
+            UserService userService,
+            JwtService jwt,
+            RegisterConfirmationService registerConfirmationService
+    ) {
         this.userService = userService;
         this.jwt = jwt;
+        this.registerConfirmationService = registerConfirmationService;
     }
 
     @PostMapping("/register")
@@ -51,6 +59,9 @@ public class AuthController {
             String refresh = jwt.generateToken(u.getEmail(),
                     Map.of("uid", u.getId().toString(), "role", u.getRole(), "user", u.getName(), "type", "refresh"),
                     REFRESH_TTL);
+
+            registerConfirmationService.sendRegisterConfirmation(u);
+
             return withAuthCookies(ResponseEntity.status(HttpStatus.CREATED), request, access, refresh)
                     .body(authPayload(u));
         } catch (IllegalArgumentException ex) {

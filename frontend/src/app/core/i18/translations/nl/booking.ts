@@ -7,6 +7,23 @@ export const nlBookingCopy: BookingCopy = {
   formHeading: 'Uw gegevens',
   existingAccountPrompt: 'Heeft u al een account?',
   loginLabel: 'Inloggen',
+  bookingModeHeading: 'Hoe wilt u boeken?',
+  registerModeLabel: 'Account aanmaken',
+  registerModeDescription: 'Aanbevolen om deze en toekomstige afspraken te beheren.',
+  guestModeLabel: 'Boeken als gast',
+  guestModeDescription: 'Snel boeken zonder account.',
+  registerBenefitsHeading: 'Voordelen van een account',
+  registerBenefits: [
+    'Bekijk of uw afspraak is geaccepteerd',
+    'Bekijk en annuleer uw afspraken',
+    'Beheer uw profiel en boekingsgeschiedenis',
+  ],
+  guestLimitationMessage:
+    'Boeken als gast is beperkt tot één afspraak per e-mailadres en kan niet online worden beheerd.',
+  guestConflictMessage: 'Dit e-mailadres is al gebruikt voor een gastafspraak.',
+  guestConfirmationNextStepsMessage:
+    'We hebben uw gastaanvraag opgeslagen en nemen rechtstreeks contact met u op. Deze afspraak kan niet online worden beheerd.',
+  guestCreateAccountLabel: 'Maak een account voor de volgende keer',
   calendarHeading: 'Kies een datum en tijd',
   calendarDescription: 'Selecteer eerst een dag in de kalender en kies daarna uw gewenste tijd.',
   nameLabel: 'Naam',

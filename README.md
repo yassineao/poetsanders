@@ -720,7 +720,7 @@ sequenceDiagram
     Form-->>Customer: Show confirmation
 ```
 
-### Anonymous Customer Booking
+### New Account Booking
 
 ```mermaid
 flowchart TD
@@ -742,6 +742,46 @@ flowchart TD
     Book -->|All requests succeed| Success
     Book -->|Any request fails| Error
 ```
+
+### Guest Booking
+
+Guests can choose the guest option instead of creating an account. The frontend
+sends name, email, phone number, treatments, and date/time to
+`POST /wash_calendar/guest`.
+
+The backend prefixes the normalized email with `GUEST_EMAIL_PREFIX`, generates
+and hashes an inaccessible random password, creates the guest user, and saves
+all selected treatment rows in one transaction. The unique prefixed email
+limits an email address to one guest appointment. Guest bookings do not create
+an authenticated session and cannot be managed online.
+
+Authenticated registered customers receive an email after a successful
+appointment request when SMTP delivery is enabled. Guest users do not receive
+this registered-account confirmation email. A mail delivery failure is logged
+without rolling back the saved appointment.
+
+Every appointment receives a cryptographically random cancellation token. All
+treatment rows in one grouped appointment share that token. Only its SHA-256
+hash is stored in PostgreSQL, while the raw token is included in the registered
+customer's booking email and the booking creation response. Later appointment
+reads do not expose it because the raw token is not persisted. Calling
+`DELETE /wash_calendar/cancel/{cancellationToken}` removes the entire grouped
+appointment and makes the token unusable.
+
+Successful cancellation sends an email to the customer's real address. For
+guest users, the backend removes the configured `guest::` prefix before sending
+mail. When the cancelled rows are the guest's final appointment rows, the
+temporary guest user is also deleted. Registered accounts are never
+automatically deleted.
+
+New customers also receive a welcome email immediately after successful
+registration. Guest users are created through the guest-booking endpoint and
+therefore do not receive the registration welcome email.
+
+When a customer later registers with an email previously used for a guest
+booking, registration upgrades the existing `guest::email` user row instead of
+creating a second user. The user UUID stays unchanged, so all guest
+appointments automatically become visible under the new registered account.
 
 ### Storage Granularity
 
@@ -956,6 +996,43 @@ erDiagram
 | `V6__create_car_pictures_table.sql` | Create picture metadata |
 | `V7__create_wash_calendar_table.sql` | Create appointment rows |
 | `V8__align_schema_with_entities.sql` | Add user phone numbers, appointment acceptance, and car status |
+| `V9__add_appointment_cancellation_tokens.sql` | Add hashed cancellation tokens for grouped appointments |
+
+Applied Flyway migrations are immutable. Never edit an existing migration after
+it has run in any shared environment; add a new version instead. SQL migration
+files are forced to LF line endings through `.gitattributes`.
+
+The `Car.co2Emissions` property is explicitly mapped to the existing
+`cars.co2_emissions` column. Hibernate otherwise derives `co2emissions` for this
+digit-and-acronym property and fails schema validation even though `V3` created
+the correct database column. The numbered lease fields are likewise explicitly
+mapped to `lease_price_60_months`, `lease_price_48_months`, and
+`lease_price_36_months`.
+
+If production reports a checksum mismatch for `V8`, first verify that its
+schema changes are present:
+
+```sql
+SELECT table_name, column_name
+FROM information_schema.columns
+WHERE (table_name, column_name) IN (
+  ('users', 'phone_number'),
+  ('wash_calendar', 'accepted'),
+  ('cars', 'status')
+);
+```
+
+When all three rows are returned and the deployed `V8` is the intended
+migration, repair the Flyway history once:
+
+```sql
+UPDATE flyway_schema_history
+SET checksum = 1320712067
+WHERE version = '8'
+  AND checksum = -842893664;
+```
+
+Restart the backend afterward. Do not disable Flyway validation.
 
 Flyway is the schema authority. Hibernate uses `ddl-auto: validate`, so startup
 fails when the migrated database no longer matches the JPA mappings instead of
@@ -1222,11 +1299,25 @@ SUPABASE_DB_URL=jdbc:postgresql://localhost:5432/autoanders
 SUPABASE_DB_USERNAME=postgres
 SUPABASE_DB_PASSWORD=replace-me
 SUPABASE_JWT_SECRET=replace-with-at-least-32-bytes
+GUEST_EMAIL_PREFIX=guest::
+MAIL_ENABLED=false
+MAIL_HOST=smtp.gmail.com
+MAIL_PORT=587
+MAIL_USERNAME=your-email@example.com
+MAIL_PASSWORD=your-smtp-app-password
+MAIL_FROM=your-email@example.com
 
 SUPABASE_URL=https://your-project.supabase.co
 SUPABASE_SERVICE_ROLE_KEY=replace-me
 SUPABASE_STORAGE_BUCKET=car-pictures
 ```
+
+`GUEST_EMAIL_PREFIX` is server-side configuration. Keep it on the backend so
+clients cannot choose how guest identities are stored.
+
+Set `MAIL_ENABLED=true` only after configuring valid SMTP credentials. For
+Gmail, `MAIL_PASSWORD` must be an app password rather than the normal account
+password.
 
 Spring's relaxed environment binding maps the Supabase storage variables to:
 

@@ -5,6 +5,17 @@ export interface BookingCopy {
   formHeading: string;
   existingAccountPrompt: string;
   loginLabel: string;
+  bookingModeHeading: string;
+  registerModeLabel: string;
+  registerModeDescription: string;
+  guestModeLabel: string;
+  guestModeDescription: string;
+  registerBenefitsHeading: string;
+  registerBenefits: string[];
+  guestLimitationMessage: string;
+  guestConflictMessage: string;
+  guestConfirmationNextStepsMessage: string;
+  guestCreateAccountLabel: string;
   calendarHeading: string;
   calendarDescription: string;
   nameLabel: string;

@@ -16,6 +16,15 @@ export interface UserBooking {
   userId: string;
   localDateTime: string;
   accepted: boolean;
+  cancellationToken?: string | null;
+}
+
+export interface GuestBookingRequest {
+  name: string;
+  email: string;
+  phoneNumber: string;
+  treatmentSlugs: string[];
+  localDateTime: string;
 }
 
 interface UserBookingResponse extends Omit<UserBooking, 'localDateTime'> {
@@ -43,6 +52,19 @@ export class BookingService {
         localDateTime,
       },
       { withCredentials: true },
+    );
+  }
+
+  bookGuestTreatments(request: GuestBookingRequest): Observable<UserBooking[]> {
+    return this.http.post<UserBooking[]>(
+      `${this.apiBaseUrl}/wash_calendar/guest`,
+      {
+        name: request.name,
+        email: request.email,
+        phoneNumber: request.phoneNumber,
+        washTypes: request.treatmentSlugs.map((slug) => washTypeBySlug[slug]),
+        localDateTime: request.localDateTime,
+      },
     );
   }
 

@@ -27,7 +27,19 @@ interface BookingConfirmation {
   treatments: string[];
   customerName: string;
   customerEmail: string;
+  guest: boolean;
 }
+
+type BookingMode = 'register' | 'guest';
+
+const accountPasswordValidators = [
+  Validators.required,
+  Validators.minLength(12),
+  Validators.maxLength(30),
+  Validators.pattern(
+    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{12,}$/,
+  ),
+];
 
 const passwordsMatchValidator: ValidatorFn = (
   control: AbstractControl,
@@ -62,6 +74,7 @@ export class BookingFormComponent {
   );
   protected readonly selectedDate = signal<Date | null>(null);
   protected readonly selectedTime = signal('');
+  protected readonly bookingMode = signal<BookingMode>('register');
   protected readonly submitted = signal(false);
   protected readonly confirmation = signal<BookingConfirmation | null>(null);
   protected readonly submitting = signal(false);
@@ -69,7 +82,9 @@ export class BookingFormComponent {
   protected readonly errorMessage = computed(() => {
     const kind = this.errorKind();
     return kind === 'conflict'
-      ? this.copy().registrationConflictMessage
+      ? this.bookingMode() === 'guest'
+        ? this.copy().guestConflictMessage
+        : this.copy().registrationConflictMessage
       : kind === 'unavailable'
         ? this.copy().unavailableMessage
         : '';
@@ -82,14 +97,7 @@ export class BookingFormComponent {
       email: ['', [Validators.required, Validators.email]],
       password: [
         '',
-        [
-          Validators.required,
-          Validators.minLength(12),
-          Validators.maxLength(30),
-          Validators.pattern(
-            /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{12,}$/,
-          ),
-        ],
+        accountPasswordValidators,
       ],
       retypePassword: ['', Validators.required],
       phone: ['', [Validators.required, Validators.minLength(8), Validators.maxLength(30)]],
@@ -198,6 +206,27 @@ export class BookingFormComponent {
     this.submitted.set(false);
   }
 
+  protected setBookingMode(mode: BookingMode): void {
+    this.bookingMode.set(mode);
+    const password = this.bookingForm.controls.password;
+    const retypePassword = this.bookingForm.controls.retypePassword;
+
+    if (mode === 'guest') {
+      password.clearValidators();
+      retypePassword.clearValidators();
+      password.setValue('');
+      retypePassword.setValue('');
+    } else {
+      password.setValidators(accountPasswordValidators);
+      retypePassword.setValidators(Validators.required);
+    }
+
+    password.updateValueAndValidity();
+    retypePassword.updateValueAndValidity();
+    this.bookingForm.updateValueAndValidity();
+    this.errorKind.set(null);
+  }
+
   protected isTreatmentSelected(slug: string): boolean {
     return this.selectedServiceSlugs().includes(slug);
   }
@@ -238,7 +267,7 @@ export class BookingFormComponent {
           next: () => this.completeBooking(),
           error: () => this.errorKind.set('unavailable'),
         });
-    } else {
+    } else if (this.bookingMode() === 'register') {
       const { email, password, name, phone } = this.bookingForm.getRawValue();
       this.submitting.set(true);
 
@@ -265,6 +294,28 @@ export class BookingFormComponent {
             this.errorKind.set(error.status === 409 ? 'conflict' : 'unavailable');
           },
         });
+    } else {
+      const { email, name, phone } = this.bookingForm.getRawValue();
+      this.submitting.set(true);
+
+      this.booking
+        .bookGuestTreatments({
+          name: name.trim(),
+          email: email.trim(),
+          phoneNumber: phone.trim(),
+          treatmentSlugs: this.bookingForm.controls.services.value,
+          localDateTime: this.selectedLocalDateTime(),
+        })
+        .pipe(
+          finalize(() => this.submitting.set(false)),
+          takeUntilDestroyed(this.destroyRef),
+        )
+        .subscribe({
+          next: () => this.completeBooking(true),
+          error: (error: HttpErrorResponse) => {
+            this.errorKind.set(error.status === 409 ? 'conflict' : 'unavailable');
+          },
+        });
     }
   }
 
@@ -284,9 +335,10 @@ export class BookingFormComponent {
     this.errorKind.set(null);
     this.submitted.set(false);
     this.confirmation.set(null);
+    this.setBookingMode('register');
   }
 
-  private completeBooking(): void {
+  private completeBooking(guest = false): void {
     const user = this.auth.currentUser();
     const formValue = this.bookingForm.getRawValue();
 
@@ -295,6 +347,7 @@ export class BookingFormComponent {
       treatments: [...this.selectedTreatmentNames()],
       customerName: user?.user || formValue.name.trim(),
       customerEmail: user?.email || formValue.email.trim(),
+      guest,
     });
     this.submitted.set(true);
   }

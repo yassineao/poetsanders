@@ -106,7 +106,9 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         return path.equals("/auth/login")
                 || path.equals("/auth/register")
                 || path.equals("/auth/refresh")
-                || path.equals("/auth/logout");
+                || path.equals("/auth/logout")
+                || path.equals("/wash_calendar/guest")
+                || path.startsWith("/wash_calendar/cancel/");
     }
 
     private String readCookie(HttpServletRequest request, String name) {

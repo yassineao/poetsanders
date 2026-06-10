@@ -18,5 +18,8 @@ public interface WashCalendarRepository extends JpaRepository<WashCalendar, UUID
 
     List<WashCalendar> findByUserAndAccepted(User user, boolean accepted);
 
+    List<WashCalendar> findByCancellationTokenHash(String cancellationTokenHash);
+
+    long countByUserAndIdNotIn(User user, List<UUID> ids);
 
 }

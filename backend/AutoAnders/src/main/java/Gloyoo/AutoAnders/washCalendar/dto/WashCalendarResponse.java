@@ -11,7 +11,8 @@ public record WashCalendarResponse(
         WashType washType,
         UUID userId,
         LocalDateTime localDateTime,
-        boolean accepted
+        boolean accepted,
+        String cancellationToken
 ) {
     public static WashCalendarResponse from(WashCalendar washCalendar) {
         return new WashCalendarResponse(
@@ -19,7 +20,8 @@ public record WashCalendarResponse(
                 washCalendar.getWashType(),
                 washCalendar.getUser().getId(),
                 washCalendar.getLocalDateTime(),
-                washCalendar.isAccepted()
+                washCalendar.isAccepted(),
+                washCalendar.getCancellationToken()
         );
     }
 }
