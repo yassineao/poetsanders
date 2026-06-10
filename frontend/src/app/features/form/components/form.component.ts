@@ -15,22 +15,15 @@ import { finalize, switchMap } from 'rxjs';
 import { AuthService } from '../../../core/auth/auth.service';
 import { BookingService } from '../../../core/booking/booking.service';
 import { I18nService } from '../../../core/i18/i18n.service';
-
-interface CalendarDay {
-  date: Date;
-  day: number;
-  disabled: boolean;
-}
-
-interface BookingConfirmation {
-  appointment: string;
-  treatments: string[];
-  customerName: string;
-  customerEmail: string;
-  guest: boolean;
-}
-
-type BookingMode = 'register' | 'guest';
+import { BookingConfirmationComponent } from './booking-confirmation/booking-confirmation.component';
+import { BookingDetailsComponent } from './booking-details/booking-details.component';
+import type {
+  BookingConfirmation,
+  BookingFormGroup,
+  BookingMode,
+  CalendarDay,
+} from './booking-form.models';
+import { BookingScheduleComponent } from './booking-schedule/booking-schedule.component';
 
 const accountPasswordValidators = [
   Validators.required,
@@ -55,7 +48,14 @@ const passwordsMatchValidator: ValidatorFn = (
 @Component({
   selector: 'app-booking-form',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterModule],
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    RouterModule,
+    BookingConfirmationComponent,
+    BookingDetailsComponent,
+    BookingScheduleComponent,
+  ],
   templateUrl: './form.component.html',
 })
 export class BookingFormComponent {
@@ -75,6 +75,7 @@ export class BookingFormComponent {
   protected readonly selectedDate = signal<Date | null>(null);
   protected readonly selectedTime = signal('');
   protected readonly bookingMode = signal<BookingMode>('register');
+  protected readonly guestRegistrationMode = signal(false);
   protected readonly submitted = signal(false);
   protected readonly confirmation = signal<BookingConfirmation | null>(null);
   protected readonly submitting = signal(false);
@@ -90,8 +91,25 @@ export class BookingFormComponent {
         : '';
   });
   protected readonly attemptedSubmit = signal(false);
+  protected readonly appointmentRequired = computed(
+    () =>
+      this.isAuthenticated() ||
+      this.bookingMode() === 'guest' ||
+      (!this.guestRegistrationMode() &&
+      (this.selectedServiceSlugs().length > 0 &&
+        this.selectedDate() !== null &&
+        this.selectedTime() !== '')),
+  );
+  protected readonly submitLabel = computed(() =>
+    this.appointmentRequired() ? this.copy().submitLabel : this.copy().registerSubmitLabel,
+  );
+  protected readonly submittingLabel = computed(() =>
+    this.appointmentRequired()
+      ? this.copy().submittingLabel
+      : this.copy().registerSubmittingLabel,
+  );
 
-  protected readonly bookingForm = this.formBuilder.nonNullable.group(
+  protected readonly bookingForm: BookingFormGroup = this.formBuilder.nonNullable.group(
     {
       name: ['', [Validators.required, Validators.maxLength(255)]],
       email: ['', [Validators.required, Validators.email]],
@@ -207,6 +225,7 @@ export class BookingFormComponent {
   }
 
   protected setBookingMode(mode: BookingMode): void {
+    this.guestRegistrationMode.set(false);
     this.bookingMode.set(mode);
     const password = this.bookingForm.controls.password;
     const retypePassword = this.bookingForm.controls.retypePassword;
@@ -227,6 +246,21 @@ export class BookingFormComponent {
     this.errorKind.set(null);
   }
 
+  protected startGuestRegistration(): void {
+    this.setBookingMode('register');
+    this.guestRegistrationMode.set(true);
+    this.bookingForm.controls.services.setValue([]);
+    this.selectedDate.set(null);
+    this.selectedTime.set('');
+    this.attemptedSubmit.set(false);
+    this.errorKind.set(null);
+  }
+
+  protected cancelGuestRegistration(): void {
+    this.guestRegistrationMode.set(false);
+    this.errorKind.set(null);
+  }
+
   protected isTreatmentSelected(slug: string): boolean {
     return this.selectedServiceSlugs().includes(slug);
   }
@@ -239,17 +273,19 @@ export class BookingFormComponent {
   });
 
   protected submit(): void {
-    this.attemptedSubmit.set(true);
+    const appointmentRequired = this.appointmentRequired();
+    this.attemptedSubmit.set(appointmentRequired);
     this.submitted.set(false);
     this.errorKind.set(null);
     this.bookingForm.markAllAsTouched();
 
     if (
-      this.bookingForm.controls.services.invalid ||
-      !this.selectedDate() ||
-      !this.selectedTime() ||
       this.submitting() ||
-      (!this.isAuthenticated() && this.bookingForm.invalid)
+      (appointmentRequired &&
+        (this.bookingForm.controls.services.invalid ||
+          !this.selectedDate() ||
+          !this.selectedTime())) ||
+      (!this.isAuthenticated() && this.accountDetailsInvalid())
     ) {
       return;
     }
@@ -271,13 +307,29 @@ export class BookingFormComponent {
       const { email, password, name, phone } = this.bookingForm.getRawValue();
       this.submitting.set(true);
 
-      this.auth
-        .register({
-          email: email.trim(),
-          password,
-          name: name.trim(),
-          phoneNumber: phone.trim(),
-        })
+      const registration = this.auth.register({
+        email: email.trim(),
+        password,
+        name: name.trim(),
+        phoneNumber: phone.trim(),
+      });
+
+      if (!appointmentRequired) {
+        registration
+          .pipe(
+            finalize(() => this.submitting.set(false)),
+            takeUntilDestroyed(this.destroyRef),
+          )
+          .subscribe({
+            next: () => this.completeRegistration(),
+            error: (error: HttpErrorResponse) => {
+              this.errorKind.set(error.status === 409 ? 'conflict' : 'unavailable');
+            },
+          });
+        return;
+      }
+
+      registration
         .pipe(
           switchMap(() =>
             this.booking.bookTreatments(
@@ -348,8 +400,37 @@ export class BookingFormComponent {
       customerName: user?.user || formValue.name.trim(),
       customerEmail: user?.email || formValue.email.trim(),
       guest,
+      registrationOnly: false,
     });
     this.submitted.set(true);
+  }
+
+  private completeRegistration(): void {
+    const user = this.auth.currentUser();
+    const formValue = this.bookingForm.getRawValue();
+
+    this.confirmation.set({
+      appointment: '',
+      treatments: [],
+      customerName: user?.user || formValue.name.trim(),
+      customerEmail: user?.email || formValue.email.trim(),
+      guest: false,
+      registrationOnly: true,
+    });
+    this.submitted.set(true);
+  }
+
+  private accountDetailsInvalid(): boolean {
+    const controls = this.bookingForm.controls;
+    return (
+      controls.name.invalid ||
+      controls.email.invalid ||
+      controls.phone.invalid ||
+      (this.bookingMode() === 'register' &&
+        (controls.password.invalid ||
+          controls.retypePassword.invalid ||
+          this.bookingForm.hasError('passwordMismatch')))
+    );
   }
 
   private selectedLocalDateTime(): string {

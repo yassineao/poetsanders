@@ -1,0 +1,72 @@
+<div class="rounded-xl border border-cyan-200/15 bg-slate-900/80 p-6 shadow-xl shadow-slate-950/30 sm:p-8">
+  <h2 class="text-2xl font-semibold text-white">
+    {{ guestRegistrationMode ? copy().existingGuestHeading : copy().calendarHeading }}
+  </h2>
+  <p class="mt-2 text-sm leading-6 text-slate-400">
+    {{
+      guestRegistrationMode
+        ? copy().existingGuestActiveMessage
+        : copy().calendarDescription
+    }}
+  </p>
+  <p
+    *ngIf="!appointmentRequired && !guestRegistrationMode"
+    class="mt-4 rounded-xl border border-cyan-300/20 bg-cyan-300/[0.06] p-4 text-sm leading-6 text-cyan-100"
+  >
+    {{ copy().registerOnlyHint }}
+  </p>
+
+  <ng-container *ngIf="!guestRegistrationMode">
+  <div class="mt-7 flex items-center justify-between">
+    <button type="button" (click)="previousMonth.emit()" [attr.aria-label]="copy().previousMonth" class="flex h-10 w-10 items-center justify-center rounded-md border border-white/10 text-slate-200 transition hover:border-cyan-200/30 hover:bg-white/5">&lt;</button>
+    <p class="text-lg font-semibold capitalize text-white">{{ monthLabel }}</p>
+    <button type="button" (click)="nextMonth.emit()" [attr.aria-label]="copy().nextMonth" class="flex h-10 w-10 items-center justify-center rounded-md border border-white/10 text-slate-200 transition hover:border-cyan-200/30 hover:bg-white/5">&gt;</button>
+  </div>
+
+  <div class="mt-6 grid grid-cols-7 gap-2 text-center">
+    <span *ngFor="let weekday of copy().weekdays" class="py-2 text-xs font-semibold uppercase tracking-wide text-slate-500">{{ weekday }}</span>
+    <ng-container *ngFor="let day of calendarDays">
+      <span *ngIf="!day" aria-hidden="true"></span>
+      <button
+        *ngIf="day"
+        type="button"
+        (click)="dateSelected.emit(day)"
+        [disabled]="day.disabled"
+        [attr.aria-pressed]="isSelectedDate(day.date)"
+        class="aspect-square rounded-md text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-200"
+        [ngClass]="isSelectedDate(day.date) ? 'bg-cyan-200 text-slate-950' : day.disabled ? 'cursor-not-allowed text-slate-700' : 'border border-white/10 text-slate-200 hover:border-cyan-200/40 hover:bg-white/5'"
+      >
+        {{ day.day }}
+      </button>
+    </ng-container>
+  </div>
+  <p *ngIf="appointmentRequired && attemptedSubmit && !selectedDate" class="mt-3 text-xs text-rose-300">{{ copy().dateRequiredMessage }}</p>
+
+  <div class="mt-8 border-t border-white/10 pt-6">
+    <h3 class="text-sm font-semibold uppercase tracking-[0.18em] text-cyan-200">{{ copy().timeLabel }}</h3>
+    <div class="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3">
+      <button
+        *ngFor="let time of copy().timeSlots"
+        type="button"
+        (click)="timeSelected.emit(time)"
+        [disabled]="!selectedDate"
+        class="rounded-md border px-3 py-2.5 text-sm font-semibold transition"
+        [ngClass]="selectedTime === time ? 'border-cyan-200 bg-cyan-200 text-slate-950' : !selectedDate ? 'cursor-not-allowed border-white/5 text-slate-700' : 'border-white/10 text-slate-200 hover:border-cyan-200/40 hover:bg-white/5'"
+      >
+        {{ time }}
+      </button>
+    </div>
+    <p *ngIf="appointmentRequired && attemptedSubmit && !selectedTime" class="mt-3 text-xs text-rose-300">{{ copy().timeRequiredMessage }}</p>
+  </div>
+
+  <div *ngIf="selectedAppointmentLabel" class="mt-6 rounded-md border border-cyan-200/20 bg-cyan-200/5 p-4">
+    <p class="text-xs font-semibold uppercase tracking-[0.18em] text-cyan-200">{{ copy().selectedAppointment }}</p>
+    <p class="mt-2 font-semibold capitalize text-white">{{ selectedAppointmentLabel }}</p>
+  </div>
+  </ng-container>
+
+  <button type="submit" [disabled]="submitting" class="mt-7 inline-flex h-12 w-full items-center justify-center rounded-md bg-cyan-200 px-5 text-sm font-bold text-slate-950 transition hover:bg-cyan-100 disabled:cursor-wait disabled:opacity-70">
+    {{ submitting ? submittingLabel : submitLabel }}
+  </button>
+  <div *ngIf="errorMessage" role="alert" class="mt-5 rounded-md border border-rose-300/20 bg-rose-300/10 p-4 text-sm text-rose-100">{{ errorMessage }}</div>
+</div>
