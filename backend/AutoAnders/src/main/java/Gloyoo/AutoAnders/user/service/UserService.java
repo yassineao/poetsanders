@@ -117,6 +117,13 @@ public class UserService {
             );
         }
 
+        if (users.existsByEmailIgnoreCase(normalizedEmail)) {
+            throw new ResponseStatusException(
+                    HttpStatus.CONFLICT,
+                    "This email is already registered as a user account"
+            );
+        }
+
         if (users.existsByEmail(guestEmail)) {
             throw new ResponseStatusException(
                     HttpStatus.CONFLICT,
