@@ -1,0 +1,94 @@
+<main class="overflow-x-hidden bg-black">
+  <section id="home" class="relative min-h-screen overflow-hidden px-4 pb-16 pt-28 sm:px-6 lg:px-8">
+    <div class="absolute inset-0 bg-[url('/hero.jpg')] bg-cover bg-center"></div>
+    <div class="hero-light-overlay absolute inset-0 bg-white/10"></div>
+    <div class="hero-light-overlay absolute inset-0 bg-gradient-to-r from-white/90 via-black/60 to-black/70"></div>
+    <div class="hero-dark-overlay absolute inset-0 bg-black/60"></div>
+    <div class="hero-dark-overlay absolute inset-0 bg-gradient-to-r from-black via-black/80 to-black/20"></div>
+    <div class="relative mx-auto grid min-h-[calc(100vh-8rem)] max-w-7xl items-center gap-12 lg:grid-cols-2">
+      <div class="max-w-3xl">
+        <p class="mb-4 border-l-2 border-red-600 pl-4 text-sm font-semibold uppercase tracking-[0.22em] text-zinc-200">
+          {{ home().hero.eyebrow }}</p>
+        <h1 class="text-4xl font-black leading-tight text-white sm:text-5xl lg:text-7xl">
+          {{ home().hero.titleFirst }}
+          <span class="block text-red-500">{{ home().hero.titleSecond }}</span>
+        </h1>
+        <div class="my-7 h-1 w-28 bg-red-600"></div>
+        <p class="max-w-2xl text-lg font-semibold leading-8 text-zinc-200">{{ home().hero.description }}</p>
+        <div class="mt-8 flex flex-col gap-3 sm:flex-row">
+          <a [routerLink]="['/', locale(), 'Catalogue']"
+            class="inline-flex h-12 items-center justify-center rounded-md bg-red-600 px-6 font-bold text-white hover:bg-red-700">{{
+            home().hero.primaryCta }}</a>
+          <a [routerLink]="['/', locale(), 'Sell']"
+            class="inline-flex h-12 items-center justify-center rounded-md border border-white/20 bg-white/10 px-6 font-bold text-white hover:bg-white/20">{{
+            home().hero.secondaryCta }} ↗</a>
+        </div>
+      </div>
+      <img src="/LogoBG-noBG.png" alt="AutoAnders" class="relative hidden w-full drop-shadow-2xl lg:block" />
+    </div>
+  </section>
+
+  <section id="services" class="px-4 py-16 sm:px-6 lg:px-8">
+    <div class="mx-auto max-w-7xl">
+      <p class="text-sm font-semibold uppercase tracking-widest text-red-500">{{ home().services.eyebrow }}</p>
+      <h2 class="mt-3 text-3xl font-black text-white sm:text-5xl">{{ home().services.title }}</h2>
+      <p class="mt-5 max-w-3xl text-lg leading-8 text-zinc-400">{{ home().services.description }}</p>
+      <div class="mt-10 grid gap-6 lg:grid-cols-3">
+        @for (item of home().services.items; track item.title; let index = $index) {
+        <a [routerLink]="index === 0 ? ['/', locale(), 'Catalogue'] : index === 1 ? ['/', locale(), 'form'] : ['/', locale(), 'Sell']"
+          class="group rounded-2xl border border-white/10 bg-zinc-950 p-6 transition hover:-translate-y-1 hover:border-red-500/50">
+          <img id="pictures_of_services" [src]="index === 0 ? '/new-car.png' : index === 1 ? '/loan.png' : '/deal.png'"
+            alt="" class="mx-auto h-36 object-contain invert transition group-hover:scale-105" />
+          <p class="mt-6 text-xs font-black tracking-widest text-white/30">0{{ index + 1 }}</p>
+          <h3 class="mt-3 text-2xl font-black text-white">{{ item.title }}</h3>
+          <p class="mt-3 leading-7 text-zinc-400">{{ item.description }}</p>
+          <span class="mt-5 inline-block font-bold text-red-500">{{ home().services.cta }} →</span>
+        </a>
+        }
+      </div>
+    </div>
+  </section>
+
+  <app-catalogue [cars]="home().catalogue.cars.slice(0, 3)" [locale]="locale()" [title]="home().catalogue.title"
+    [subtitle]="home().catalogue.subtitle" [labels]="home().catalogue.labels" [showMoreButton]="true" />
+
+  <section id="advantages" class="px-4 py-16 sm:px-6 lg:px-8">
+    <div class="mx-auto max-w-7xl text-center">
+      <img src="/LogoBG-noBG.png" alt="AutoAnders Logo" class="mx-auto h-16 w-auto" />
+      <p class="mt-6 text-sm uppercase tracking-widest text-zinc-400">{{ home().advantages.eyebrow }}</p>
+      <h2 class="mt-3 text-3xl font-semibold text-white sm:text-5xl">{{ home().advantages.title }}</h2>
+      <p class="mx-auto mt-4 max-w-2xl text-lg text-zinc-400">{{ home().advantages.description }}</p>
+      <div class="mt-12 grid gap-5 md:grid-cols-3">
+        @for (item of home().advantages.items; track item.title) {
+        <article class="rounded-3xl border border-white/10 bg-white/5 p-8">
+          <p class="text-5xl font-bold text-red-500">{{ item.value }}</p>
+          <h3 class="mt-3 text-2xl font-semibold text-white">{{ item.title }}</h3>
+          <p class="mt-3 leading-7 text-zinc-400">{{ item.subtitle }}</p>
+        </article>
+        }
+      </div>
+    </div>
+  </section>
+
+  <section id="about-us" class="px-4 py-16 sm:px-6 lg:px-8">
+    <div class="mx-auto grid max-w-7xl items-center gap-10 lg:grid-cols-2">
+      <img src="/Hero2.jpg" alt="AutoAnders" class="h-[32rem] w-full rounded-xl object-cover" />
+      <div>
+        <p class="text-sm font-semibold text-red-500">{{ home().about.eyebrow }}</p>
+        <h2 class="mt-5 text-4xl font-bold text-white sm:text-6xl">{{ home().about.title }}</h2>
+        @for (paragraph of home().about.paragraphs; track paragraph) {
+        <p class="mt-4 text-lg leading-8 text-zinc-400">{{ paragraph }}</p>
+        }
+        <div class="mt-8 flex gap-3">
+          <a [routerLink]="['/', locale(), 'form']" class="rounded-lg bg-red-600 px-5 py-3 font-bold text-white">{{
+            home().about.cta }}</a>
+          <a [routerLink]="['/', locale(), 'about']"
+            class="rounded-lg border border-white/10 px-5 py-3 font-bold text-white">{{ home().about.more }} →</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <app-faq [content]="dictionary().faq" [items]="dictionary().faq.items.slice(0, 4)"
+    [ctaHref]="'/' + locale() + '/faq'" />
+</main>

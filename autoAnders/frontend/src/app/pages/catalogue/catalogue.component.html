@@ -1,0 +1,75 @@
+<section class="bg-black px-4 py-12 text-white">
+  <div class="mx-auto max-w-7xl">
+    <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+      <div>
+        <p class="font-semibold text-red-500">{{ subtitle() }}</p>
+        <h2 class="mt-1 text-3xl font-black sm:text-4xl">{{ title() }}</h2>
+      </div>
+      <div class="flex items-center gap-3">
+        <span class="rounded-lg border border-white/10 px-4 py-2 text-sm text-zinc-300">{{ filteredCars().length }} {{ labels().vehiclesFound }}</span>
+        @if (showMoreButton()) {
+          <a [routerLink]="['/', locale(), 'Catalogue']" class="rounded-lg bg-red-600 px-5 py-2 font-bold">{{ labels().moreButton }}</a>
+        }
+      </div>
+    </div>
+
+    <div class="my-8 grid gap-3 rounded-xl border border-white/10 bg-zinc-900 p-4 sm:grid-cols-2">
+      <input [ngModel]="search()" (ngModelChange)="search.set($event)" [placeholder]="labels().searchPlaceholder" class="h-12 rounded-lg border border-white/10 bg-zinc-950 px-4 outline-none focus:border-red-500" />
+      <select [ngModel]="brand()" (ngModelChange)="brand.set($event)" class="h-12 rounded-lg border border-white/10 bg-zinc-950 px-4">
+        @for (option of brands(); track option) {
+          <option [value]="option">{{ option === "All" ? labels().allBrands : option }}</option>
+        }
+      </select>
+    </div>
+
+    <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      @for (car of filteredCars(); track car.id) {
+        <article class="overflow-hidden rounded-xl border border-white/10 bg-zinc-900 shadow-xl">
+          <img [src]="car.image" [alt]="car.brand + ' ' + car.model" class="h-56 w-full object-cover" />
+          <div class="p-5">
+            <div class="flex justify-between gap-3">
+              <h3 class="text-xl font-black">{{ car.brand }} {{ car.model }}</h3>
+              <span class="font-bold text-emerald-400">{{ formatPrice(car.price) }}</span>
+            </div>
+            <div class="mt-4 grid grid-cols-2 gap-2 text-sm text-zinc-300">
+              <span>{{ car.firstRegistrationDate }}</span><span>{{ car.mileage | number }} km</span>
+              <span>{{ car.transmission }}</span><span>{{ car.fuel }}</span>
+            </div>
+            <div class="mt-4 flex flex-wrap gap-2">
+              @for (tag of car.tags[locale()]; track tag) {
+                <span class="rounded-full bg-red-950 px-3 py-1 text-xs text-red-100">{{ tag }}</span>
+              }
+            </div>
+            <button type="button" (click)="selectedCar.set(car)" class="mt-5 h-12 w-full rounded-lg bg-white font-bold text-black">{{ labels().viewDetails }}</button>
+          </div>
+        </article>
+      }
+    </div>
+  </div>
+</section>
+
+@if (selectedCar(); as car) {
+  <div class="fixed inset-0 z-[70] flex items-center justify-center bg-black/80 p-4" (click)="selectedCar.set(null)">
+    <article class="max-h-[92vh] w-full max-w-5xl overflow-y-auto rounded-2xl border border-white/10 bg-zinc-950 text-white" (click)="$event.stopPropagation()">
+      <div class="grid lg:grid-cols-2">
+        <img [src]="car.image" [alt]="car.brand + ' ' + car.model" class="h-full min-h-80 w-full object-cover" />
+        <div class="p-6">
+          <button type="button" (click)="selectedCar.set(null)" class="float-right h-10 w-10 rounded-full bg-white/10">×</button>
+          <h2 class="text-3xl font-black">{{ car.brand }} {{ car.model }}</h2>
+          <p class="mt-2 text-2xl font-bold text-emerald-400">{{ formatPrice(car.price) }}</p>
+          <div class="mt-6 grid grid-cols-2 gap-3 text-sm">
+            <span class="rounded-lg bg-white/5 p-3">Year: {{ car.year }}</span>
+            <span class="rounded-lg bg-white/5 p-3">{{ car.mileage | number }} km</span>
+            <span class="rounded-lg bg-white/5 p-3">{{ car.transmission }}</span>
+            <span class="rounded-lg bg-white/5 p-3">{{ car.fuel }}</span>
+            <span class="rounded-lg bg-white/5 p-3">{{ car.colour }}</span>
+            <span class="rounded-lg bg-white/5 p-3">{{ car.engineCapacity }} cc</span>
+            <span class="rounded-lg bg-white/5 p-3">{{ car.numberOfDoors }} doors</span>
+            <span class="rounded-lg bg-white/5 p-3">{{ car.numberOfSeats }} seats</span>
+          </div>
+          <a [routerLink]="['/', locale(), 'form']" class="mt-6 block rounded-lg bg-red-600 px-5 py-3 text-center font-bold">Request</a>
+        </div>
+      </div>
+    </article>
+  </div>
+}
