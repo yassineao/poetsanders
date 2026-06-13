@@ -1,0 +1,90 @@
+<main class="min-h-screen bg-black px-4 pb-20 pt-28 text-white sm:px-6">
+  <article class="mx-auto max-w-4xl rounded-3xl border border-white/10 bg-white/5 p-6 shadow-2xl sm:p-10">
+    <header>
+      <p class="text-xs font-semibold uppercase tracking-[0.25em] text-red-400">{{ page().eyebrow }}</p>
+      <h1 class="mt-4 text-3xl font-semibold sm:text-5xl">{{ page().title }}</h1>
+      <p class="mt-6 text-lg leading-8 text-zinc-400">{{ page().intro }}</p>
+      @if (page().heroMeta?.length) {
+        <div class="mt-6 flex flex-wrap gap-2">
+          @for (item of page().heroMeta; track item) {
+            <span class="rounded-full border border-white/10 px-4 py-2 text-sm text-zinc-400">{{ item }}</span>
+          }
+        </div>
+      }
+      @if (page().ctaLabel) {
+        <a [routerLink]="['/', locale(), 'form']" class="mt-7 inline-flex rounded-xl border border-red-500 px-5 py-3 font-semibold text-red-400">{{ page().ctaLabel }}</a>
+      }
+    </header>
+
+    @if (page().contents?.length) {
+      <nav class="mt-8 rounded-2xl border border-white/10 bg-black/20 p-5">
+        <ul class="grid gap-2 text-sm text-zinc-400 sm:grid-cols-2">
+          @for (item of page().contents; track item) {
+            <li class="flex gap-3"><span class="text-red-500">•</span>{{ item }}</li>
+          }
+        </ul>
+      </nav>
+    }
+
+    <div class="mt-10 space-y-7">
+      @for (section of page().sections; track section.title) {
+        <section class="rounded-2xl border border-white/10 bg-black/20 p-5 sm:p-6">
+          <h2 class="text-2xl font-semibold">{{ section.title }}</h2>
+          @for (paragraph of section.paragraphs ?? []; track paragraph) {
+            <p class="mt-4 leading-8 text-zinc-400">{{ paragraph }}</p>
+          }
+          @if (section.bullets?.length) {
+            <ul class="mt-4 space-y-3 text-zinc-400">
+              @for (bullet of section.bullets; track bullet) {
+                <li class="flex gap-3"><span class="text-red-500">•</span><span>{{ bullet }}</span></li>
+              }
+            </ul>
+          }
+          @for (subsection of section.subsections ?? []; track subsection.title) {
+            <div class="mt-5 rounded-xl border border-white/10 bg-white/5 p-5">
+              <h3 class="text-lg font-semibold">{{ subsection.title }}</h3>
+              @for (paragraph of subsection.paragraphs ?? []; track paragraph) {
+                <p class="mt-3 leading-7 text-zinc-400">{{ paragraph }}</p>
+              }
+              @for (bullet of subsection.bullets ?? []; track bullet) {
+                <p class="mt-2 text-zinc-400">• {{ bullet }}</p>
+              }
+              @for (link of subsection.links ?? []; track link.href) {
+                <a [href]="link.href" target="_blank" rel="noopener" class="mt-3 block text-red-400 underline">{{ link.label }}</a>
+              }
+            </div>
+          }
+          @if (section.table; as table) {
+            <div class="mt-6 overflow-x-auto rounded-xl border border-white/10">
+              <table class="min-w-full text-left text-sm text-zinc-400">
+                <thead class="bg-white/5 text-white"><tr>@for (column of table.columns; track column) { <th class="px-4 py-3">{{ column }}</th> }</tr></thead>
+                <tbody>@for (row of table.rows; track $index) { <tr class="border-t border-white/10">@for (cell of row; track $index) { <td class="px-4 py-3">{{ cell }}</td> }</tr> }</tbody>
+              </table>
+            </div>
+          }
+          @if (section.rights?.length) {
+            <div class="mt-5 grid gap-4 sm:grid-cols-2">@for (right of section.rights; track right.article) { <div class="rounded-xl bg-white/5 p-5"><span class="text-xs text-red-400">{{ right.article }}</span><h3 class="mt-2 font-semibold">{{ right.title }}</h3><p class="mt-2 text-sm leading-6 text-zinc-400">{{ right.description }}</p></div> }</div>
+          }
+          @if (section.contactCards?.length) {
+            <div class="mt-5 grid gap-4 sm:grid-cols-2">@for (card of section.contactCards; track card.label) { <div class="rounded-xl bg-white/5 p-5"><p class="text-xs uppercase text-red-400">{{ card.label }}</p><p class="mt-2 text-zinc-400">{{ card.value }}</p></div> }</div>
+          }
+          @if (section.categories?.length) {
+            <div class="mt-5 grid gap-4 sm:grid-cols-2">@for (category of section.categories; track category.name) { <div class="rounded-xl bg-white/5 p-5"><h3 class="font-semibold">{{ category.name }}</h3><p class="mt-2 text-sm leading-6 text-zinc-400">{{ category.description }}</p></div> }</div>
+          }
+          @for (cookieTable of section.cookieTables ?? []; track cookieTable.title) {
+            <div class="mt-6 overflow-x-auto rounded-xl border border-white/10"><h3 class="p-4 font-semibold">{{ cookieTable.title }}</h3><table class="min-w-full text-left text-sm text-zinc-400"><thead class="bg-white/5"><tr>@for (column of cookieTable.columns; track column) { <th class="px-4 py-3">{{ column }}</th> }</tr></thead><tbody>@for (row of cookieTable.rows; track $index) { <tr class="border-t border-white/10">@for (cell of row; track $index) { <td class="px-4 py-3">{{ cell }}</td> }</tr> }</tbody></table></div>
+          }
+          @for (link of section.links ?? []; track link.href) {
+            <a [href]="link.href" target="_blank" rel="noopener" class="mt-4 block text-red-400 underline">{{ link.label }}</a>
+          }
+          @if (section.note) {
+            <p class="mt-5 rounded-xl border border-amber-300/20 bg-amber-300/10 p-4 text-sm leading-7 text-amber-50">{{ section.note }}</p>
+          }
+        </section>
+      }
+    </div>
+    @if (page().note) {
+      <p class="mt-8 rounded-xl border border-amber-300/20 bg-amber-300/10 p-4 text-sm leading-7 text-amber-50">{{ page().note }}</p>
+    }
+  </article>
+</main>

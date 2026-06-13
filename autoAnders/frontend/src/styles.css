@@ -1,0 +1,115 @@
+@import "tailwindcss";
+
+:root {
+  --color-brand-primary: #d90429;
+  --color-brand-secondary: #ffffff;
+  --color-brand-accent: #9d0208;
+  --color-brand-muted: #a1a1aa;
+  --color-brand-gray: #a1a1aa;
+  --color-brand-graySoft: #d4d4d8;
+  --color-brand-grayMuted: #71717a;
+  --color-brand-grayLight: #d4d4d8;
+  --color-brand-navyDark: #0b0b0f;
+  --color-brand-petalPink: #ef4444;
+  --color-brand-purple: #dc2626;
+  --color-brand-teal: #f87171;
+  --background: #0a0a0a;
+  --foreground: #ededed;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+html {
+  scroll-behavior: smooth;
+  color-scheme: dark;
+}
+
+body {
+  margin: 0;
+  background: var(--background);
+  color: var(--foreground);
+}
+
+button,
+a {
+  cursor: pointer;
+}
+
+html[data-theme="light"] {
+  --background: #f8f9fa;
+  --foreground: #1a1a1a;
+  color-scheme: light;
+}
+
+html[data-theme="light"] body,
+html[data-theme="light"] main,
+html[data-theme="light"] section {
+  background-color: #ffffff;
+  color: #1a1a1a;
+}
+
+html[data-theme="light"] footer {
+  background-color: #f3f3f3;
+  color: #1a1a1a;
+}
+
+html[data-theme="light"] :where(.text-white, .text-zinc-100, .text-zinc-200, .text-zinc-300) {
+  color: #1a1a1a;
+}
+
+html[data-theme="light"] :where(.text-zinc-400, .text-zinc-500, .text-brand-muted) {
+  color: #6b7280;
+}
+
+html[data-theme="light"] :where(.bg-black, .bg-zinc-950, .bg-zinc-900, .bg-white\/5) {
+  background-color: #f3f4f6;
+}
+
+html[data-theme="light"] :where(.border-white\/5, .border-white\/10, .border-white\/20) {
+  border-color: #e5e7eb;
+}
+
+html[data-theme="light"] input,
+html[data-theme="light"] textarea,
+html[data-theme="light"] select {
+  background: #ffffff;
+  color: #1a1a1a;
+  border-color: #e5e7eb;
+}
+
+html[data-theme="light"] :where(.bg-black\/60) {
+  filter : brightness(0);
+}
+
+html[data-theme="light"] :where(.bg-black\/80) {
+  background-color: rgba(219, 219, 219, 0.8);
+}
+
+.hero-light-overlay {
+  display: none;
+}
+
+html[data-theme="light"] .hero-light-overlay {
+  display: block;
+}
+
+html[data-theme="light"] .hero-dark-overlay {
+  display: none;
+}
+
+html[data-theme="light"] #advantages {
+  background-color: #d3d3d3b5;
+}
+
+
+
+html[data-theme="light"] #pictures_of_services {
+  filter: brightness(0);
+}
+
+.filter-black {
+  filter: brightness(0);
+}
+html[data-theme="light"] #submit-button {
+  background: red;
+  opacity: 20;
+}
