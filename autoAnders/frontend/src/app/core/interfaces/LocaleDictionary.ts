@@ -170,6 +170,7 @@ interface LocaleDictionary  {
     ariaLabel: string;
     homeAriaLabel: string;
     items: NavItem[];
+    authLabel: string;
     contactLabel: string;
     mobileMenuLabel: string;
     switchLabel: string;
@@ -185,6 +186,7 @@ interface LocaleDictionary  {
     rights: string;
     legalLinks: FooterLink[];
   };
+  auth: AuthContent;
   home: HomeContent;
   faq: FaqContent;
   servicePage: ServicePageContent;
@@ -201,6 +203,7 @@ interface LocaleDictionary  {
 
 export type {
   AdvantageItem,
+  AuthContent,
   ContentPage,
   ContentSection,
   FooterLink,
@@ -215,6 +218,51 @@ export type {
   ServicePageContent,
   SellContent,
 };
+
+interface AuthContent  {
+  metadata: PageMetadata;
+  badge: string;
+  title: string;
+  description: string;
+  fields: {
+    email: string;
+    password: string;
+    name: string;
+    phoneNumber: string;
+  };
+  placeholders: {
+    email: string;
+    password: string;
+    name: string;
+    phoneNumber: string;
+  };
+  consent: {
+    prefix: string;
+    terms: string;
+    and: string;
+    privacyPolicy: string;
+    suffix: string;
+  };
+  submitLabel: string;
+  sendingLabel: string;
+  popup: {
+    successTitle: string;
+    successMessage: string;
+    errorTitle: string;
+    errorMessage: string;
+    closeLabel: string;
+  };
+  loginAuth?: {
+    message: string;
+    buttonLabel: string;
+  };
+  registerAuth?: {
+    message: string;
+    buttonLabel: string;
+  };
+}
+
+
 interface CatalogueCar  {
   id: number;
   brand: string;
@@ -269,3 +317,38 @@ interface CatalogueContent  {
   labels: CatalogueLabels;
   cars: CatalogueCar[];
 };
+
+interface ContactContent  {
+  title: string;
+  description: string;
+  fields: {
+    companyName: string;
+    lastName: string;
+    email: string;
+    phoneNumber: string;
+    message: string;
+  };
+  placeholders: {
+    companyName: string;
+    lastName: string;
+    email: string;
+    phoneNumber: string;
+    message: string;
+  };
+    consent: {
+      prefix: string;
+      terms: string;
+      and: string;
+      privacyPolicy: string;
+      suffix: string;
+    };
+  submitLabel: string;
+  sendingLabel: string;
+  popup: {
+    successTitle: string;
+    successMessage: string;
+    errorTitle: string;
+    errorMessage: string;
+    closeLabel: string;
+  };
+}

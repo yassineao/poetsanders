@@ -7,6 +7,7 @@ import { LegalPageComponent } from "./pages/legal/legal-page.component";
 import { SellPageComponent } from "./pages/sell/sell-page.component";
 import { LocaleShellComponent } from "./shared/locale-shell/locale-shell.component";
 import { ContactFormComponent } from "./pages/contact/components/form";
+import { AuthComponent } from "./pages/auth/components/auth";
 
 export const routes: Routes = [
   { path: "", pathMatch: "full", redirectTo: "de" },
@@ -22,6 +23,8 @@ export const routes: Routes = [
       { path: "faq", component: FaqPageComponent },
       { path: "form", component: ContactFormComponent },
       { path: "contact", redirectTo: "form" },
+      { path: "auth", component: AuthComponent },
+      { path: "login", redirectTo: "auth" },
       { path: "advantages", component: AdvantagesPageComponent },
       { path: "about", component: LegalPageComponent, data: { page: "about" } },
       { path: "privacy", component: LegalPageComponent, data: { page: "privacy" } },

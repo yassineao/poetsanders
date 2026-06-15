@@ -1,55 +1,83 @@
 <header class="fixed top-0 z-50 w-full border-b border-white/5 bg-black/80 backdrop-blur-lg">
   <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
     <nav [attr.aria-label]="content().ariaLabel" class="flex h-16 items-center justify-between lg:h-18">
-      <a [routerLink]="['/', locale()]" fragment="home" class="flex items-center px-2" [attr.aria-label]="content().homeAriaLabel">
+      <a [routerLink]="['/', locale()]" fragment="home" class="flex items-center px-2"
+        [attr.aria-label]="content().homeAriaLabel">
         <img src="/Logo.png" alt="AutoAnders Logo" class="h-7 w-auto lg:h-8" />
       </a>
 
       <ul class="hidden items-center gap-1 lg:flex">
         @for (item of content().items; track item.href + item.label) {
-          <li class="group relative">
-            <a [routerLink]="localizedHref(item.href)" class="inline-flex h-10 items-center gap-1 rounded-lg px-4 text-sm font-medium text-zinc-300 transition hover:bg-white/5 hover:text-white">
-              {{ item.label }}
-              @if (item.children?.length) {
-                <span class="transition group-hover:rotate-180">⌄</span>
-              }
-            </a>
+        <li class="group relative">
+          <a [routerLink]="localizedHref(item.href)"
+            class="inline-flex h-10 items-center gap-1 rounded-lg px-4 text-sm font-medium text-zinc-300 transition hover:bg-white/5 hover:text-white">
+            {{ item.label }}
             @if (item.children?.length) {
-              <div class="invisible absolute left-0 top-full z-50 mt-2 w-56 translate-y-2 rounded-xl border border-white/10 bg-black/95 p-1.5 opacity-0 shadow-xl transition-all group-hover:visible group-hover:translate-y-0 group-hover:opacity-100">
-                @for (child of item.children; track child.href + child.label) {
-                  <a [routerLink]="localizedHref(child.href)" class="block rounded-lg px-3 py-2.5 text-sm text-zinc-300 hover:bg-white/10 hover:text-white">{{ child.label }}</a>
-                }
-              </div>
+            <span class="transition group-hover:rotate-180">⌄</span>
             }
-          </li>
+          </a>
+          @if (item.children?.length) {
+          <div
+            class="invisible absolute left-0 top-full z-50 mt-2 w-56 translate-y-2 rounded-xl border border-white/10 bg-black/95 p-1.5 opacity-0 shadow-xl transition-all group-hover:visible group-hover:translate-y-0 group-hover:opacity-100">
+            @for (child of item.children; track child.href + child.label) {
+            <a [routerLink]="localizedHref(child.href)"
+              class="block rounded-lg px-3 py-2.5 text-sm text-zinc-300 hover:bg-white/10 hover:text-white">{{
+              child.label }}</a>
+            }
+          </div>
+          }
+        </li>
         }
       </ul>
 
+      <div class="">
+        <div class="relative">
+          <button type="button" [routerLink]="['/auth']"
+            class="inline-flex h-10 items-center gap-2 rounded-lg px-4 text-sm font-medium text-zinc-300 hover:bg-white/5 hover:text-white">
+            
+          </button>
+        </div>
+      </div>
+
+
       <div class="hidden items-center gap-2 lg:flex">
         <div class="relative">
-          <button type="button" (click)="localeOpen.update(value => !value)" class="inline-flex h-10 items-center gap-2 rounded-lg px-4 text-sm font-medium text-zinc-300 hover:bg-white/5 hover:text-white">
+          <button type="button" (click)="localeOpen.update(value => !value)"
+            class="inline-flex h-10 items-center gap-2 rounded-lg px-4 text-sm font-medium text-zinc-300 hover:bg-white/5 hover:text-white">
             {{ locale().toUpperCase() }} <span>⌄</span>
           </button>
           @if (localeOpen()) {
-            <div class="absolute right-0 top-full mt-2 min-w-40 rounded-xl border border-white/10 bg-black/95 p-2 shadow-2xl">
-              @for (language of locales; track language) {
-                <button type="button" (click)="switchLocale(language)" class="flex w-full justify-between rounded-lg px-3 py-2 text-sm text-zinc-300 hover:bg-white/10 hover:text-white">
-                  <span>{{ language.toUpperCase() }}</span>
-                  <span>{{ language === "de" ? "Deutsch" : language === "en" ? "English" : "Nederlands" }}</span>
-                </button>
-              }
-            </div>
+          <div
+            class="absolute right-0 top-full mt-2 min-w-40 rounded-xl border border-white/10 bg-black/95 p-2 shadow-2xl">
+            @for (language of locales; track language) {
+            <button type="button" (click)="switchLocale(language)"
+              class="flex w-full justify-between rounded-lg px-3 py-2 text-sm text-zinc-300 hover:bg-white/10 hover:text-white">
+              <span>{{ language.toUpperCase() }}</span>
+              <span>{{ language === "de" ? "Deutsch" : language === "en" ? "English" : "Nederlands" }}</span>
+            </button>
+            }
+          </div>
           }
         </div>
-        <button type="button" (click)="toggleTheme()" class="inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-white/5 text-white" [attr.aria-label]="lightTheme() ? 'Switch to dark mode' : 'Switch to light mode'">
+        <button type="button" (click)="toggleTheme()"
+          class="inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-white/5 text-white"
+          [attr.aria-label]="lightTheme() ? 'Switch to dark mode' : 'Switch to light mode'">
           {{ lightTheme() ? "☾" : "☀" }}
         </button>
-        <a [routerLink]="['/', locale(), 'form']" class="inline-flex h-10 items-center rounded-lg border border-red-500 bg-red-500/10 px-5 text-sm font-semibold text-red-400 transition hover:bg-red-600 hover:text-white">{{ content().contactLabel }}</a>
+        <a [routerLink]="['/', locale(), 'auth']"
+          class="inline-flex h-10 items-center rounded-lg px-4 text-sm font-semibold text-zinc-300 transition hover:bg-white/5 hover:text-white">{{
+          content().authLabel }}</a>
+        <a [routerLink]="['/', locale(), 'form']"
+          class="inline-flex h-10 items-center rounded-lg border border-red-500 bg-red-500/10 px-5 text-sm font-semibold text-red-400 transition hover:bg-red-600 hover:text-white">{{
+          content().contactLabel }}</a>
       </div>
 
       <div class="flex items-center gap-2 lg:hidden">
-        <button type="button" (click)="toggleTheme()" class="h-10 w-10 rounded-full border border-white/10 text-white">{{ lightTheme() ? "☾" : "☀" }}</button>
-        <button type="button" (click)="mobileOpen.update(value => !value)" class="h-10 w-10 rounded-full border border-white/10 text-white" [attr.aria-expanded]="mobileOpen()" [attr.aria-label]="content().mobileMenuLabel">
+        <button type="button" (click)="toggleTheme()"
+          class="h-10 w-10 rounded-full border border-white/10 text-white">{{ lightTheme() ? "☾" : "☀" }}</button>
+        <button type="button" (click)="mobileOpen.update(value => !value)"
+          class="h-10 w-10 rounded-full border border-white/10 text-white" [attr.aria-expanded]="mobileOpen()"
+          [attr.aria-label]="content().mobileMenuLabel">
           {{ mobileOpen() ? "×" : "☰" }}
         </button>
       </div>
@@ -57,21 +85,29 @@
   </div>
 
   @if (mobileOpen()) {
-    <div class="border-t border-white/10 bg-black/95 p-4 lg:hidden">
-      <div class="mx-auto max-w-7xl space-y-2">
-        @for (item of content().items; track item.href + item.label) {
-          <a [routerLink]="localizedHref(item.href)" (click)="closeMenus()" class="block rounded-xl border border-white/10 px-4 py-3 text-white">{{ item.label }}</a>
-          @for (child of item.children ?? []; track child.href + child.label) {
-            <a [routerLink]="localizedHref(child.href)" (click)="closeMenus()" class="ml-4 block rounded-lg px-4 py-2 text-sm text-zinc-300">{{ child.label }}</a>
-          }
+  <div class="border-t border-white/10 bg-black/95 p-4 lg:hidden">
+    <div class="mx-auto max-w-7xl space-y-2">
+      @for (item of content().items; track item.href + item.label) {
+      <a [routerLink]="localizedHref(item.href)" (click)="closeMenus()"
+        class="block rounded-xl border border-white/10 px-4 py-3 text-white">{{ item.label }}</a>
+      @for (child of item.children ?? []; track child.href + child.label) {
+      <a [routerLink]="localizedHref(child.href)" (click)="closeMenus()"
+        class="ml-4 block rounded-lg px-4 py-2 text-sm text-zinc-300">{{ child.label }}</a>
+      }
+      }
+      <div class="grid grid-cols-3 gap-2 pt-2">
+        @for (language of locales; track language) {
+        <button type="button" (click)="switchLocale(language)"
+          class="rounded-lg border border-white/10 py-2 text-sm text-white">{{ language.toUpperCase() }}</button>
         }
-        <div class="grid grid-cols-3 gap-2 pt-2">
-          @for (language of locales; track language) {
-            <button type="button" (click)="switchLocale(language)" class="rounded-lg border border-white/10 py-2 text-sm text-white">{{ language.toUpperCase() }}</button>
-          }
-        </div>
-        <a [routerLink]="['/', locale(), 'form']" (click)="closeMenus()" class="block rounded-xl bg-red-600 px-4 py-3 text-center font-semibold text-white">{{ content().contactLabel }}</a>
       </div>
+      <a [routerLink]="['/', locale(), 'auth']" (click)="closeMenus()"
+        class="block rounded-xl border border-white/10 px-4 py-3 text-center font-semibold text-white">{{
+        content().authLabel }}</a>
+      <a [routerLink]="['/', locale(), 'form']" (click)="closeMenus()"
+        class="block rounded-xl bg-red-600 px-4 py-3 text-center font-semibold text-white">{{ content().contactLabel
+        }}</a>
     </div>
+  </div>
   }
 </header>

@@ -1,3 +1,5 @@
+import type { PageMetadata } from "./LocaleDictionary";
+
 export interface Infos  {
   title: string;
   description: string;
@@ -47,6 +49,7 @@ export interface FormField {
 }
 
 export interface FormPageContent {
+  metadata?: PageMetadata;
   eyebrow?: string;
   title: string;
   description: string;
@@ -63,5 +66,15 @@ export interface FormPageContent {
   sendingLabel: string;
   popup: Infos["popup"];
   testimonial?: Infos["testimonial"];
+  registerAuth?: {
+    message: string;
+    buttonLabel: string;
+  };
+  loginAuth?: {
+    message: string;
+    buttonLabel: string;
+  };
 }
+
+
 
