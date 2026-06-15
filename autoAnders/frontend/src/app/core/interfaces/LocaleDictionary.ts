@@ -227,14 +227,25 @@ interface AuthContent  {
   fields: {
     email: string;
     password: string;
+    confirmPassword: string;
     name: string;
     phoneNumber: string;
   };
   placeholders: {
     email: string;
     password: string;
+    confirmPassword: string;
     name: string;
     phoneNumber: string;
+  };
+  validation: {
+    required: string;
+    invalidEmail: string;
+    passwordLength: string;
+    passwordPattern: string;
+    passwordMismatch: string;
+    nameTooLong: string;
+    phoneLength: string;
   };
   consent: {
     prefix: string;

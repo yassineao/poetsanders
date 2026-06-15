@@ -37,12 +37,23 @@
             <label class="text-sm font-medium text-zinc-300">
               {{ field.label }}
               <input
+                #fieldControl="ngModel"
                 [name]="field.name"
                 ngModel
                 [required]="field.required ?? false"
+                [minlength]="field.minLength ?? null"
+                [maxlength]="field.maxLength ?? null"
+                [pattern]="field.pattern ?? ''"
                 [type]="field.type"
                 [placeholder]="field.placeholder ?? ''"
+                [attr.aria-invalid]="fieldError(field, fieldControl, form) ? 'true' : null"
+                [class.border-red-500]="fieldError(field, fieldControl, form)"
                 class="mt-2 w-full rounded-xl border border-white/10 bg-zinc-950/80 px-4 py-3.5 text-white outline-none transition placeholder:text-zinc-600 hover:border-white/20 focus:border-red-500 focus:ring-4 focus:ring-red-500/10" />
+              @if (fieldError(field, fieldControl, form); as error) {
+                <span class="mt-2 block text-xs font-medium text-red-400" role="alert">
+                  {{ error }}
+                </span>
+              }
             </label>
           }
         </div>

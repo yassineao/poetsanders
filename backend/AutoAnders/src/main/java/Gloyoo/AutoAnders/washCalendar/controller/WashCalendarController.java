@@ -50,7 +50,9 @@ public class WashCalendarController {
                         authenticatedUserId(authentication)
                 );
         bookingConfirmationEmailService.sendBookingConfirmation(
-                washCalendar.getUser(),
+                washCalendar.getUser().getName(),
+                washCalendar.getUser().getEmail(),
+                false,
                 List.of(washCalendar)
         );
 
@@ -67,7 +69,9 @@ public class WashCalendarController {
                 authenticatedUserId(authentication)
         );
         bookingConfirmationEmailService.sendBookingConfirmation(
-                washCalendars.getFirst().getUser(),
+                washCalendars.getFirst().getUser().getName(),
+                washCalendars.getFirst().getUser().getEmail(),
+                false,
                 washCalendars
         );
 
@@ -78,8 +82,17 @@ public class WashCalendarController {
     public ResponseEntity<List<WashCalendarResponse>> addGuestWashCalendars(
             @Valid @RequestBody GuestWashCalendarRequest request
     ) {
-        return ResponseEntity.ok(toResponses(
-                washCalendarService.bookGuestWashCalendars(request)
+
+        List<WashCalendar> washCalendars = washCalendarService.bookGuestWashCalendars(request);
+
+        bookingConfirmationEmailService.sendBookingConfirmation(
+                washCalendars.getFirst().getUser().getName(),
+                washCalendars.getFirst().getUser().getEmail(),
+                true,
+                washCalendars
+        );
+
+        return ResponseEntity.ok(toResponses(washCalendars
         ));
     }
 

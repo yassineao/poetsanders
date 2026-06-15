@@ -24,7 +24,8 @@ class RegisterConfirmationServiceTest {
                 new RegisterConfirmationService(
                         mailSender,
                         true,
-                        "accounts@poetsanders.nl"
+                        "accounts@poetsanders.nl",
+                        ""
                 );
         User user = User.builder()
                 .id(UUID.randomUUID())
@@ -46,7 +47,7 @@ class RegisterConfirmationServiceTest {
     void doesNothingWhenMailIsDisabled() {
         JavaMailSender mailSender = mock(JavaMailSender.class);
         RegisterConfirmationService service =
-                new RegisterConfirmationService(mailSender, false, "");
+                new RegisterConfirmationService(mailSender, false, "", "");
 
         service.sendRegisterConfirmation(
                 User.builder().email("jane@example.com").build()

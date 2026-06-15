@@ -46,6 +46,18 @@ export interface FormField {
   type: string;
   placeholder?: string;
   required?: boolean;
+  minLength?: number;
+  maxLength?: number;
+  pattern?: string;
+  matchField?: string;
+  errors?: {
+    required?: string;
+    email?: string;
+    minlength?: string;
+    maxlength?: string;
+    pattern?: string;
+    mismatch?: string;
+  };
 }
 
 export interface FormPageContent {

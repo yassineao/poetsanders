@@ -30,7 +30,7 @@ const accountPasswordValidators = [
   Validators.minLength(12),
   Validators.maxLength(30),
   Validators.pattern(
-    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{12,}$/,
+    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z\d\s]).{12,}$/,
   ),
 ];
 
