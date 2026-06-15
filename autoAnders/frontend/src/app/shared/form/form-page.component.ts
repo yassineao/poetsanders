@@ -19,8 +19,16 @@ export class FormPageComponent {
   readonly content = input.required<FormPageContent>();
   readonly sending = input(false);
   readonly sent = input(false);
+  readonly failed = input(false);
   readonly submitted = output<FormSubmission>();
   readonly successClosed = output<void>();
+  readonly failureClosed = output<void>();
+  readonly registering = input(false);
+  readonly registeringChange = output<boolean>();
+
+  protected toggleAuthMode(): void {
+    this.registeringChange.emit(!this.registering());
+  }
 
   protected submit(form: NgForm): void {
     if (form.invalid || this.sending()) {

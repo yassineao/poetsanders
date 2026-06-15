@@ -1,0 +1,14 @@
+ <app-form-page
+            [locale]="locale()"
+            [content]="content()"
+            [sending]="sending()"
+            [sent]="sent()"
+            [failed]="failed()"
+            (submitted)="submit($event)"
+            (successClosed)="sent.set(false)"
+            (failureClosed)="failed.set(false)"
+            [registering]="registring()"
+            (registeringChange)="registring.set($event)"
+        >
+        
+ </app-form-page>

@@ -28,6 +28,7 @@ export const deNavbarCopy: Copy["nav"] = {
        { label: "FAQ", href: "/faq" },
       { label: "Über uns", href: "/about" },
     ],
+    authLabel: "Anmelden",
     contactLabel: "Kontakt",
     mobileMenuLabel: "Menü",
     switchLabel: "EN",

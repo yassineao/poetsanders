@@ -28,6 +28,7 @@ export const enNavbarCopy: Copy["nav"] = {
         { label: "FAQ", href: "/faq" },
         { label: "About Us", href: "/about" },
       ],
+      authLabel: "Sign in",
       contactLabel: "Contact",
       mobileMenuLabel: "Menu",
       switchLabel: "DE",

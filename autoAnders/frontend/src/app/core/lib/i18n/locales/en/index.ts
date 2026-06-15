@@ -8,6 +8,7 @@ import { enServicesCopy } from "./services";
 import { enFormCopy } from "./form";
 import { enPagesCopy } from "./pages";
 import { enSellCopy } from "./sell";
+import { enAuthCopy } from "./auth";
 
 export const enCopy: Copy = {
   localeName: enLocaleCopy,
@@ -18,5 +19,6 @@ export const enCopy: Copy = {
   servicePage: enServicesCopy,
   form: enFormCopy,
   sell: enSellCopy,
+  auth: enAuthCopy,
   pages: enPagesCopy,
 };

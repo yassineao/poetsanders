@@ -28,6 +28,7 @@ export const nlNavbarCopy: Copy["nav"] = {
       { label: "FAQ", href: "/faq" },
       { label: "Over Ons", href: "/about" },
     ],
+    authLabel: "Inloggen",
     contactLabel: "Contact",
     mobileMenuLabel: "Menu",
     switchLabel: "EN",

@@ -1,71 +1,149 @@
-<main class="min-h-screen bg-black px-4 pb-16 pt-28 text-white">
-  <div class="mx-auto grid max-w-7xl gap-8 lg:grid-cols-[1fr_28rem]">
-    <section class="rounded-xl border border-white/10 bg-zinc-900 p-6 lg:p-8">
-      <p class="font-semibold text-red-500">{{ content().eyebrow ?? "AutoAnders" }}</p>
-      <h1 class="mt-2 text-3xl font-black sm:text-4xl">{{ content().title }}</h1>
-      <p class="mt-4 leading-7 text-zinc-400">{{ content().description }}</p>
+<main class="min-h-screen bg-zinc-950 px-4 pb-16 pt-28 text-white sm:px-6">
+  <div
+    class="mx-auto grid max-w-7xl overflow-hidden rounded-3xl border border-white/10 bg-zinc-900 shadow-2xl shadow-black/40 lg:min-h-[42rem] lg:grid-cols-[minmax(0,1fr)_28rem]">
+    <section class="flex flex-col justify-center p-6 sm:p-10 lg:p-14">
+      <div class="max-w-2xl">
+        <p class="text-sm font-bold uppercase tracking-[0.2em] text-red-500">
+          {{ content().eyebrow ?? "AutoAnders" }}
+        </p>
+        <h1 class="mt-3 text-3xl font-black tracking-tight sm:text-4xl lg:text-5xl">
+          {{ content().title }}
+        </h1>
+        <p class="mt-4 max-w-xl leading-7 text-zinc-400">
+          {{ content().description }}
+        </p>
+      </div>
+
+      @let authContent = registering()
+        ? content().registerAuth
+        : content().loginAuth;
+
+      @if (authContent) {
+        <div class="mt-7 flex flex-wrap items-center gap-x-3 gap-y-2 rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3">
+          <p class="text-sm text-zinc-300">{{ authContent.message }}</p>
+          <button
+            type="button"
+            (click)="toggleAuthMode()"
+            [disabled]="sending()"
+            class="text-sm font-bold text-red-400 underline decoration-red-400/40 underline-offset-4 transition hover:text-red-300 disabled:cursor-not-allowed disabled:opacity-50">
+            {{ authContent.buttonLabel }}
+          </button>
+        </div>
+      }
+
       <form #form="ngForm" (ngSubmit)="submit(form)" class="mt-8 space-y-5">
-        <div class="grid gap-4 sm:grid-cols-2">
+        <div class="grid gap-5 sm:grid-cols-2">
           @for (field of content().fields; track field.name) {
-          <label class="text-sm text-zinc-300">
-            {{ field.label }}
-            <input [name]="field.name" ngModel [required]="field.required ?? false" [type]="field.type"
-              [placeholder]="field.placeholder ?? ''"
-              class="mt-2 w-full rounded-lg border border-white/10 bg-zinc-950 px-4 py-3 text-white" />
-          </label>
+            <label class="text-sm font-medium text-zinc-300">
+              {{ field.label }}
+              <input
+                [name]="field.name"
+                ngModel
+                [required]="field.required ?? false"
+                [type]="field.type"
+                [placeholder]="field.placeholder ?? ''"
+                class="mt-2 w-full rounded-xl border border-white/10 bg-zinc-950/80 px-4 py-3.5 text-white outline-none transition placeholder:text-zinc-600 hover:border-white/20 focus:border-red-500 focus:ring-4 focus:ring-red-500/10" />
+            </label>
           }
         </div>
 
         @if (content().textarea; as textarea) {
-        <label class="block text-sm text-zinc-300">
-          {{ textarea.label }}
-          <textarea [name]="textarea.name" ngModel [required]="textarea.required ?? false"
-            [rows]="textarea.rows ?? 6" [placeholder]="textarea.placeholder ?? ''"
-            class="mt-2 w-full rounded-lg border border-white/10 bg-zinc-950 px-4 py-3 text-white"></textarea>
-        </label>
+          <label class="block text-sm font-medium text-zinc-300">
+            {{ textarea.label }}
+            <textarea
+              [name]="textarea.name"
+              ngModel
+              [required]="textarea.required ?? false"
+              [rows]="textarea.rows ?? 6"
+              [placeholder]="textarea.placeholder ?? ''"
+              class="mt-2 w-full resize-y rounded-xl border border-white/10 bg-zinc-950/80 px-4 py-3.5 text-white outline-none transition placeholder:text-zinc-600 hover:border-white/20 focus:border-red-500 focus:ring-4 focus:ring-red-500/10"></textarea>
+          </label>
         }
 
         @if (content().consent; as consent) {
-        <label class="flex gap-3 rounded-lg border border-white/10 bg-zinc-950 p-4 text-sm leading-6 text-zinc-300">
-          <input type="checkbox" name="consent" ngModel required class="mt-1" />
-          <span>
-            {{ consent.prefix }}
-            <a [routerLink]="['/', locale(), 'terms']" class="underline">{{ consent.terms }}</a>
-            {{ consent.and }}
-            <a [routerLink]="['/', locale(), 'privacy']" class="underline">{{ consent.privacyPolicy }}</a>
-            {{ consent.suffix }}
-          </span>
-        </label>
+          <label class="flex gap-3 rounded-xl border border-white/10 bg-zinc-950/60 p-4 text-sm leading-6 text-zinc-300">
+            <input
+              type="checkbox"
+              name="consent"
+              ngModel
+              required
+              class="mt-1 size-4 shrink-0 accent-red-600" />
+            <span>
+              {{ consent.prefix }}
+              <a [routerLink]="['/', locale(), 'terms']" class="font-medium text-white underline underline-offset-4">{{ consent.terms }}</a>
+              {{ consent.and }}
+              <a [routerLink]="['/', locale(), 'privacy']" class="font-medium text-white underline underline-offset-4">{{ consent.privacyPolicy }}</a>
+              {{ consent.suffix }}
+            </span>
+          </label>
         }
 
-        <button id="submit-button" [disabled]="form.invalid || sending()"
-          class="w-full rounded-lg bg-red-600 px-5 py-3.5 font-bold disabled:opacity-50">
-          {{ sending() ? 
-            content().sendingLabel :
-            content().submitLabel }}</button>
+        <button
+          id="submit-button"
+          [disabled]="form.invalid || sending()"
+          class="w-full rounded-xl bg-red-600 px-5 py-4 font-bold shadow-lg shadow-red-950/30 transition hover:bg-red-500 focus:outline-none focus:ring-4 focus:ring-red-500/25 disabled:cursor-not-allowed disabled:opacity-50">
+          {{ sending() ? content().sendingLabel : content().submitLabel }}
+        </button>
       </form>
     </section>
 
-    @if (content().testimonial; as testimonial) {
-    <aside class="relative hidden overflow-hidden rounded-xl lg:block">
-      <img [src]="testimonial.imageUrl" [alt]="testimonial.imageAlt"
-        class="absolute inset-0 h-full w-full object-cover" />
-      <div class="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent"></div>
-      <div class="relative flex h-full flex-col justify-end p-8">
-        <p class="text-lg font-semibold leading-7">{{ testimonial.quote }}</p>
-        <p class="mt-4 text-zinc-300">{{ testimonial.author }}</p>
-      </div>
+    <aside class="relative hidden min-h-full overflow-hidden bg-red-700 lg:flex">
+      @if (content().testimonial; as testimonial) {
+        @if (testimonial.imageUrl) {
+          <img
+            [src]="testimonial.imageUrl"
+            [alt]="testimonial.imageAlt"
+            class="absolute inset-0 h-full w-full object-cover" />
+          <div class="absolute inset-0 bg-gradient-to-t from-black via-black/55 to-black/10"></div>
+        } @else {
+          <div class="absolute inset-0 bg-red-700"></div>
+        }
+
+        <div class="relative z-10 flex min-h-full w-full flex-col justify-end p-10">
+          <div class="mb-auto flex size-12 items-center justify-center rounded-full border border-white/25 bg-white/10 text-xl font-black backdrop-blur">
+            A
+          </div>
+          <p class="text-2xl font-bold leading-9">{{ testimonial.quote }}</p>
+          <p class="mt-5 text-sm font-semibold uppercase tracking-widest text-white/70">
+            {{ testimonial.author }}
+          </p>
+        </div>
+      } @else {
+        <div class="relative flex min-h-full w-full flex-col justify-between p-10">
+          <div class="flex size-12 items-center justify-center rounded-full border border-white/25 bg-white/10 text-xl font-black">
+            A
+          </div>
+          <div>
+            <p class="text-sm font-bold uppercase tracking-[0.24em] text-white/65">AutoAnders</p>
+            <p class="mt-4 text-4xl font-black leading-tight">{{ content().title }}</p>
+            <div class="mt-8 h-1 w-16 rounded-full bg-white"></div>
+          </div>
+        </div>
+      }
     </aside>
-    }
   </div>
+
   @if (sent()) {
-  <div class="fixed inset-0 z-[80] flex items-center justify-center bg-black/70 p-4">
-    <div class="max-w-sm rounded-xl bg-zinc-900 p-6 text-center">
-      <h2 class="text-xl font-bold text-emerald-300">{{ content().popup.successTitle }}</h2>
-      <p class="mt-3 text-zinc-300">{{ content().popup.successMessage }}</p>
-      <button type="button" (click)="successClosed.emit()" class="mt-6 w-full rounded-lg bg-red-600 py-3 font-bold">{{
-        content().popup.closeLabel }}</button>
+    <div class="fixed inset-0 z-[80] flex items-center justify-center bg-black/75 p-4 backdrop-blur-sm">
+      <div class="w-full max-w-sm rounded-2xl border border-white/10 bg-zinc-900 p-7 text-center shadow-2xl">
+        <h2 class="text-xl font-bold text-emerald-300">{{ content().popup.successTitle }}</h2>
+        <p class="mt-3 text-zinc-300">{{ content().popup.successMessage }}</p>
+        <button type="button" (click)="successClosed.emit()" class="mt-6 w-full rounded-xl bg-red-600 py-3 font-bold transition hover:bg-red-500">
+          {{ content().popup.closeLabel }}
+        </button>
+      </div>
     </div>
-  </div>
+  }
+
+  @if (failed()) {
+    <div class="fixed inset-0 z-[80] flex items-center justify-center bg-black/75 p-4 backdrop-blur-sm">
+      <div class="w-full max-w-sm rounded-2xl border border-white/10 bg-zinc-900 p-7 text-center shadow-2xl">
+        <h2 class="text-xl font-bold text-red-300">{{ content().popup.errorTitle }}</h2>
+        <p class="mt-3 text-zinc-300">{{ content().popup.errorMessage }}</p>
+        <button type="button" (click)="failureClosed.emit()" class="mt-6 w-full rounded-xl bg-red-600 py-3 font-bold transition hover:bg-red-500">
+          {{ content().popup.closeLabel }}
+        </button>
+      </div>
+    </div>
   }
 </main>
