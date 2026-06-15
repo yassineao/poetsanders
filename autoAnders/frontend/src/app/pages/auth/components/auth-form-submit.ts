@@ -22,18 +22,13 @@ export function createCredentials(
     if (registring) {
         credentials = {
             ...credentials,
-
-            confirmPassword: String(
-                submission.values["confirmPassword"] ?? ""
-            ),
-
             name: String(
                 submission.values["name"] ?? ""
-            ),
+            ).trim(),
 
             phoneNumber: String(
                 submission.values["phoneNumber"] ?? ""
-            ),
+            ).trim(),
         };
     }
 
