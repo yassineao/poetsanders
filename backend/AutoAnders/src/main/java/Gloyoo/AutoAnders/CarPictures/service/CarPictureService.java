@@ -44,8 +44,8 @@ public class CarPictureService {
         CarPicture picture = CarPicture.builder()
                 .car(car)
                 .storage_path(storage_path)
-                .title(title)
-                .description(description)
+                .title(defaultText(title))
+                .description(defaultText(description))
                 .width(width)
                 .height(height)
                 .build();
@@ -55,5 +55,9 @@ public class CarPictureService {
 
     public List<CarPicture> getAllCarPicturesByCarId(UUID carId ) {
         return carPictureRepository.findByCarId(carId);
+    }
+
+    private String defaultText(String value) {
+        return value == null ? "" : value;
     }
 }

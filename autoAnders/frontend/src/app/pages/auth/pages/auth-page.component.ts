@@ -11,17 +11,17 @@ import type { FormPageContent } from "../../../core/interfaces/Infos";
 import type { Locale } from "../../../core/interfaces/locale";
 import { AuthService } from "../../../core/auth/auth.service";
 import type { LoginCredentials } from "../../../core/interfaces/loginCridentials";
-import { createAuthFormContent } from "./auth-form-content";
+import { createAuthFormContent } from "../components/auth-form-content";
 import { RegisterCredentials } from "../../../core/interfaces/registerCredentials";
-import { createCredentials } from "./auth-form-submit";
+import { createCredentials } from "../components/auth-form-submit";
 
 @Component({
     selector: "app-auth",
     imports: [FormPageComponent],
 
-    templateUrl: "./auth.html",
+    templateUrl: "./auth-page.component.html",
 })
-export class AuthComponent {
+export class AuthPageComponent {
     private readonly route = inject(ActivatedRoute);
     private readonly localeParam = toSignal(
         (this.route.parent?.paramMap ?? this.route.paramMap).pipe(

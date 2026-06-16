@@ -1,8 +1,9 @@
 import { CommonModule, DOCUMENT, isPlatformBrowser } from "@angular/common";
-import { Component, HostListener, PLATFORM_ID, inject, input, signal } from "@angular/core";
+import { Component, HostListener, PLATFORM_ID, computed, inject, input, signal } from "@angular/core";
 import { Router, RouterLink } from "@angular/router";
 import type { LocaleDictionary } from "../../core/interfaces/LocaleDictionary";
 import type { Locale } from "../../core/interfaces/locale";
+import { AuthService } from "../../core/auth/auth.service";
 
 @Component({
   selector: "app-navbar",
@@ -12,6 +13,7 @@ import type { Locale } from "../../core/interfaces/locale";
 export class NavBarComponent {
   readonly locale = input.required<Locale>();
   readonly content = input.required<LocaleDictionary["nav"]>();
+  
 
   protected readonly mobileOpen = signal(false);
   protected readonly localeOpen = signal(false);
@@ -21,6 +23,14 @@ export class NavBarComponent {
   private readonly router = inject(Router);
   private readonly document = inject(DOCUMENT);
   private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
+  private readonly auth = inject(AuthService);
+
+  protected readonly isAuthenticated = computed(() => this.auth.currentUser() !== null);
+  protected readonly isAdmin = computed(() => this.auth.currentUser()?.role === 'ADMIN');
+  protected readonly userName = computed(() => {
+    const user = this.auth.currentUser();
+    return user?.user || user?.email || '';
+  });
 
   constructor() {
     const savedTheme = this.isBrowser

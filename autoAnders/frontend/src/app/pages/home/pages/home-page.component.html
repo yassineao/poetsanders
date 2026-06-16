@@ -49,8 +49,9 @@
     </div>
   </section>
 
-  <app-catalogue [cars]="home().catalogue.cars.slice(0, 3)" [locale]="locale()" [title]="home().catalogue.title"
-    [subtitle]="home().catalogue.subtitle" [labels]="home().catalogue.labels" [showMoreButton]="true" />
+  <app-catalogue [cars]="cars()" [locale]="locale()" [title]="home().catalogue.title"
+    [subtitle]="home().catalogue.subtitle" [labels]="home().catalogue.labels" [showMoreButton]="true"
+    [loaded]="carsLoaded()" />
 
   <section id="advantages" class="px-4 py-16 sm:px-6 lg:px-8">
     <div class="mx-auto max-w-7xl text-center">

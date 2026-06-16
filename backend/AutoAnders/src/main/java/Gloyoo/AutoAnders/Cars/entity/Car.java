@@ -105,6 +105,7 @@ public class Car {
         private User user;
 
         @OneToMany(mappedBy = "car", cascade = CascadeType.ALL, orphanRemoval = true)
+        @Builder.Default
         private List<CarPicture> pictures = new ArrayList<>();
 
 }

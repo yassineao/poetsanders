@@ -1,5 +1,6 @@
 package Gloyoo.AutoAnders.Cars.service;
 
+import Gloyoo.AutoAnders.CarPictures.entity.CarPicture;
 import Gloyoo.AutoAnders.Cars.dto.CarRequest;
 import Gloyoo.AutoAnders.Cars.entity.*;
 import Gloyoo.AutoAnders.Cars.repository.CarRepository;
@@ -10,6 +11,7 @@ import jakarta.validation.constraints.NotNull;
 import org.springframework.stereotype.Service;
 
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -78,7 +80,10 @@ public class CarService {
                 .upholstery(carRequest.upholstery())
                 .status(carRequest.status())
                 .user(user)
+                .pictures(new ArrayList<>())
                 .build();
+
+        addPicturesFromRequest(car, carRequest);
 
         return carRepository.save(car);
     }
@@ -170,5 +175,30 @@ public class CarService {
         return car;
     }
 
+    private void addPicturesFromRequest(Car car, CarRequest carRequest) {
+        if (carRequest.pictures() == null || carRequest.pictures().isEmpty()) {
+            return;
+        }
+
+        carRequest.pictures().stream()
+                .filter(picture -> picture.storagePath() != null && !picture.storagePath().isBlank())
+                .map(picture -> CarPicture.builder()
+                        .car(car)
+                        .storage_path(picture.storagePath())
+                        .title(defaultText(picture.title()))
+                        .description(defaultText(picture.description()))
+                        .width(defaultNumber(picture.width()))
+                        .height(defaultNumber(picture.height()))
+                        .build())
+                .forEach(car.getPictures()::add);
+    }
+
+    private String defaultText(String value) {
+        return value == null ? "" : value;
+    }
+
+    private Integer defaultNumber(Integer value) {
+        return value == null ? 0 : value;
+    }
 
 }

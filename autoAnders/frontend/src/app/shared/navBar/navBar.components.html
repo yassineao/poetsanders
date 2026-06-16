@@ -34,7 +34,7 @@
         <div class="relative">
           <button type="button" [routerLink]="['/auth']"
             class="inline-flex h-10 items-center gap-2 rounded-lg px-4 text-sm font-medium text-zinc-300 hover:bg-white/5 hover:text-white">
-            
+
           </button>
         </div>
       </div>
@@ -64,9 +64,19 @@
           [attr.aria-label]="lightTheme() ? 'Switch to dark mode' : 'Switch to light mode'">
           {{ lightTheme() ? "☾" : "☀" }}
         </button>
-        <a [routerLink]="['/', locale(), 'auth']"
+
+        <!-- <a [routerLink]="['/', locale(), 'auth']"
           class="inline-flex h-10 items-center rounded-lg px-4 text-sm font-semibold text-zinc-300 transition hover:bg-white/5 hover:text-white">{{
-          content().authLabel }}</a>
+          content().authLabel }}</a> -->
+        <a type="button" [routerLink]="[
+          '/',
+          locale(),
+          isAuthenticated() ? 'profile' : 'auth'
+          ]"
+         class="inline-flex h-10 items-center gap-2 rounded-lg px-4 text-sm font-medium text-zinc-300 hover:bg-white/5 hover:text-white">
+          {{ isAuthenticated() ? 'My account' : content().authLabel }}
+        </a>
+
         <a [routerLink]="['/', locale(), 'form']"
           class="inline-flex h-10 items-center rounded-lg border border-red-500 bg-red-500/10 px-5 text-sm font-semibold text-red-400 transition hover:bg-red-600 hover:text-white">{{
           content().contactLabel }}</a>

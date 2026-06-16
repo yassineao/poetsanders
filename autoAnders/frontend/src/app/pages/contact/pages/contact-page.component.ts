@@ -23,7 +23,7 @@ import type { FormPageContent } from "../../../core/interfaces/Infos";
         />
     `,
 })
-export class ContactFormComponent {
+export class ContactPageComponent {
     private readonly route = inject(ActivatedRoute);
 
     private readonly localeParam = toSignal(
