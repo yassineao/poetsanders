@@ -7,6 +7,9 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 
 public record CarRequest(
+        String brand,
+        String model,
+
         String title,
         String subtitle,
 

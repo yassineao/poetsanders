@@ -32,6 +32,8 @@ public class CarService {
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
         Car car = Car.builder()
+                .brand(carRequest.brand())
+                .model(carRequest.model())
                 .title(carRequest.title())
                 .subtitle(carRequest.subtitle())
                 .yearOfManufacture(carRequest.yearOfManufacture())
@@ -90,6 +92,8 @@ public class CarService {
             throw new IllegalArgumentException("Car already exists with this license plate");
         }
 
+        car.setBrand(carRequest.brand());
+        car.setModel(carRequest.model());
         car.setTitle(carRequest.title());
         car.setSubtitle(carRequest.subtitle());
         car.setYearOfManufacture(carRequest.yearOfManufacture());
@@ -151,6 +155,11 @@ public class CarService {
         Car car = carRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Car not found"));
         return carRepository.findById(id);
+    }
+
+    public List<Car> findCarByUser(UUID id){
+        List<Car> cars = carRepository.findByUserId(id);
+        return cars;
     }
 
     public Car updateCarStatus(UUID id, Status status) {
