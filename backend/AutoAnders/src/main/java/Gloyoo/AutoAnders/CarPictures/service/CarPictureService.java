@@ -53,6 +53,43 @@ public class CarPictureService {
         return carPictureRepository.save(picture);
     }
 
+    public List<CarPicture> addPicturesToCar(
+            UUID carId,
+            List<MultipartFile> files,
+            int width,
+            int height
+    ) {
+        if (files == null || files.isEmpty()) {
+            throw new IllegalArgumentException("At least one picture is required");
+        }
+
+        Car car = carRepository.findById(carId)
+                .orElseThrow(() -> new IllegalArgumentException("Car not found"));
+
+        List<CarPicture> pictures = files.stream()
+                .filter(file -> file != null && !file.isEmpty())
+                .map(file -> {
+                    String storagePath = storageService.uploadCarPicture(carId, file);
+                    String filename = defaultText(file.getOriginalFilename());
+
+                    return CarPicture.builder()
+                            .car(car)
+                            .storage_path(storagePath)
+                            .title(filename)
+                            .description(filename)
+                            .width(width)
+                            .height(height)
+                            .build();
+                })
+                .toList();
+
+        if (pictures.isEmpty()) {
+            throw new IllegalArgumentException("At least one picture is required");
+        }
+
+        return carPictureRepository.saveAll(pictures);
+    }
+
     public List<CarPicture> getAllCarPicturesByCarId(UUID carId ) {
         return carPictureRepository.findByCarId(carId);
     }
