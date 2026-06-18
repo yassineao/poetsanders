@@ -13,14 +13,25 @@ export const enAuthCopy: Copy["auth"] = {
   fields: {
     email: "Email address",
     password: "Password",
+    confirmPassword: "Confirm password",
     name: "Name",
     phoneNumber: "Phone number",
   },
   placeholders: {
     email: "Enter your email address",
     password: "Enter your password",
+    confirmPassword: "Enter your password again",
     name: "Enter your full name",
     phoneNumber: "Enter your phone number",
+  },
+  validation: {
+    required: "This field is required.",
+    invalidEmail: "Enter a valid email address.",
+    passwordLength: "Password must be between 12 and 30 characters.",
+    passwordPattern: "Use uppercase, lowercase, a number, and a special character.",
+    passwordMismatch: "The passwords do not match.",
+    nameTooLong: "Name cannot exceed 255 characters.",
+    phoneLength: "Phone number must be between 8 and 30 characters.",
   },
   consent: {
     prefix: "By signing in, you agree to our",

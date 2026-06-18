@@ -26,7 +26,8 @@ class AppointmentCancellationEmailServiceTest {
                 new AppointmentCancellationEmailService(
                         mailSender,
                         true,
-                        "appointments@poetsanders.nl"
+                        "appointments@poetsanders.nl",
+                        ""
                 );
         AppointmentCancellation cancellation = new AppointmentCancellation(
                 "Guest Customer",
@@ -57,7 +58,7 @@ class AppointmentCancellationEmailServiceTest {
     void doesNothingWhenMailIsDisabled() {
         JavaMailSender mailSender = mock(JavaMailSender.class);
         AppointmentCancellationEmailService service =
-                new AppointmentCancellationEmailService(mailSender, false, "");
+                new AppointmentCancellationEmailService(mailSender, false, "","");
 
         service.sendCancellationConfirmation(new AppointmentCancellation(
                 "Customer",

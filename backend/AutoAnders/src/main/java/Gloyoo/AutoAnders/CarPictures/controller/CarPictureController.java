@@ -39,6 +39,18 @@ public class CarPictureController {
         return ResponseEntity.ok(picture);
     }
 
+    @PostMapping(path = "/batch", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<List<CarPicture>> uploadPictures(
+            @PathVariable UUID carId,
+            @RequestParam("files") List<org.springframework.web.multipart.MultipartFile> files,
+            @RequestParam(required = false, defaultValue = "0") int width,
+            @RequestParam(required = false, defaultValue = "0") int height
+    ) {
+        List<CarPicture> pictures = carPictureService.addPicturesToCar(carId, files, width, height);
+
+        return ResponseEntity.ok(pictures);
+    }
+
     @GetMapping
     public ResponseEntity<List<CarPicture>> getAllCarPictures(@PathVariable UUID carId) {
         List <CarPicture> carPictures = carPictureService.getAllCarPicturesByCarId(carId);

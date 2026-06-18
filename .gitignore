@@ -37,6 +37,8 @@ yarn-error.log
 .env.example
 .env.*.example
 /frontend/src/environments/environment.generated.ts
+
+/autoAnders/frontend/src/environments/environment.generated.ts
 .sass-cache/
 connect.lock
 coverage/

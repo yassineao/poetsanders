@@ -143,6 +143,13 @@ interface FormContent  {
 
 type SellContent = FormPageContent;
 
+interface ProfileContent extends FormPageContent {
+  editLabel: string;
+  cancelEditLabel: string;
+  logoutLabel: string;
+  readOnlyHint: string;
+}
+
 interface FaqContent  {
   metadata: PageMetadata;
   badge: string;
@@ -192,6 +199,7 @@ interface LocaleDictionary  {
   servicePage: ServicePageContent;
   form: FormContent;
   sell: SellContent;
+  profile: ProfileContent;
   pages: {
     about: ContentPage;
     privacy: ContentPage;
@@ -214,6 +222,7 @@ export type {
   NavItem,
   PageMetadata,
   PageSeo,
+  ProfileContent,
   ServiceItem,
   ServicePageContent,
   SellContent,
@@ -227,14 +236,25 @@ interface AuthContent  {
   fields: {
     email: string;
     password: string;
+    confirmPassword: string;
     name: string;
     phoneNumber: string;
   };
   placeholders: {
     email: string;
     password: string;
+    confirmPassword: string;
     name: string;
     phoneNumber: string;
+  };
+  validation: {
+    required: string;
+    invalidEmail: string;
+    passwordLength: string;
+    passwordPattern: string;
+    passwordMismatch: string;
+    nameTooLong: string;
+    phoneLength: string;
   };
   consent: {
     prefix: string;
@@ -263,8 +283,8 @@ interface AuthContent  {
 }
 
 
-interface CatalogueCar  {
-  id: number;
+export interface CatalogueCar  {
+  id: number | string;
   brand: string;
   model: string;
   price: number;
@@ -289,7 +309,7 @@ interface CatalogueCar  {
   };
 };
 
-interface CatalogueLabels  {
+export interface CatalogueLabels  {
   vehiclesFound: string;
   searchPlaceholder: string;
   allBrands: string;

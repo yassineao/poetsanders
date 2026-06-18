@@ -11,39 +11,17 @@ import type { FormPageContent } from "../../../core/interfaces/Infos";
 import type { Locale } from "../../../core/interfaces/locale";
 import { AuthService } from "../../../core/auth/auth.service";
 import type { LoginCredentials } from "../../../core/interfaces/loginCridentials";
-import { createAuthFormContent } from "./auth-form-content";
+import { createAuthFormContent } from "../components/auth-form-content";
 import { RegisterCredentials } from "../../../core/interfaces/registerCredentials";
-import { createCredentials } from "./auth-form-submit";
-import { AbstractControl, FormBuilder, ValidationErrors, ValidatorFn, Validators } from "@angular/forms";
-import type { AuthFormGroup } from "./auth-form.models";
-
-
-const passwordsMatchValidator: ValidatorFn = (
-  control: AbstractControl,
-): ValidationErrors | null => {
-  const password = control.get('password')?.value;
-  const confirmPassword = control.get('confirmPassword')?.value;
-
-  return password && confirmPassword && password !== confirmPassword
-    ? { passwordMismatch: true }
-    : null;
-};
-const accountPasswordValidators = [
-  Validators.required,
-  Validators.minLength(12),
-  Validators.maxLength(30),
-  Validators.pattern(
-    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{12,}$/,
-  ),
-];
+import { createCredentials } from "../components/auth-form-submit";
 
 @Component({
     selector: "app-auth",
     imports: [FormPageComponent],
 
-    templateUrl: "./auth.html",
+    templateUrl: "./auth-page.component.html",
 })
-export class AuthComponent {
+export class AuthPageComponent {
     private readonly route = inject(ActivatedRoute);
     private readonly localeParam = toSignal(
         (this.route.parent?.paramMap ?? this.route.paramMap).pipe(
@@ -68,25 +46,7 @@ export class AuthComponent {
     protected readonly sending = signal(false);
     protected readonly sent = signal(false);
     protected readonly failed = signal(false);
-    private readonly formBuilder = inject(FormBuilder);
 
-    protected readonly authForm: AuthFormGroup = this.formBuilder.nonNullable.group(
-        {
-            name: ["", [Validators.required, Validators.maxLength(255)]],
-            email: ["", [Validators.required, Validators.email]],
-            password: ["", accountPasswordValidators],
-            confirmPassword: ["", Validators.required],
-            phoneNumber: [
-                "",
-                [
-                    Validators.required,
-                    Validators.minLength(8),
-                    Validators.maxLength(30),
-                ],
-            ],
-        },
-        { validators: passwordsMatchValidator },
-    );
     protected submit(submission: FormSubmission): void {
         const credentials = createCredentials(submission, this.registring());
         this.sending.set(true);

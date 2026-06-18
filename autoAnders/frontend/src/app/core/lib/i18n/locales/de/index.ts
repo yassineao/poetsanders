@@ -9,6 +9,7 @@ import { deFormCopy } from "./form";
 import { dePagesCopy } from "./pages";
 import { deSellCopy } from "./sell";
 import { deAuthCopy } from "./auth";
+import { deProfileCopy } from "./profile";
 
 export const deCopy: Copy = {
   localeName: deLocaleCopy,
@@ -20,5 +21,6 @@ export const deCopy: Copy = {
   form: deFormCopy,
   sell: deSellCopy,
   auth: deAuthCopy,
+  profile: deProfileCopy,
   pages: dePagesCopy,
 };

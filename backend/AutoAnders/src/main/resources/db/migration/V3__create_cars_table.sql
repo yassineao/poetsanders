@@ -3,6 +3,9 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 CREATE TABLE cars (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
 
+    brand VARCHAR(255) NOT NULL,
+    model VARCHAR(255) NOT NULL,
+
     title VARCHAR(255),
     subtitle VARCHAR(255),
 

@@ -14,7 +14,7 @@ public class UserCreateRequest {
 
     @NotBlank
     @Size(min = 12, max = 30)
-    @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{12,}$")
+    @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[^A-Za-z\\d\\s]).{12,}$")
     private String password;
 
     @NotBlank

@@ -11,6 +11,10 @@ spring:
     password: ${SUPABASE_DB_PASSWORD}
     driver-class-name: org.postgresql.Driver
 
+  flyway:
+    baseline-on-migrate: true
+    baseline-version: 9
+
   jpa:
     hibernate:
       ddl-auto: validate
@@ -45,6 +49,7 @@ app:
   mail:
     enabled: ${MAIL_ENABLED:false}
     from: ${MAIL_FROM:${MAIL_USERNAME:}}
+  base-url: ${BASE_URL:https://poetsanders.vercel.app}
   appointments:
     cleanup-cron: "${APPOINTMENT_CLEANUP_CRON:0 */15 * * * *}"
     time-zone: ${APPOINTMENT_TIME_ZONE:Europe/Amsterdam}

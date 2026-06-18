@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 public class UserUpdateRequest {
 
     @Size(min = 12, max = 30)
-    @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{12,}$")
+    @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[^A-Za-z\\d\\s]).{12,}$")
     private String password;
 
     @Size(max = 255)

@@ -13,14 +13,25 @@ export const nlAuthCopy: Copy["auth"] = {
   fields: {
     email: "E-mailadres",
     password: "Wachtwoord",
+    confirmPassword: "Bevestig wachtwoord",
     name: "Naam",
     phoneNumber: "Telefoonnummer",
   },
   placeholders: {
     email: "Voer uw e-mailadres in",
     password: "Voer uw wachtwoord in",
+    confirmPassword: "Voer uw wachtwoord opnieuw in",
     name: "Voer uw volledige naam in",
     phoneNumber: "Voer uw telefoonnummer in",
+  },
+  validation: {
+    required: "Dit veld is verplicht.",
+    invalidEmail: "Voer een geldig e-mailadres in.",
+    passwordLength: "Het wachtwoord moet 12 tot 30 tekens bevatten.",
+    passwordPattern: "Gebruik hoofdletters, kleine letters, een cijfer en een speciaal teken.",
+    passwordMismatch: "De wachtwoorden komen niet overeen.",
+    nameTooLong: "De naam mag maximaal 255 tekens bevatten.",
+    phoneLength: "Het telefoonnummer moet 8 tot 30 tekens bevatten.",
   },
   consent: {
     prefix: "Door in te loggen gaat u akkoord met onze",

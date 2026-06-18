@@ -6,6 +6,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 import java.util.UUID;
 
-public interface CarPictureRepository extends JpaRepository<CarPicture, Long> {
+public interface CarPictureRepository extends JpaRepository<CarPicture, UUID> {
     List<CarPicture> findByCarId(UUID carId);
 }

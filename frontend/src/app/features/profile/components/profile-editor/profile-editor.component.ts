@@ -15,7 +15,7 @@ import { AuthService } from '../../../../core/auth/auth.service';
 import { I18nService } from '../../../../core/i18/i18n.service';
 import type { AuthUser } from '../../../../core/interfaces/AuthUser';
 
-const passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{12,}$/;
+const passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z\d\s]).{12,}$/;
 
 @Component({
   selector: 'app-profile-editor',

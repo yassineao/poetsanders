@@ -9,6 +9,7 @@ import { nlFormCopy } from "./form";
 import { nlPagesCopy } from "./pages";
 import { nlSellCopy } from "./sell";
 import { nlAuthCopy } from "./auth";
+import { nlProfileCopy } from "./profile";
 
 export const nlCopy: Copy = {
   localeName: nlLocaleCopy,
@@ -20,5 +21,6 @@ export const nlCopy: Copy = {
   form: nlFormCopy,
   sell: nlSellCopy,
   auth: nlAuthCopy,
+  profile: nlProfileCopy,
   pages: nlPagesCopy,
 };

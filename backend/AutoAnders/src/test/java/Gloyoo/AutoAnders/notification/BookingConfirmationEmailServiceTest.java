@@ -27,7 +27,8 @@ class BookingConfirmationEmailServiceTest {
                 new BookingConfirmationEmailService(
                         mailSender,
                         true,
-                        "appointments@poetsanders.nl"
+                        "appointments@poetsanders.nl",
+                        ""
                 );
         User user = User.builder()
                 .name("Jane Customer")
@@ -39,7 +40,7 @@ class BookingConfirmationEmailServiceTest {
                 appointment(user, WashType.Exterior_Treatment, appointmentTime)
         );
 
-        service.sendBookingConfirmation(user, appointments);
+        service.sendBookingConfirmation(user.getName(), user.getEmail(), false,appointments);
 
         ArgumentCaptor<SimpleMailMessage> message =
                 ArgumentCaptor.forClass(SimpleMailMessage.class);
@@ -58,11 +59,14 @@ class BookingConfirmationEmailServiceTest {
     @Test
     void doesNothingWhenMailIsDisabled() {
         JavaMailSender mailSender = mock(JavaMailSender.class);
+        User user = User.builder().email("jane@example.com").build();
         BookingConfirmationEmailService service =
-                new BookingConfirmationEmailService(mailSender, false, "");
+                new BookingConfirmationEmailService(mailSender, false, "","");
 
         service.sendBookingConfirmation(
-                User.builder().email("jane@example.com").build(),
+                user.getName(),
+                user.getEmail(),
+                false,
                 List.of(appointment(
                         User.builder().email("jane@example.com").build(),
                         WashType.Total_Treatment,

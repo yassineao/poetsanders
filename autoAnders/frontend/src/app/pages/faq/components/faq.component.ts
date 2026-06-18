@@ -1,6 +1,6 @@
 import { Component, input } from "@angular/core";
 import { RouterLink } from "@angular/router";
-import type { FaqContent } from "../../core/interfaces/LocaleDictionary";
+import type { FaqContent } from "../../../core/interfaces/LocaleDictionary";
 
 @Component({
   selector: "app-faq",

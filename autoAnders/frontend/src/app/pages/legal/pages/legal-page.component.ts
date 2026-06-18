@@ -2,19 +2,18 @@ import { Component, computed, inject } from "@angular/core";
 import { toSignal } from "@angular/core/rxjs-interop";
 import { ActivatedRoute, RouterLink } from "@angular/router";
 import { map } from "rxjs";
-import { getDictionary, isValidLocale } from "../../core/lib/i18n";
-import type { Locale } from "../../core/interfaces/locale";
-import { CatalogueComponent } from "../catalogue/catalogue.component";
-import { FaqComponent } from "../faq/faq.component";
+import { getDictionary, isValidLocale } from "../../../core/lib/i18n";
+import type { LocaleDictionary } from "../../../core/interfaces/LocaleDictionary";
+import type { Locale } from "../../../core/interfaces/locale";
+
+type PageKey = keyof LocaleDictionary["pages"];
 
 @Component({
-  selector: "app-home",
-  imports: [RouterLink, CatalogueComponent, FaqComponent],
-  templateUrl: "./home.component.html",
+  imports: [RouterLink],
+  templateUrl: "./legal-page.component.html",
 })
-export class HomeComponent {
+export class LegalPageComponent {
   private readonly route = inject(ActivatedRoute);
-
   private readonly localeParam = toSignal(
     (this.route.parent?.paramMap ?? this.route.paramMap).pipe(
       map((params) => params.get("locale") ?? "de"),
@@ -26,7 +25,8 @@ export class HomeComponent {
     const value = this.localeParam();
     return isValidLocale(value) ? value : "de";
   });
-   
-  protected readonly dictionary = computed(() => getDictionary(this.locale()));
-  protected readonly home = computed(() => this.dictionary().home);
+  protected readonly page = computed(() => {
+    const key = (this.route.snapshot.data["page"] ?? "about") as PageKey;
+    return getDictionary(this.locale()).pages[key];
+  });
 }

@@ -5,8 +5,12 @@ import Gloyoo.AutoAnders.Cars.entity.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
 
 public record CarRequest(
+        String brand,
+        String model,
+
         String title,
         String subtitle,
 
@@ -54,5 +58,7 @@ public record CarRequest(
         EnergyLabel energyLabel,
         PaintType paintType,
         Upholstery upholstery,
-        Status status
+        Status status,
+
+        List<CarPictureMetadataRequest> pictures
 ) {}

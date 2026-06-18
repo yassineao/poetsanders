@@ -1,6 +1,7 @@
 package Gloyoo.AutoAnders.config;
 
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -23,6 +24,7 @@ import java.util.List;
 @EnableWebSecurity
 public class SecurityConfig {
 
+    @Value("${app.base-url:http://localhost:8080}") String productionUrl;
     private final JwtAuthFilter jwtAuthFilter;
 
     public SecurityConfig(JwtAuthFilter jwtAuthFilter) {
@@ -103,8 +105,8 @@ public class SecurityConfig {
                 "http://localhost:5173",
                 "https://poetsanders.nl",
                 "https://www.poetsanders.nl",
-                "https://guitar-io.vercel.app",
-                "https://*.vercel.app"
+                "https://poetsanders.vercel.app/",
+                productionUrl
         ));
 
         cfg.setAllowedMethods(List.of(
