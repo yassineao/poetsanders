@@ -109,8 +109,16 @@ export const deSellCopy: Copy["sell"] = {
     { name: "paintType", label: "Lackart", type: "select", options: paintTypeOptions },
     { name: "upholstery", label: "Polsterung", type: "select", options: upholsteryOptions },
     { name: "status", label: "Status", type: "select", options: statusOptions },
+     {
+      name: "pictures",
+      label: "Bilder",
+      type: "file",
+      accept: "image/*",
+      multiple: true,
+      placeholder: "Fahrzeugbilder auswaehlen",
+    },
   ],
-  textarea: { name: "message", label: "Nachricht", rows: 5 },
+  // textarea: { name: "message", label: "Nachricht", rows: 5 },
   submitLabel: "Anfrage senden",
   sendingLabel: "Wird gesendet...",
   popup: {

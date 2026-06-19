@@ -4,6 +4,9 @@ import Gloyoo.AutoAnders.Cars.dto.CarRequest;
 import Gloyoo.AutoAnders.Cars.entity.Car;
 import Gloyoo.AutoAnders.Cars.entity.Status;
 import Gloyoo.AutoAnders.Cars.service.CarService;
+import Gloyoo.AutoAnders.notification.CarManagementEmail;
+import Gloyoo.AutoAnders.user.entity.User;
+import Gloyoo.AutoAnders.user.repository.UserRepository;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
@@ -20,9 +23,17 @@ import java.util.UUID;
 public class CarController {
 
     private final CarService carService;
+    private final UserRepository userRepository;
+    private final CarManagementEmail carManagementEmail;
 
-    public CarController(CarService carService) {
+    public CarController(
+            CarService carService,
+            UserRepository userRepository,
+            CarManagementEmail carManagementEmail
+    ) {
         this.carService = carService;
+        this.userRepository = userRepository;
+        this.carManagementEmail = carManagementEmail;
     }
 
     @PostMapping
@@ -30,7 +41,12 @@ public class CarController {
             @Valid @RequestBody CarRequest carRequest,
             Authentication authentication
     ) {
-        Car savedCar = carService.addCar(carRequest, authenticatedUserId(authentication));
+        UUID userId = authenticatedUserId(authentication);
+        Car savedCar = carService.addCar(carRequest, userId);
+
+        userRepository.findById(userId)
+                .ifPresent(user -> sendCarRequestConfirmation(user, savedCar));
+
         return ResponseEntity.status(HttpStatus.CREATED).body(savedCar);
     }
 
@@ -90,6 +106,14 @@ public class CarController {
         }
 
         return UUID.fromString(uid.toString());
+    }
+
+    private void sendCarRequestConfirmation(User user, Car car) {
+        carManagementEmail.sendCarRequestConfirmation(
+                user.getName(),
+                user.getEmail(),
+                car
+        );
     }
 
     @ExceptionHandler(IllegalArgumentException.class)

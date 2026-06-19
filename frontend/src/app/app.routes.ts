@@ -8,11 +8,15 @@ import { LoginPageComponent } from './features/login/pages/login-page.component'
 import { ProfilePageComponent } from './features/profile/pages/profile-page.component';
 import { ServicesPageComponent } from './features/services/pages/services-page.components';
 import { ServiceDetailPageComponent } from './features/services/pages/service-detail-page.component';
+import { adminGuard } from './guards/admin.guard';
 
 export const routes: Routes = [
   { path: '', component: HomePageComponent },
-  { path: 'admin', component: AdminDashboardPageComponent },
-  { path: 'appointments', component: AppointmentsPageComponent },
+  {
+    path: 'admin',
+    component: AdminDashboardPageComponent,
+    canActivate: [adminGuard],
+  },
   { path: 'book', component: BookingPageComponent },
   { path: 'faq', component: FaqPageComponent },
   { path: 'login', component: LoginPageComponent },

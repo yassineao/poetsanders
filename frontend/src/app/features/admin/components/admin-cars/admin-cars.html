@@ -1,0 +1,233 @@
+<section class="mt-10 overflow-hidden rounded-lg border border-white/10 bg-slate-900/70">
+  <div class="flex flex-col gap-5 border-b border-white/10 p-6 lg:flex-row lg:items-end lg:justify-between">
+    <div>
+      <h2 class="text-2xl font-bold text-white">{{ copy().carsManagementHeading }}</h2>
+      <p class="mt-2 text-sm text-slate-400">{{ copy().carsManagementDescription }}</p>
+    </div>
+
+    <div class="grid w-full gap-3 sm:grid-cols-[1fr_190px] lg:max-w-xl">
+      <label>
+        <span class="sr-only">{{ copy().searchCarsLabel }}</span>
+        <input
+          type="search"
+          [placeholder]="copy().searchCarsLabel"
+          (input)="updateQuery($event)"
+          class="h-11 w-full rounded-lg border border-white/10 bg-slate-950 px-4 text-sm text-white outline-none transition placeholder:text-slate-600 focus:border-cyan-300/50"
+        />
+      </label>
+
+      <label>
+        <span class="sr-only">{{ copy().statusLabel }}</span>
+        <select
+          (change)="updateFilter($event)"
+          class="h-11 w-full rounded-lg border border-white/10 bg-slate-950 px-3 text-sm text-white outline-none focus:border-cyan-300/50"
+        >
+          <option value="all">{{ copy().allCarStatusesLabel }}</option>
+          @for (statusOption of statuses; track statusOption) {
+            <option [value]="statusOption">{{ statusLabel(statusOption) }}</option>
+          }
+        </select>
+      </label>
+    </div>
+  </div>
+
+  @if (updateError()) {
+    <p role="alert" class="m-6 rounded-lg border border-rose-300/20 bg-rose-300/10 p-4 text-sm text-rose-100">
+      {{ copy().carUpdateErrorLabel }}
+    </p>
+  }
+
+  <div class="overflow-x-auto">
+    <table class="w-full min-w-[860px] text-left text-sm">
+      <thead class="bg-slate-950/60 text-xs uppercase text-slate-500">
+        <tr>
+          <th class="px-6 py-4">{{ copy().carLabel }}</th>
+          <th class="px-6 py-4">{{ copy().licensePlateLabel }}</th>
+          <th class="px-6 py-4">{{ copy().yearLabel }}</th>
+          <th class="px-6 py-4">{{ copy().priceLabel }}</th>
+          <th class="px-6 py-4">{{ copy().statusLabel }}</th>
+          <th class="px-6 py-4">{{ copy().actionsLabel }}</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-white/10">
+        @for (car of paginatedCars(); track car.id) {
+          <tr class="transition hover:bg-white/[0.03]">
+            <td class="px-6 py-4">
+              <p class="font-semibold text-white">{{ car.brand }} {{ car.model }}</p>
+              <p class="mt-1 text-xs text-slate-400">{{ car.title || car.referenceNumber || '-' }}</p>
+            </td>
+            <td class="px-6 py-4 font-medium text-slate-300">{{ car.licensePlate || '-' }}</td>
+            <td class="px-6 py-4 text-slate-300">{{ car.yearOfManufacture || '-' }}</td>
+            <td class="px-6 py-4 font-semibold text-cyan-100">{{ formatPrice(car.price) }}</td>
+            <td class="px-6 py-4">
+              <div class="flex items-center gap-3">
+                <select
+                  [value]="car.status"
+                  [disabled]="isUpdating(car.id)"
+                  (change)="updateCarStatus(car, $event)"
+                  class="h-10 min-w-44 rounded-lg border border-white/10 bg-slate-950 px-3 text-sm text-white outline-none focus:border-cyan-300/50 disabled:cursor-wait disabled:opacity-60"
+                >
+                  @for (statusOption of statuses; track statusOption) {
+                    <option [value]="statusOption">{{ statusLabel(statusOption) }}</option>
+                  }
+                </select>
+                @if (isUpdating(car.id)) {
+                  <span class="text-xs text-slate-400">{{ copy().updatingLabel }}</span>
+                }
+              </div>
+            </td>
+            <td class="px-6 py-4">
+              <div class="flex items-center gap-2">
+                <button
+                  type="button"
+                  class="min-h-10 rounded-lg border border-cyan-300/25 bg-cyan-300/10 px-4 text-sm font-semibold text-cyan-100 transition hover:bg-cyan-300/20"
+                  (click)="selectedCar.set(car)"
+                >
+                  {{ copy().detailsLabel }}
+                </button>
+                <button
+                  type="button"
+                  [disabled]="!car.pictures.length"
+                  class="min-h-10 whitespace-nowrap rounded-lg border border-white/10 px-4 text-sm font-semibold text-slate-200 transition hover:bg-white/5 disabled:cursor-not-allowed disabled:opacity-40"
+                  (click)="selectedPicturesCar.set(car)"
+                >
+                  {{ copy().picturesLabel }} ({{ car.pictures.length }})
+                </button>
+              </div>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+
+  @if (!filteredCars().length) {
+    <p class="p-6 text-sm text-slate-400">{{ copy().noCarsLabel }}</p>
+  }
+
+  @if (filteredCars().length) {
+    <div class="flex items-center justify-between gap-4 border-t border-white/10 px-6 py-4">
+      <button
+        type="button"
+        [disabled]="page() === 1"
+        (click)="changePage(-1)"
+        class="rounded-lg border border-white/10 px-4 py-2 text-sm font-semibold text-slate-200 transition hover:bg-white/5 disabled:cursor-not-allowed disabled:opacity-40"
+      >
+        {{ copy().previousLabel }}
+      </button>
+      <span class="text-sm text-slate-400">
+        {{ copy().pageLabel }} {{ page() }} {{ copy().ofLabel }} {{ pageCount() }}
+      </span>
+      <button
+        type="button"
+        [disabled]="page() === pageCount()"
+        (click)="changePage(1)"
+        class="rounded-lg border border-white/10 px-4 py-2 text-sm font-semibold text-slate-200 transition hover:bg-white/5 disabled:cursor-not-allowed disabled:opacity-40"
+      >
+        {{ copy().nextLabel }}
+      </button>
+    </div>
+  }
+</section>
+
+@if (selectedCar(); as car) {
+  <div
+    class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4"
+    role="presentation"
+    (click)="closeDetails()"
+  >
+    <section
+      role="dialog"
+      aria-modal="true"
+      [attr.aria-label]="copy().characteristicsLabel"
+      class="max-h-[92vh] w-full max-w-5xl overflow-y-auto rounded-lg border border-white/10 bg-slate-950 text-slate-100 shadow-2xl"
+      (click)="$event.stopPropagation()"
+    >
+      <header class="sticky top-0 z-10 flex items-start justify-between gap-4 border-b border-white/10 bg-slate-950 px-5 py-4 sm:px-6">
+        <div>
+          <p class="text-xs font-bold uppercase text-cyan-300">{{ copy().characteristicsLabel }}</p>
+          <h2 class="mt-1 text-xl font-bold text-white sm:text-2xl">{{ car.brand }} {{ car.model }}</h2>
+          <p class="mt-1 text-sm text-slate-400">{{ car.licensePlate || car.referenceNumber || '-' }}</p>
+        </div>
+        <button
+          type="button"
+          class="grid h-10 w-10 shrink-0 place-items-center rounded-lg border border-white/10 text-2xl text-slate-300 transition hover:bg-white/5 hover:text-white"
+          [attr.aria-label]="copy().closeLabel"
+          (click)="closeDetails()"
+        >
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </header>
+
+      <div class="p-5 sm:p-6">
+        <section aria-labelledby="car-characteristics-heading">
+          <h3 id="car-characteristics-heading" class="text-base font-bold text-white">
+            {{ copy().characteristicsLabel }}
+          </h3>
+          <dl class="mt-4 grid border-l border-t border-white/10 sm:grid-cols-2 lg:grid-cols-3">
+            @for (item of characteristics(car); track item.label) {
+              <div class="min-w-0 border-b border-r border-white/10 p-4">
+                <dt class="text-xs font-semibold uppercase text-slate-500">{{ item.label }}</dt>
+                <dd class="mt-2 break-words text-sm font-medium text-slate-200">{{ item.value }}</dd>
+              </div>
+            }
+          </dl>
+        </section>
+      </div>
+    </section>
+  </div>
+}
+
+@if (selectedPicturesCar(); as car) {
+  <div
+    class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4"
+    role="presentation"
+    (click)="closePictures()"
+  >
+    <section
+      role="dialog"
+      aria-modal="true"
+      [attr.aria-label]="copy().picturesLabel"
+      class="max-h-[92vh] w-full max-w-6xl overflow-y-auto rounded-lg border border-white/10 bg-slate-950 text-slate-100 shadow-2xl"
+      (click)="$event.stopPropagation()"
+    >
+      <header class="sticky top-0 z-10 flex items-start justify-between gap-4 border-b border-white/10 bg-slate-950 px-5 py-4 sm:px-6">
+        <div>
+          <p class="text-xs font-bold uppercase text-cyan-300">{{ copy().picturesLabel }}</p>
+          <h2 class="mt-1 text-xl font-bold text-white sm:text-2xl">{{ car.brand }} {{ car.model }}</h2>
+          <p class="mt-1 text-sm text-slate-400">{{ car.pictures.length }} {{ copy().picturesLabel }}</p>
+        </div>
+        <button
+          type="button"
+          class="grid h-10 w-10 shrink-0 place-items-center rounded-lg border border-white/10 text-2xl text-slate-300 transition hover:bg-white/5 hover:text-white"
+          [attr.aria-label]="copy().closeLabel"
+          (click)="closePictures()"
+        >
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </header>
+
+      <div class="grid gap-5 p-5 sm:grid-cols-2 sm:p-6 lg:grid-cols-3">
+        @for (picture of car.pictures; track picture.id) {
+          <figure class="overflow-hidden rounded-lg border border-white/10 bg-slate-900">
+            <img
+              [src]="picture.storage_path"
+              [alt]="picture.title || car.brand + ' ' + car.model"
+              class="aspect-[4/3] w-full object-cover"
+            />
+            @if (picture.title || picture.description) {
+              <figcaption class="border-t border-white/10 p-4">
+                @if (picture.title) {
+                  <p class="font-semibold text-white">{{ picture.title }}</p>
+                }
+                @if (picture.description) {
+                  <p class="mt-1 text-sm text-slate-400">{{ picture.description }}</p>
+                }
+              </figcaption>
+            }
+          </figure>
+        }
+      </div>
+    </section>
+  </div>
+}

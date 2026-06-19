@@ -2,10 +2,11 @@ import { writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { config } from 'dotenv';
 
-config({ path: resolve('.env'), quiet: true });
+const { parsed = {} } = config({ path: resolve('.env'), quiet: true });
 
-const apiBaseUrl = (process.env.API_BASE_URL ?? '').replace(/\/+$/, '');
-const dealershipUrl = (process.env.DEALERSHIP_URL ?? '').replace(/\/+$/, '');
+const envValue = (name) => process.env[name]?.trim() || parsed[name]?.trim() || '';
+const apiBaseUrl = (envValue('API_BASE_URL') || envValue('VITE_API_URL')).replace(/\/+$/, '');
+const dealershipUrl = envValue('DEALERSHIP_URL').replace(/\/+$/, '');
 const outputPath = resolve('src/environments/environment.generated.ts');
 const output = `// Generated from .env by scripts/generate-environment.mjs.
 export const environment = {

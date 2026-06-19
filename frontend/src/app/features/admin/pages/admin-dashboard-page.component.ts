@@ -2,14 +2,24 @@ import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, DestroyRef, PLATFORM_ID, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { Router } from '@angular/router';
-import { EMPTY, catchError, finalize, of, switchMap } from 'rxjs';
+import { EMPTY, catchError, finalize } from 'rxjs';
 import { AdminService } from '../../../core/admin/admin.service';
-import { AuthService } from '../../../core/auth/auth.service';
-import type { AdminAppointment, AdminDashboard } from '../../../core/interfaces/admin';
+import { CarsService } from '../../../core/cars/cars.service';
+import type { Car } from '../../../core/interfaces/Car';
+import type {
+  AdminAppointment,
+  AdminDashboard,
+  AdminSection,
+  AdminSidebar,
+} from '../../../core/interfaces/admin';
 import { I18nService } from '../../../core/i18/i18n.service';
 import { AdminAppointmentsComponent } from '../components/admin-appointments/admin-appointments.component';
+import {
+  AdminCarsComponent,
+  type CarStatusChange,
+} from '../components/admin-cars/admin-cars';
 import { AdminDashboardStatsComponent } from '../components/admin-dashboard-stats/admin-dashboard-stats.component';
+import { AdminSidebarComponent } from '../components/admin-sidebar/admin-sidebar';
 import { AdminUsersComponent } from '../components/admin-users/admin-users.component';
 
 @Component({
@@ -18,56 +28,75 @@ import { AdminUsersComponent } from '../components/admin-users/admin-users.compo
   imports: [
     CommonModule,
     AdminAppointmentsComponent,
+    AdminCarsComponent,
     AdminDashboardStatsComponent,
+    AdminSidebarComponent,
     AdminUsersComponent,
   ],
   templateUrl: './admin-dashboard-page.component.html',
 })
 export class AdminDashboardPageComponent {
   private readonly admin = inject(AdminService);
-  private readonly auth = inject(AuthService);
+  private readonly carsService = inject(CarsService);
   private readonly i18n = inject(I18nService);
-  private readonly router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
   private readonly platformId = inject(PLATFORM_ID);
 
   protected readonly copy = computed(() => this.i18n.copy().admin);
+  protected readonly sidebar = computed<AdminSidebar>(() => {
+    const copy = this.i18n.copy();
+
+    return {
+      items: [
+        { name: copy.admin.heading, table: 'overview' },
+        { name: copy.admin.usersHeading, table: 'users' },
+        { name: copy.admin.appointmentsHeading, table: 'appointments' },
+        { name: copy.admin.carsManagementHeading, table: 'cars' },
+      ],
+      logout: copy.profile.logoutLabel,
+    };
+  });
+  protected readonly activeSection = signal<AdminSection>('overview');
   protected readonly loading = signal(true);
   protected readonly hasError = signal(false);
   protected readonly dashboard = signal<AdminDashboard | null>(null);
   protected readonly acceptingIds = signal<string[]>([]);
   protected readonly acceptError = signal(false);
+  protected readonly cars = signal<Car[]>([]);
+  protected readonly updatingCarIds = signal<string[]>([]);
+  protected readonly carUpdateError = signal(false);
 
   constructor() {
-    if (!isPlatformBrowser(this.platformId)) {
-      return;
-    }
-
-    const session = this.auth.currentUser() ? of(this.auth.currentUser()!) : this.auth.me();
-    session
-      .pipe(
-        switchMap((user) => {
-          if (user.role !== 'ADMIN') {
-            void this.router.navigateByUrl('/');
-            return EMPTY;
-          }
-          return this.admin.dashboard();
-        }),
-        catchError((error: HttpErrorResponse) => {
-          if (error.status === 401) {
-            void this.router.navigateByUrl('/login');
-          } else if (error.status === 403) {
-            void this.router.navigateByUrl('/');
-          } else {
-            this.hasError.set(true);
-          }
-          return EMPTY;
-        }),
-        finalize(() => this.loading.set(false)),
-        takeUntilDestroyed(this.destroyRef),
-      )
-      .subscribe((dashboard) => this.dashboard.set(dashboard));
+  if (!isPlatformBrowser(this.platformId)) {
+    return;
   }
+
+  this.admin.dashboard()
+    .pipe(
+      catchError((error: HttpErrorResponse) => {
+        console.error('Loading dashboard failed:', error);
+        this.hasError.set(true);
+        return EMPTY;
+      }),
+      finalize(() => this.loading.set(false)),
+      takeUntilDestroyed(this.destroyRef),
+    )
+    .subscribe((dashboard) => {
+      this.dashboard.set(dashboard);
+    });
+
+  this.carsService
+    .getCars()
+    .pipe(
+      catchError((error: HttpErrorResponse) => {
+        console.error('Loading cars failed:', error);
+        this.hasError.set(true);
+        return EMPTY;
+      }),
+      takeUntilDestroyed(this.destroyRef),
+    )
+    .subscribe((cars) => this.cars.set(cars));
+}
 
   protected acceptAppointment(appointment: AdminAppointment): void {
     if (appointment.accepted || this.isAccepting(appointment.id)) {
@@ -103,6 +132,33 @@ export class AdminDashboardPageComponent {
             ),
           };
         });
+      });
+  }
+
+  protected updateCarStatus(change: CarStatusChange): void {
+    if (this.updatingCarIds().includes(change.car.id)) {
+      return;
+    }
+
+    this.carUpdateError.set(false);
+    this.updatingCarIds.update((ids) => [...ids, change.car.id]);
+
+    this.carsService
+      .updateCarStatus(change.car.id, change.status)
+      .pipe(
+        catchError(() => {
+          this.carUpdateError.set(true);
+          return EMPTY;
+        }),
+        finalize(() =>
+          this.updatingCarIds.update((ids) => ids.filter((id) => id !== change.car.id)),
+        ),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe((updatedCar) => {
+        this.cars.update((cars) =>
+          cars.map((car) => (car.id === updatedCar.id ? { ...car, ...updatedCar } : car)),
+        );
       });
   }
 

@@ -1,34 +1,58 @@
-<main class="min-h-screen bg-slate-950 px-4 py-16 text-slate-100 sm:px-6 lg:px-8 lg:py-24">
-  <div class="mx-auto max-w-7xl">
-    <header class="max-w-3xl">
-      <p class="text-sm font-bold uppercase tracking-[0.22em] text-cyan-300">
-        {{ copy().eyebrow }}
-      </p>
-      <h1 class="mt-4 text-4xl font-bold tracking-tight text-white sm:text-5xl">
-        {{ copy().heading }}
-      </h1>
-      <p class="mt-5 text-lg leading-8 text-slate-300">{{ copy().description }}</p>
-    </header>
+<div class="min-h-screen bg-slate-950 md:flex">
+  <app-admin-sidebar
+    [sidebar]="sidebar()"
+    [activeSection]="activeSection()"
+    (sectionSelected)="activeSection.set($event)"
+  />
 
-    <p *ngIf="loading()" class="mt-10 text-slate-400">{{ copy().loadingLabel }}</p>
+  <main class="min-w-0 flex-1 px-4 py-12 text-slate-100 sm:px-6 lg:px-8 lg:py-16">
+    <div class="mx-auto max-w-7xl">
+      <header id="overview" class="scroll-mt-8 max-w-3xl">
+        <p class="text-sm font-bold uppercase text-cyan-300">
+          {{ copy().eyebrow }}
+        </p>
+        <h1 class="mt-4 text-4xl font-bold text-white sm:text-5xl">
+          {{ copy().heading }}
+        </h1>
+        <p class="mt-5 text-lg leading-8 text-slate-300">{{ copy().description }}</p>
+      </header>
 
-    <div
-      *ngIf="hasError()"
-      role="alert"
-      class="mt-10 rounded-xl border border-rose-300/20 bg-rose-300/10 p-5 text-rose-100"
-    >
-      {{ copy().errorLabel }}
+      <p *ngIf="loading()" class="mt-10 text-slate-400">{{ copy().loadingLabel }}</p>
+
+      <div
+        *ngIf="hasError()"
+        role="alert"
+        class="mt-10 rounded-lg border border-rose-300/20 bg-rose-300/10 p-5 text-rose-100"
+      >
+        {{ copy().errorLabel }}
+      </div>
+
+      <ng-container *ngIf="dashboard() as data">
+        @switch (activeSection()) {
+          @case ('overview') {
+            <app-admin-dashboard-stats [dashboard]="data" />
+          }
+          @case ('users') {
+            <app-admin-users [users]="data.users" />
+          }
+          @case ('appointments') {
+            <app-admin-appointments
+              [appointments]="data.appointments"
+              [acceptingIds]="acceptingIds()"
+              [acceptError]="acceptError()"
+              (appointmentAccepted)="acceptAppointment($event)"
+            />
+          }
+          @case ('cars') {
+            <app-admin-cars
+              [cars]="cars()"
+              [updatingIds]="updatingCarIds()"
+              [updateError]="carUpdateError()"
+              (statusChanged)="updateCarStatus($event)"
+            />
+          }
+        }
+      </ng-container>
     </div>
-
-    <ng-container *ngIf="dashboard() as data">
-      <app-admin-dashboard-stats [dashboard]="data" />
-      <app-admin-users [users]="data.users" />
-      <app-admin-appointments
-        [appointments]="data.appointments"
-        [acceptingIds]="acceptingIds()"
-        [acceptError]="acceptError()"
-        (appointmentAccepted)="acceptAppointment($event)"
-      />
-    </ng-container>
-  </div>
-</main>
+  </main>
+</div>

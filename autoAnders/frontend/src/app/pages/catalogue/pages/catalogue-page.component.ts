@@ -2,7 +2,7 @@ import { isPlatformBrowser } from "@angular/common";
 import { Component, PLATFORM_ID, computed, inject } from "@angular/core";
 import { toSignal } from "@angular/core/rxjs-interop";
 import { ActivatedRoute } from "@angular/router";
-import { catchError, map, of, startWith, type Observable } from "rxjs";
+import { catchError, forkJoin, map, of, startWith, switchMap, type Observable } from "rxjs";
 import { getDictionary, isValidLocale } from "../../../core/lib/i18n";
 import type { Locale } from "../../../core/interfaces/locale";
 import { CatalogueComponent } from "../components/catalogue.component";
@@ -33,6 +33,27 @@ export class CataloguePageComponent {
     this.carsSource$
       .pipe(
         startWith(null),
+        switchMap((cars) => {
+          if (cars === null) {
+            return of(null);
+          }
+
+          if (cars.length === 0) {
+            return of([] as Car[]);
+          }
+
+          return forkJoin(
+            cars.map((car) =>
+              this.carsService.getCarPictures(car.id).pipe(
+                map((pictures) => ({ ...car, pictures })),
+                catchError((error) => {
+                  console.error(`Loading pictures for car ${car.id} failed:`, error);
+                  return of({ ...car, pictures: [] });
+                }),
+              ),
+            ),
+          );
+        }),
         catchError((error) => {
           console.error("Loading cars failed:", error);
           return of([] as Car[]);

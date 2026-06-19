@@ -107,12 +107,7 @@ enum PaintType {
     PEARL,
     MATTE
 }
-enum CarStatus {
-    Available,
-    Pending_Confirmation,
-    Booked,
-    Cancelled,
-}
+export type CarStatus = 'Available' | 'Pending_Confirmation' | 'Booked' | 'Cancelled';
 enum Transmission {
     Automatic,
     Manual,

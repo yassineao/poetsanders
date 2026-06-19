@@ -68,4 +68,35 @@ export interface AdminCopy {
   ofLabel: string;
   noUsersLabel: string;
   noAppointmentsLabel: string;
+  carsManagementHeading: string;
+  carsManagementDescription: string;
+  searchCarsLabel: string;
+  carLabel: string;
+  licensePlateLabel: string;
+  yearLabel: string;
+  priceLabel: string;
+  allCarStatusesLabel: string;
+  availableLabel: string;
+  bookedLabel: string;
+  cancelledLabel: string;
+  updatingLabel: string;
+  carUpdateErrorLabel: string;
+  noCarsLabel: string;
+  detailsLabel: string;
+  closeLabel: string;
+  characteristicsLabel: string;
+  picturesLabel: string;
+}
+
+export interface AdminSidebar{
+  items: AdminSidebarItems[];
+  logout: string;
+
+}
+
+export type AdminSection = 'overview' | 'users' | 'appointments' | 'cars';
+
+export interface AdminSidebarItems{
+  name: string;
+  table: AdminSection;
 }
