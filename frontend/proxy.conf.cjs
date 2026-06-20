@@ -1,16 +1,20 @@
 const { resolve } = require('node:path');
 const { config } = require('dotenv');
 
-config({ path: resolve(__dirname, '.env'), quiet: true });
+const { parsed = {} } = config({ path: resolve(__dirname, '.env'), quiet: true });
+
+const proxyTarget = process.env.API_PROXY_TARGET?.trim()
+  || parsed.API_PROXY_TARGET?.trim()
+  || 'http://localhost:8080';
 
 module.exports = {
   '/auth': {
-    target: process.env.API_PROXY_TARGET || 'http://localhost:8080',
+    target: proxyTarget,
     secure: false,
     changeOrigin: true,
   },
   '/wash_calendar': {
-    target: process.env.API_PROXY_TARGET || 'http://localhost:8080',
+    target: proxyTarget,
     secure: false,
     changeOrigin: true,
   },

@@ -66,6 +66,7 @@ export const nlSellCopy: Copy["sell"] = {
     // { name: "phone", label: "Telefoon", type: "tel" },
     { name: "brand", label: "Merk", type: "text", required: true },
     { name: "model", label: "Model", type: "text", required: true },
+    
     { name: "title", label: "Titel", type: "text" },
     { name: "subtitle", label: "Subtitel", type: "text" },
     { name: "yearOfManufacture", label: "Bouwjaar", type: "number" },
@@ -109,8 +110,17 @@ export const nlSellCopy: Copy["sell"] = {
     { name: "paintType", label: "Laksoort", type: "select", options: paintTypeOptions },
     { name: "upholstery", label: "Bekleding", type: "select", options: upholsteryOptions },
     { name: "status", label: "Status", type: "select", options: statusOptions },
+
+    {
+      name: "pictures",
+      label: "Afbeeldingen",
+      type: "file",
+      accept: "image/*",
+      multiple: true,
+      placeholder: "Kies voertuigfotos",
+    },
   ],
-  textarea: { name: "message", label: "Bericht", rows: 5 },
+  // textarea: { name: "message", label: "Bericht", rows: 5 },
   submitLabel: "Aanvraag versturen",
   sendingLabel: "Wordt verstuurd...",
   popup: {

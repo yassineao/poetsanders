@@ -14,6 +14,7 @@ import type { LoginCredentials } from "../../../core/interfaces/loginCridentials
 import { createAuthFormContent } from "../components/auth-form-content";
 import { RegisterCredentials } from "../../../core/interfaces/registerCredentials";
 import { createCredentials } from "../components/auth-form-submit";
+import { log } from "console";
 
 @Component({
     selector: "app-auth",
@@ -46,6 +47,7 @@ export class AuthPageComponent {
     protected readonly sending = signal(false);
     protected readonly sent = signal(false);
     protected readonly failed = signal(false);
+    protected readonly sent_Url = signal("/");
 
     protected submit(submission: FormSubmission): void {
         const credentials = createCredentials(submission, this.registring());
@@ -61,6 +63,12 @@ export class AuthPageComponent {
             request$
                 .pipe(
                     finalize(() => this.sending.set(false)),
+                    map((user) => {
+                        if(user.role === "ADMIN"){
+                             window.location.href = 'https://poetsanders.vercel.app/admin';
+                        }
+                     
+                    })
                 )
                 .subscribe({
                     next: () => {
@@ -68,6 +76,7 @@ export class AuthPageComponent {
                         this.sent.set(true);
                         this.failed.set(false);
                         submission.form.resetForm();
+                        
                     },
                     error: (error) => {
                         console.error(

@@ -1,4 +1,5 @@
 import type { WashType } from '../booking/booking.service';
+import type { Car, CarStatus } from './Car';
 
 export interface AdminUser {
   id: string;
@@ -8,6 +9,12 @@ export interface AdminUser {
   role: 'USER' | 'ADMIN';
   createdAt: string;
   updatedAt: string;
+}
+
+export type AdminUserUpdate = Pick<AdminUser, 'name' | 'email' | 'phoneNumber' | 'role'>;
+
+export interface AdminUserCreate extends AdminUserUpdate {
+  password: string;
 }
 
 export interface AdminAppointment {
@@ -68,4 +75,62 @@ export interface AdminCopy {
   ofLabel: string;
   noUsersLabel: string;
   noAppointmentsLabel: string;
+  carsManagementHeading: string;
+  carsManagementDescription: string;
+  searchCarsLabel: string;
+  carLabel: string;
+  licensePlateLabel: string;
+  yearLabel: string;
+  priceLabel: string;
+  allCarStatusesLabel: string;
+  availableLabel: string;
+  bookedLabel: string;
+  cancelledLabel: string;
+  updatingLabel: string;
+  carUpdateErrorLabel: string;
+  noCarsLabel: string;
+  detailsLabel: string;
+  closeLabel: string;
+  characteristicsLabel: string;
+  picturesLabel: string;
+  editLabel: string;
+  saveLabel: string;
+  cancelLabel: string;
+  savingLabel: string;
+  userUpdateErrorLabel: string;
+  addCarLabel: string;
+  carCreateErrorLabel: string;
+}
+
+export interface AdminSidebar{
+  items: AdminSidebarItems[];
+  logout: string;
+
+}
+
+export type AdminAppointmentUpdate = Pick<
+  AdminAppointment,
+  'washType' | 'localDateTime' | 'accepted'
+>;
+
+export type AdminCarUpdate = Pick<
+  Car,
+  | 'brand'
+  | 'model'
+  | 'title'
+  | 'licensePlate'
+  | 'yearOfManufacture'
+  | 'mileage'
+  | 'price'
+  | 'colour'
+  | 'location'
+> & { status: CarStatus };
+
+export type AdminCarCreate = AdminCarUpdate;
+
+export type AdminSection = 'overview' | 'users' | 'appointments' | 'cars';
+
+export interface AdminSidebarItems{
+  name: string;
+  table: AdminSection;
 }

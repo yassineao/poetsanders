@@ -1,14 +1,25 @@
 import { Component, computed, inject, signal } from "@angular/core";
 import { ActivatedRoute } from "@angular/router";
 import { toSignal } from "@angular/core/rxjs-interop";
-import { finalize, map } from "rxjs";
+import { finalize, map, of, switchMap } from "rxjs";
 import { getDictionary, isValidLocale } from "../../../core/lib/i18n";
 import type { Locale } from "../../../core/interfaces/locale";
 import {
     FormPageComponent,
     type FormSubmission,
 } from "../../../shared/form/form-page.component";
-import { CarsService, type CarRequest } from "../../../core/cars/cars.service";
+import {
+    CarsService,
+
+} from "../../../core/cars/cars.service";
+
+import { 
+    type Car,
+    type CarPicture ,
+    type CarPictureRequest,
+    type CarRequest  } from "../../../core/interfaces/Car"
+
+
 
 @Component({
     imports: [FormPageComponent],
@@ -21,7 +32,24 @@ import { CarsService, type CarRequest } from "../../../core/cars/cars.service";
             [failed]="failed()"
             (submitted)="submit($event)"
             (successClosed)="sent.set(false)"
+            (failureClosed)="failed.set(false)"
         />
+
+        @if (uploadedPictures().length > 0) {
+            <section class="bg-zinc-950 px-4 pb-16 text-white sm:px-6">
+                <div class="mx-auto max-w-7xl rounded-2xl border border-white/10 bg-zinc-900 p-5">
+                    <h2 class="text-lg font-black">Uploaded pictures</h2>
+                    <div class="mt-4 space-y-2">
+                        @for (picture of uploadedPictures(); track picture.id) {
+                            <div class="rounded-xl border border-white/10 bg-zinc-950 px-4 py-3 text-sm">
+                                <p class="font-bold text-zinc-200">{{ picture.title || picture.id }}</p>
+                                <p class="mt-1 break-all text-xs text-zinc-500">{{ picture.storage_path }}</p>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </section>
+        }
     `,
 })
 export class SellPageComponent {
@@ -47,14 +75,34 @@ export class SellPageComponent {
     protected readonly failed = signal(false);
     protected readonly sending = signal(false);
     protected readonly sent = signal(false);
+    protected readonly uploadedPictures = signal<CarPicture[]>([]);
 
     protected submit(submission: FormSubmission): void {
         this.sent.set(false);
         this.failed.set(false);
+        this.uploadedPictures.set([]);
         this.sending.set(true);
 
-        this.carsService.addCar(this.toCarRequest(submission))
-            .pipe(finalize(() => this.sending.set(false)))
+        const pictures = this.toPictureRequests(submission.values["pictures"]);
+
+        this.carsService.AddCar(this.toCarRequest(submission))
+            .pipe(
+                switchMap((car) => {
+                    if (pictures.length === 0) {
+                        return of(car);
+                    }
+
+                    return this.carsService
+                        .addCarPictures(car.id, pictures)
+                        .pipe(
+                            map((uploadedPictures) => {
+                                this.uploadedPictures.set(uploadedPictures);
+                                return car;
+                            }),
+                        );
+                }),
+                finalize(() => this.sending.set(false)),
+            )
             .subscribe({
                 next: () => {
                     this.sent.set(true);
@@ -65,6 +113,24 @@ export class SellPageComponent {
                     this.failed.set(true);
                 },
             });
+    }
+
+    private toPictureRequests(value: unknown): CarPictureRequest[] {
+        const files = Array.isArray(value)
+            ? value
+            : value instanceof File
+              ? [value]
+              : [];
+
+        return files
+            .filter((file): file is File => file instanceof File)
+            .map((file) => ({
+                file,
+                title: file.name,
+                description: file.name,
+                width: 0,
+                height: 0,
+            }));
     }
 
     private toCarRequest(submission: FormSubmission): CarRequest {

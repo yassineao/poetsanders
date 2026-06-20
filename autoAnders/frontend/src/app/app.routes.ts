@@ -9,6 +9,7 @@ import { LocaleShellComponent } from "./shared/locale-shell/locale-shell.compone
 import { ContactPageComponent } from "./pages/contact/pages/contact-page.component";
 import { AuthPageComponent } from "./pages/auth/pages/auth-page.component";
 import { ProfileForm } from "./pages/profile/components/profile.form";
+import { authGuard } from "./guards/auth.guard";
 
 export const routes: Routes = [
   { path: "", pathMatch: "full", redirectTo: "de" },
@@ -19,7 +20,10 @@ export const routes: Routes = [
       { path: "", component: HomeComponent },
       { path: "Catalogue", component: CataloguePageComponent },
       { path: "catalogue", redirectTo: "Catalogue" },
-      { path: "Sell", component: SellPageComponent },
+      {
+        path: "Sell", component: SellPageComponent,
+        canActivate: [authGuard],
+      },
       { path: "sell", redirectTo: "Sell" },
       { path: "faq", component: FaqPageComponent },
       { path: "form", component: ContactPageComponent },

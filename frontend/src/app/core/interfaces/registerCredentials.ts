@@ -7,3 +7,14 @@ export interface RegisterCredentials {
   phoneNumber: string;
   
 }
+
+
+
+export interface RegisterCredentialsAdmin {
+  email: string;
+  password: string;
+  name: string;
+  phoneNumber: string;
+  role: string
+  
+}

@@ -51,13 +51,15 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/wash_calendar/date/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.POST, "/wash_calendar/accept/**").hasRole("ADMIN")
 
-                        // Car management: only ADMIN
-                        .requestMatchers(HttpMethod.POST, "/cars/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.PUT, "/cars/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.PATCH, "/cars/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.DELETE, "/cars/**").hasRole("ADMIN")
+                        // Car status management: only ADMIN
+                        .requestMatchers(HttpMethod.PATCH, "/cars/statusUpdate/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/cars/statusUpdate/**").hasRole("ADMIN")
 
-                        // Public car reading
+                        // Authenticated car submission
+                        .requestMatchers(HttpMethod.POST, "/cars").authenticated()
+
+                        // Public car endpoints
+                        .requestMatchers(HttpMethod.GET, "/cars").permitAll()
                         .requestMatchers(HttpMethod.GET, "/cars/**").permitAll()
 
                         // Everything else needs login
@@ -105,7 +107,7 @@ public class SecurityConfig {
                 "http://localhost:5173",
                 "https://poetsanders.nl",
                 "https://www.poetsanders.nl",
-                "https://poetsanders.vercel.app/",
+                "https://poetsanders.vercel.app",
                 productionUrl
         ));
 

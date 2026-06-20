@@ -98,8 +98,16 @@ export const enSellCopy: Copy["sell"] = {
     { name: "paintType", label: "Paint type", type: "select", options: paintTypeOptions },
     { name: "upholstery", label: "Upholstery", type: "select", options: upholsteryOptions },
     { name: "status", label: "Status", type: "select", options: statusOptions },
+     {
+      name: "pictures",
+      label: "Pictures",
+      type: "file",
+      accept: "image/*",
+      multiple: true,
+      placeholder: "Choose car pictures",
+    },
   ],
-  textarea: { name: "message", label: "Message", rows: 5 },
+  // textarea: { name: "message", label: "Message", rows: 5 },
   submitLabel: "Send request",
   sendingLabel: "Sending...",
   popup: {

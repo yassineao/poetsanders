@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable, inject, signal } from '@angular/core';
 import { Observable, tap } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { Car, CarPicture , CarPictureRequest , CarRequest  } from '../interfaces/Car';
+import { Car, CarPicture , CarPictureRequest , CarRequest} from "../interfaces/Car"
 
 
 

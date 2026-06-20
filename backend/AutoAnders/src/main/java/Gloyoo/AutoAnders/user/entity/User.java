@@ -2,6 +2,7 @@ package Gloyoo.AutoAnders.user.entity;
 
 import Gloyoo.AutoAnders.Cars.entity.Car;
 import Gloyoo.AutoAnders.washCalendar.entity.WashCalendar;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -29,6 +30,7 @@ public class User {
     private String name;
 
     @Column(nullable = false)
+    @JsonIgnore
     private String password;
 
     @Column(name = "phone_number")
@@ -46,10 +48,12 @@ public class User {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
+    @JsonIgnore
     private List<Car> cars = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
+    @JsonIgnore
     private List<WashCalendar> washCalendars = new ArrayList<>();
 
     @PrePersist

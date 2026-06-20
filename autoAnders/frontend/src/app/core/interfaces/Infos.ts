@@ -44,6 +44,8 @@ export interface FormField {
   name: string;
   label: string;
   type: string;
+  accept?: string;
+  multiple?: boolean;
   options?: {
     label: string;
     value: string;
@@ -81,6 +83,12 @@ export interface FormPageContent {
   submitLabel: string;
   sendingLabel: string;
   popup: Infos["popup"];
+  pagination?: {
+    previousLabel: string;
+    nextLabel: string;
+    pageLabel: string;
+    ofLabel: string;
+  };
   testimonial?: Infos["testimonial"];
   registerAuth?: {
     message: string;

@@ -2,6 +2,7 @@ package Gloyoo.AutoAnders.Cars.entity;
 
 import Gloyoo.AutoAnders.CarPictures.entity.CarPicture;
 import Gloyoo.AutoAnders.user.entity.User;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -102,6 +103,7 @@ public class Car {
 
         @ManyToOne(fetch = FetchType.LAZY)
         @JoinColumn(name = "user_id", nullable = false)
+        @JsonIgnore
         private User user;
 
         @OneToMany(mappedBy = "car", cascade = CascadeType.ALL, orphanRemoval = true)
