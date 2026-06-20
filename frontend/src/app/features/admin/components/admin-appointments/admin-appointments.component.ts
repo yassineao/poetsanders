@@ -1,5 +1,19 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Output, computed, inject, input, signal } from '@angular/core';
+import {
+  Component,
+  DestroyRef,
+  EventEmitter,
+  Output,
+  computed,
+  inject,
+  input,
+  output,
+  signal,
+} from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { FormsModule } from '@angular/forms';
+import { finalize } from 'rxjs';
+import { AdminService } from '../../../../core/admin/admin.service';
 import { I18nService } from '../../../../core/i18/i18n.service';
 import type { AdminAppointment } from '../../../../core/interfaces/admin';
 import type { WashType } from '../../../../core/booking/booking.service';
@@ -18,7 +32,7 @@ const treatmentSlugByWashType: Record<WashType, string> = {
 @Component({
   selector: 'app-admin-appointments',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './admin-appointments.component.html',
 })
 export class AdminAppointmentsComponent {
@@ -26,12 +40,19 @@ export class AdminAppointmentsComponent {
   readonly acceptingIds = input<string[]>([]);
   readonly acceptError = input(false);
   @Output() readonly appointmentAccepted = new EventEmitter<AdminAppointment>();
+  readonly appointmentUpdated = output<AdminAppointment>();
 
+  private readonly admin = inject(AdminService);
   private readonly i18n = inject(I18nService);
+  private readonly destroyRef = inject(DestroyRef);
   protected readonly copy = computed(() => this.i18n.copy().admin);
   protected readonly query = signal('');
   protected readonly status = signal<AppointmentStatusFilter>('all');
   protected readonly page = signal(1);
+  protected readonly editingAppointment = signal<AdminAppointment | null>(null);
+  protected readonly savingEdit = signal(false);
+  protected readonly editError = signal(false);
+  protected readonly washTypes = Object.keys(treatmentSlugByWashType) as WashType[];
 
   protected readonly filteredAppointments = computed(() => {
     const query = this.query().trim().toLowerCase();
@@ -82,6 +103,48 @@ export class AdminAppointmentsComponent {
 
   protected isAccepting(id: string): boolean {
     return this.acceptingIds().includes(id);
+  }
+
+  protected startEditing(appointment: AdminAppointment): void {
+    this.editError.set(false);
+    this.editingAppointment.set({
+      ...appointment,
+      localDateTime: appointment.localDateTime.slice(0, 16),
+    });
+  }
+
+  protected cancelEditing(): void {
+    if (!this.savingEdit()) {
+      this.editingAppointment.set(null);
+      this.editError.set(false);
+    }
+  }
+
+  protected saveAppointment(): void {
+    const appointment = this.editingAppointment();
+    if (!appointment || this.savingEdit() || !appointment.localDateTime) {
+      return;
+    }
+
+    this.savingEdit.set(true);
+    this.editError.set(false);
+    this.admin
+      .updateAppointment(appointment.id, {
+        washType: appointment.washType,
+        localDateTime: appointment.localDateTime,
+        accepted: appointment.accepted,
+      })
+      .pipe(
+        finalize(() => this.savingEdit.set(false)),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe({
+        next: (updated) => {
+          this.appointmentUpdated.emit(updated);
+          this.cancelEditing();
+        },
+        error: () => this.editError.set(true),
+      });
   }
 
   protected treatmentName(washType: WashType): string {

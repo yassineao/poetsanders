@@ -33,7 +33,11 @@
             <app-admin-dashboard-stats [dashboard]="data" />
           }
           @case ('users') {
-            <app-admin-users [users]="data.users" />
+            <app-admin-users
+              [users]="data.users"
+              (userUpdated)="updateUser($event)"
+              (userCreated)="addUser($event)"
+            />
           }
           @case ('appointments') {
             <app-admin-appointments
@@ -41,6 +45,7 @@
               [acceptingIds]="acceptingIds()"
               [acceptError]="acceptError()"
               (appointmentAccepted)="acceptAppointment($event)"
+              (appointmentUpdated)="updateAppointment($event)"
             />
           }
           @case ('cars') {
@@ -49,6 +54,8 @@
               [updatingIds]="updatingCarIds()"
               [updateError]="carUpdateError()"
               (statusChanged)="updateCarStatus($event)"
+              (carUpdated)="updateCar($event)"
+              (carCreated)="addCar($event)"
             />
           }
         }

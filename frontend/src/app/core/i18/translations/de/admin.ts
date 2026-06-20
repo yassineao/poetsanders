@@ -56,4 +56,11 @@ export const deAdminCopy: AdminCopy = {
   closeLabel: 'Schließen',
   characteristicsLabel: 'Merkmale',
   picturesLabel: 'Bilder',
+  editLabel: 'Bearbeiten',
+  saveLabel: 'Speichern',
+  cancelLabel: 'Abbrechen',
+  savingLabel: 'Wird gespeichert...',
+  userUpdateErrorLabel: 'Der Benutzer konnte nicht aktualisiert werden.',
+  addCarLabel: 'Fahrzeug hinzufügen',
+  carCreateErrorLabel: 'Das Fahrzeug konnte nicht erstellt werden.',
 };

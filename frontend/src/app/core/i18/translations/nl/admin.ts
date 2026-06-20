@@ -56,4 +56,11 @@ export const nlAdminCopy: AdminCopy = {
   closeLabel: 'Sluiten',
   characteristicsLabel: 'Kenmerken',
   picturesLabel: "Foto's",
+  editLabel: 'Bewerken',
+  saveLabel: 'Opslaan',
+  cancelLabel: 'Annuleren',
+  savingLabel: 'Opslaan...',
+  userUpdateErrorLabel: 'De gebruiker kon niet worden bijgewerkt.',
+  addCarLabel: 'Auto toevoegen',
+  carCreateErrorLabel: 'De auto kon niet worden aangemaakt.',
 };

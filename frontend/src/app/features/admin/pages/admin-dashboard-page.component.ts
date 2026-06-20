@@ -11,6 +11,7 @@ import type {
   AdminDashboard,
   AdminSection,
   AdminSidebar,
+  AdminUser,
 } from '../../../core/interfaces/admin';
 import { I18nService } from '../../../core/i18/i18n.service';
 import { AdminAppointmentsComponent } from '../components/admin-appointments/admin-appointments.component';
@@ -135,6 +136,26 @@ export class AdminDashboardPageComponent {
       });
   }
 
+  protected updateAppointment(updatedAppointment: AdminAppointment): void {
+    this.dashboard.update((dashboard) => {
+      if (!dashboard) {
+        return dashboard;
+      }
+
+      const appointments = dashboard.appointments.map((appointment) =>
+        appointment.id === updatedAppointment.id ? updatedAppointment : appointment,
+      );
+      const acceptedAppointments = appointments.filter((appointment) => appointment.accepted).length;
+
+      return {
+        ...dashboard,
+        appointments,
+        acceptedAppointments,
+        pendingAppointments: appointments.length - acceptedAppointments,
+      };
+    });
+  }
+
   protected updateCarStatus(change: CarStatusChange): void {
     if (this.updatingCarIds().includes(change.car.id)) {
       return;
@@ -160,6 +181,41 @@ export class AdminDashboardPageComponent {
           cars.map((car) => (car.id === updatedCar.id ? { ...car, ...updatedCar } : car)),
         );
       });
+  }
+
+  protected updateCar(updatedCar: Car): void {
+    this.cars.update((cars) =>
+      cars.map((car) => (car.id === updatedCar.id ? { ...car, ...updatedCar } : car)),
+    );
+  }
+
+  protected addCar(createdCar: Car): void {
+    this.cars.update((cars) => [createdCar, ...cars]);
+  }
+
+  protected updateUser(updatedUser: AdminUser): void {
+    this.dashboard.update((dashboard) =>
+      dashboard
+        ? {
+            ...dashboard,
+            users: dashboard.users.map((user) =>
+              user.id === updatedUser.id ? updatedUser : user,
+            ),
+          }
+        : dashboard,
+    );
+  }
+
+  protected addUser(createdUser: AdminUser): void {
+    this.dashboard.update((dashboard) =>
+      dashboard
+        ? {
+            ...dashboard,
+            totalUsers: dashboard.totalUsers + 1,
+            users: [createdUser, ...dashboard.users],
+          }
+        : dashboard,
+    );
   }
 
   private isAccepting(id: string): boolean {

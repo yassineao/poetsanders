@@ -1,30 +1,24 @@
-import { CanActivateFn, Router } from "@angular/router";
+import { CanMatchFn, Router } from '@angular/router';
 import { AuthService } from "../core/auth/auth.service";
 import { inject } from "@angular/core";
-import { catchError, map, of } from "rxjs";
-import { HttpErrorResponse } from "@angular/common/http";
+import { catchError, map, of } from 'rxjs';
 
-export const adminGuard: CanActivateFn = (_route, state) => {
+export const adminGuard: CanMatchFn = (_route, segments) => {
   const auth = inject(AuthService);
   const router = inject(Router);
+  const returnUrl = `/${segments.map((segment) => segment.path).join('/')}`;
 
   const redirect = (url: string) =>
     router.createUrlTree([url], {
-      queryParams: { returnUrl: state.url },
+      queryParams: { returnUrl },
     });
 
-  const user$ = auth.currentUser()
-    ? of(auth.currentUser()!)
-    : auth.me();
-
-  return user$.pipe(
+  return auth.me().pipe(
     map((user) =>
-      user.role === 'ADMIN'
+      String(user.role).toUpperCase() === 'ADMIN'
         ? true
         : redirect('/'),
     ),
-    catchError((error: HttpErrorResponse) =>
-      of(redirect(error.status === 401 ? '/login' : '/')),
-    ),
+    catchError(() => of(redirect('/login'))),
   );
 };

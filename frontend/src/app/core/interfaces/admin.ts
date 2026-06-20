@@ -1,4 +1,5 @@
 import type { WashType } from '../booking/booking.service';
+import type { Car, CarStatus } from './Car';
 
 export interface AdminUser {
   id: string;
@@ -8,6 +9,12 @@ export interface AdminUser {
   role: 'USER' | 'ADMIN';
   createdAt: string;
   updatedAt: string;
+}
+
+export type AdminUserUpdate = Pick<AdminUser, 'name' | 'email' | 'phoneNumber' | 'role'>;
+
+export interface AdminUserCreate extends AdminUserUpdate {
+  password: string;
 }
 
 export interface AdminAppointment {
@@ -86,6 +93,13 @@ export interface AdminCopy {
   closeLabel: string;
   characteristicsLabel: string;
   picturesLabel: string;
+  editLabel: string;
+  saveLabel: string;
+  cancelLabel: string;
+  savingLabel: string;
+  userUpdateErrorLabel: string;
+  addCarLabel: string;
+  carCreateErrorLabel: string;
 }
 
 export interface AdminSidebar{
@@ -93,6 +107,26 @@ export interface AdminSidebar{
   logout: string;
 
 }
+
+export type AdminAppointmentUpdate = Pick<
+  AdminAppointment,
+  'washType' | 'localDateTime' | 'accepted'
+>;
+
+export type AdminCarUpdate = Pick<
+  Car,
+  | 'brand'
+  | 'model'
+  | 'title'
+  | 'licensePlate'
+  | 'yearOfManufacture'
+  | 'mileage'
+  | 'price'
+  | 'colour'
+  | 'location'
+> & { status: CarStatus };
+
+export type AdminCarCreate = AdminCarUpdate;
 
 export type AdminSection = 'overview' | 'users' | 'appointments' | 'cars';
 

@@ -60,65 +60,14 @@ export interface Car {
     pictures: CarPicture[];
 }
 
-enum BodyType {
-    MPV,
-    SUV,
-    SEDAN,
-    HATCHBACK,
-    STATION_WAGON,
-    COUPE,
-    CABRIOLET,
-    VAN
-}
-
-enum EmissionClass {
-    EURO_1,
-    EURO_2,
-    EURO_3,
-    EURO_4,
-    EURO_5,
-    EURO_6
-}
-enum EnergyLabel {
-    A,
-    B,
-    C,
-    D,
-    E,
-    F,
-    G
-}
-enum Fuel {
-    PETROL,
-    DIESEL,
-    ELECTRIC,
-    HYBRID,
-    LPG,
-    CNG
-}
-enum Gearbox {
-    MANUAL,
-    AUTOMATIC,
-    SEMI_AUTOMATIC
-}
-enum PaintType {
-    BASIC,
-    METALLIC,
-    PEARL,
-    MATTE
-}
+export type BodyType = 'MPV' | 'SUV' | 'SEDAN' | 'HATCHBACK' | 'STATION_WAGON' | 'COUPE' | 'CABRIOLET' | 'VAN';
+export type EmissionClass = 'EURO_1' | 'EURO_2' | 'EURO_3' | 'EURO_4' | 'EURO_5' | 'EURO_6';
+export type EnergyLabel = 'A' | 'B' | 'C' | 'D' | 'E' | 'F' | 'G';
+export type Fuel = 'PETROL' | 'DIESEL' | 'ELECTRIC' | 'HYBRID' | 'LPG' | 'CNG';
+export type Gearbox = 'MANUAL' | 'AUTOMATIC' | 'SEMI_AUTOMATIC';
+export type PaintType = 'BASIC' | 'METALLIC' | 'PEARL' | 'MATTE';
 export type CarStatus = 'Available' | 'Pending_Confirmation' | 'Booked' | 'Cancelled';
-enum Transmission {
-    Automatic,
-    Manual,
-    Semi_Automatic
-}
-enum Upholstery {
-    FABRIC,
-    LEATHER,
-    PART_LEATHER,
-    ALCANTARA
-}
+export type Upholstery = 'FABRIC' | 'LEATHER' | 'PART_LEATHER' | 'ALCANTARA';
 
 export interface CarPicture {
     id: string;

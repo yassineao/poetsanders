@@ -1,5 +1,4 @@
 import { Routes } from '@angular/router';
-import { AdminDashboardPageComponent } from './features/admin/pages/admin-dashboard-page.component';
 import { AppointmentsPageComponent } from './features/appointments/pages/appointments-page.component';
 import { BookingPageComponent } from './features/form/page/booking-page';
 import { FaqPageComponent } from './features/faq/pages/faq-page.component';
@@ -14,8 +13,11 @@ export const routes: Routes = [
   { path: '', component: HomePageComponent },
   {
     path: 'admin',
-    component: AdminDashboardPageComponent,
-    canActivate: [adminGuard],
+    canMatch: [adminGuard],
+    loadComponent: () =>
+      import('./features/admin/pages/admin-dashboard-page.component').then(
+        (module) => module.AdminDashboardPageComponent,
+      ),
   },
   { path: 'book', component: BookingPageComponent },
   { path: 'faq', component: FaqPageComponent },
