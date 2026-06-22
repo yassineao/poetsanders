@@ -91,7 +91,13 @@ public class CarPictureService {
     }
 
     public List<CarPicture> getAllCarPicturesByCarId(UUID carId ) {
-        return carPictureRepository.findByCarId(carId);
+        return carPictureRepository.findByCarId(carId).stream()
+                .peek(this::resolvePictureUrl)
+                .toList();
+    }
+
+    private void resolvePictureUrl(CarPicture picture) {
+        picture.setStorage_path(storageService.resolvePublicUrl(picture.getStorage_path()));
     }
 
     private String defaultText(String value) {

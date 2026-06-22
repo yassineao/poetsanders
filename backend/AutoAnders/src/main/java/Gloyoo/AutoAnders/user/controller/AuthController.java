@@ -142,9 +142,11 @@ public class AuthController {
             String access = jwt.generateToken(email,
                     Map.of("uid", claims.get("uid"), "role", claims.get("role"), "user", claims.get("user")),
                     ACCESS_TTL);
+            Map<String, Object> payload = authPayload(claims);
+            payload.put("accessToken", access);
             return ResponseEntity.ok()
                     .header(HttpHeaders.SET_COOKIE, authCookie(request, ACCESS_COOKIE, access, ACCESS_TTL).toString())
-                    .body(authPayload(claims));
+                    .body(payload);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "Invalid/expired token"));
         }

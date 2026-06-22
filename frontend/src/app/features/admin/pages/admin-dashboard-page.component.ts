@@ -2,6 +2,7 @@ import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, DestroyRef, PLATFORM_ID, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { ActivatedRoute } from '@angular/router';
 import { EMPTY, catchError, finalize } from 'rxjs';
 import { AdminService } from '../../../core/admin/admin.service';
 import { CarsService } from '../../../core/cars/cars.service';
@@ -15,6 +16,7 @@ import type {
 } from '../../../core/interfaces/admin';
 import { I18nService } from '../../../core/i18/i18n.service';
 import { AdminAppointmentsComponent } from '../components/admin-appointments/admin-appointments.component';
+import { AdminButtonComponent } from '../components/admin-buttons/admin-buttons';
 import {
   AdminCarsComponent,
   type CarStatusChange,
@@ -29,6 +31,7 @@ import { AdminUsersComponent } from '../components/admin-users/admin-users.compo
   imports: [
     CommonModule,
     AdminAppointmentsComponent,
+    AdminButtonComponent,
     AdminCarsComponent,
     AdminDashboardStatsComponent,
     AdminSidebarComponent,
@@ -42,6 +45,7 @@ export class AdminDashboardPageComponent {
   private readonly i18n = inject(I18nService);
   private readonly destroyRef = inject(DestroyRef);
   private readonly platformId = inject(PLATFORM_ID);
+  private readonly route = inject(ActivatedRoute);
 
   protected readonly copy = computed(() => this.i18n.copy().admin);
   protected readonly sidebar = computed<AdminSidebar>(() => {
@@ -68,6 +72,15 @@ export class AdminDashboardPageComponent {
   protected readonly carUpdateError = signal(false);
 
   constructor() {
+  this.route.queryParamMap
+    .pipe(takeUntilDestroyed(this.destroyRef))
+    .subscribe((params) => {
+      const section = params.get('section');
+      if (this.isAdminSection(section)) {
+        this.activeSection.set(section);
+      }
+    });
+
   if (!isPlatformBrowser(this.platformId)) {
     return;
   }
@@ -98,6 +111,10 @@ export class AdminDashboardPageComponent {
     )
     .subscribe((cars) => this.cars.set(cars));
 }
+
+  private isAdminSection(value: string | null): value is AdminSection {
+    return value === 'overview' || value === 'users' || value === 'appointments' || value === 'cars';
+  }
 
   protected acceptAppointment(appointment: AdminAppointment): void {
     if (appointment.accepted || this.isAccepting(appointment.id)) {
@@ -155,6 +172,10 @@ export class AdminDashboardPageComponent {
       };
     });
   }
+
+  protected link(): void {
+  console.log('Button clicked');
+}
 
   protected updateCarStatus(change: CarStatusChange): void {
     if (this.updatingCarIds().includes(change.car.id)) {

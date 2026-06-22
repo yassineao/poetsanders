@@ -3,9 +3,9 @@ package Gloyoo.AutoAnders.user.controller;
 import Gloyoo.AutoAnders.user.dto.AdminDashboardResponse;
 import Gloyoo.AutoAnders.user.dto.AdminAppointmentResponse;
 import Gloyoo.AutoAnders.user.dto.AdminAppointmentUpdateRequest;
-import Gloyoo.AutoAnders.user.dto.AdminCarUpdateRequest;
 import Gloyoo.AutoAnders.user.dto.AdminCarCreateRequest;
 import Gloyoo.AutoAnders.Cars.entity.Car;
+import Gloyoo.AutoAnders.Cars.dto.CarRequest;
 import Gloyoo.AutoAnders.user.dto.AdminUserCreateRequest;
 import Gloyoo.AutoAnders.user.dto.AdminUserUpdateRequest;
 import Gloyoo.AutoAnders.user.dto.AdminUserResponse;
@@ -67,7 +67,7 @@ public class AdminDashboardController {
     @PatchMapping("/cars/{id}")
     public ResponseEntity<Car> updateCar(
             @PathVariable UUID id,
-            @Valid @RequestBody AdminCarUpdateRequest request
+            @Valid @RequestBody CarRequest request
     ) {
         return ResponseEntity.ok(adminDashboardService.updateCar(id, request));
     }

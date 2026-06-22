@@ -1,4 +1,5 @@
 import { CommonModule } from '@angular/common';
+import { HttpErrorResponse } from '@angular/common/http';
 import {
   Component,
   DestroyRef,
@@ -72,8 +73,9 @@ export class AdminCarsComponent {
   protected readonly editError = signal(false);
   protected readonly creatingCar = signal<CarRequest | null>(null);
   protected readonly newCarPictures = signal<File[]>([]);
+  protected readonly newCarPicturePreviews = signal<string[]>([]);
   protected readonly creating = signal(false);
-  protected readonly createError = signal(false);
+  protected readonly createError = signal<string | null>(null);
   protected readonly statuses: CarStatus[] = [
     'Available',
     'Pending_Confirmation',
@@ -227,7 +229,7 @@ export class AdminCarsComponent {
   }
 
   protected startCreating(): void {
-    this.createError.set(false);
+    this.createError.set(null);
     this.creatingCar.set({
       brand: '',
       model: '',
@@ -275,14 +277,14 @@ export class AdminCarsComponent {
       paintType: 'BASIC',
       upholstery: 'FABRIC',
     });
-    this.newCarPictures.set([]);
+    this.clearNewCarPictures();
   }
 
   protected cancelCreating(): void {
     if (!this.creating()) {
       this.creatingCar.set(null);
-      this.newCarPictures.set([]);
-      this.createError.set(false);
+      this.clearNewCarPictures();
+      this.createError.set(null);
     }
   }
 
@@ -293,7 +295,7 @@ export class AdminCarsComponent {
     }
 
     this.creating.set(true);
-    this.createError.set(false);
+    this.createError.set(null);
     const pictures = this.toPictureRequests(this.newCarPictures());
     this.carsService
       .addCar(car)
@@ -313,13 +315,20 @@ export class AdminCarsComponent {
           this.carCreated.emit(created);
           this.cancelCreating();
         },
-        error: () => this.createError.set(true),
+        error: (error: HttpErrorResponse) => this.createError.set(this.errorMessage(error)),
       });
   }
 
   protected updateNewCarPictures(event: Event): void {
     const input = event.target as HTMLInputElement;
-    this.newCarPictures.set(Array.from(input.files ?? []));
+    const files = Array.from(input.files ?? []);
+    this.clearNewCarPictures();
+    this.newCarPictures.set(files);
+    this.newCarPicturePreviews.set(files.map((file) => URL.createObjectURL(file)));
+  }
+
+  protected closeCreateError(): void {
+    this.createError.set(null);
   }
 
   protected createFieldLabel(key: CarRequestKey): string {
@@ -341,19 +350,9 @@ export class AdminCarsComponent {
 
     this.savingEdit.set(true);
     this.editError.set(false);
+    const { id, user: _user, pictures: _pictures, ...request } = car;
     this.admin
-      .updateCar(car.id, {
-        brand: car.brand.trim(),
-        model: car.model.trim(),
-        title: car.title?.trim() ?? '',
-        licensePlate: car.licensePlate?.trim() ?? '',
-        yearOfManufacture: Number(car.yearOfManufacture) || 0,
-        mileage: Number(car.mileage) || 0,
-        price: Number(car.price) || 0,
-        colour: car.colour?.trim() ?? '',
-        location: car.location?.trim() ?? '',
-        status: car.status,
-      })
+      .updateCar(id, request)
       .pipe(
         finalize(() => this.savingEdit.set(false)),
         takeUntilDestroyed(this.destroyRef),
@@ -391,6 +390,26 @@ export class AdminCarsComponent {
       width: 0,
       height: 0,
     }));
+  }
+
+  private clearNewCarPictures(): void {
+    this.newCarPicturePreviews().forEach((url) => URL.revokeObjectURL(url));
+    this.newCarPicturePreviews.set([]);
+    this.newCarPictures.set([]);
+  }
+
+  private errorMessage(error: HttpErrorResponse): string {
+    const body = error.error;
+    if (typeof body === 'string' && body.trim()) {
+      return body;
+    }
+    if (body && typeof body === 'object') {
+      const message = body.detail ?? body.message ?? body.error;
+      if (typeof message === 'string' && message.trim()) {
+        return message;
+      }
+    }
+    return this.copy().carCreateErrorLabel;
   }
 
   private formatCharacteristic(key: string, value: unknown): string {

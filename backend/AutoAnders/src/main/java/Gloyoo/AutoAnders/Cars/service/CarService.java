@@ -7,6 +7,7 @@ import Gloyoo.AutoAnders.Cars.repository.CarRepository;
 
 import Gloyoo.AutoAnders.user.entity.User;
 import Gloyoo.AutoAnders.user.repository.UserRepository;
+import Gloyoo.AutoAnders.storage.service.SupaBasePictureStorage;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.stereotype.Service;
 
@@ -14,20 +15,28 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Objects;
 import java.util.UUID;
 
 @Service
 public class CarService {
     private final CarRepository carRepository;
     private final UserRepository userRepository;
+    private final SupaBasePictureStorage pictureStorage;
 
-    public CarService(CarRepository carRepository, UserRepository userRepository) {
+    public CarService(
+            CarRepository carRepository,
+            UserRepository userRepository,
+            SupaBasePictureStorage pictureStorage
+    ) {
         this.carRepository = carRepository;
         this.userRepository = userRepository;
+        this.pictureStorage = pictureStorage;
     }
 
     public Car addCar(@NotNull CarRequest carRequest, @NotNull UUID userId) {
-        if (carRepository.existsByLicensePlate(carRequest.licensePlate())) {
+        String licensePlate = normalizeOptional(carRequest.licensePlate());
+        if (licensePlate != null && carRepository.existsByLicensePlate(licensePlate)) {
             throw new IllegalArgumentException("Car already exists with this license plate");
         }
         User user = userRepository.findById(userId)
@@ -59,7 +68,7 @@ public class CarService {
                 .taxDeductible(carRequest.taxDeductible())
                 .chassisNumber(carRequest.chassisNumber())
                 .numberOfKeys(carRequest.numberOfKeys())
-                .licensePlate(carRequest.licensePlate())
+                .licensePlate(licensePlate)
                 .engineDisplacement(carRequest.engineDisplacement())
                 .colour(carRequest.colour())
                 .emptyWeight(carRequest.emptyWeight())
@@ -92,8 +101,10 @@ public class CarService {
         Car car = carRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Car not found"));
 
-        if (!car.getLicensePlate().equals(carRequest.licensePlate())
-                && carRepository.existsByLicensePlate(carRequest.licensePlate())) {
+        String licensePlate = normalizeOptional(carRequest.licensePlate());
+        if (!Objects.equals(car.getLicensePlate(), licensePlate)
+                && licensePlate != null
+                && carRepository.existsByLicensePlate(licensePlate)) {
             throw new IllegalArgumentException("Car already exists with this license plate");
         }
 
@@ -122,7 +133,7 @@ public class CarService {
         car.setTaxDeductible(carRequest.taxDeductible());
         car.setChassisNumber(carRequest.chassisNumber());
         car.setNumberOfKeys(carRequest.numberOfKeys());
-        car.setLicensePlate(carRequest.licensePlate());
+        car.setLicensePlate(licensePlate);
         car.setEngineDisplacement(carRequest.engineDisplacement());
         car.setColour(carRequest.colour());
         car.setEmptyWeight(carRequest.emptyWeight());
@@ -153,17 +164,21 @@ public class CarService {
     }
 
     public List<Car> findAllCars() {
-        return carRepository.findAll();
+        return carRepository.findAll().stream()
+                .peek(this::resolvePictureUrls)
+                .toList();
     }
 
     public Optional<Car> findCarById(UUID id) {
         Car car = carRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Car not found"));
-        return carRepository.findById(id);
+        resolvePictureUrls(car);
+        return Optional.of(car);
     }
 
     public List<Car> findCarByUser(UUID id){
         List<Car> cars = carRepository.findByUserId(id);
+        cars.forEach(this::resolvePictureUrls);
         return cars;
     }
 
@@ -199,6 +214,16 @@ public class CarService {
 
     private Integer defaultNumber(Integer value) {
         return value == null ? 0 : value;
+    }
+
+    private String normalizeOptional(String value) {
+        return value == null || value.isBlank() ? null : value.trim();
+    }
+
+    private void resolvePictureUrls(Car car) {
+        car.getPictures().forEach(picture ->
+                picture.setStorage_path(pictureStorage.resolvePublicUrl(picture.getStorage_path()))
+        );
     }
 
 }

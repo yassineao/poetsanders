@@ -1,7 +1,10 @@
 <section id="appointments" class="mt-10 scroll-mt-8 overflow-hidden rounded-2xl border border-white/10 bg-slate-900/70">
-  <div
-    class="flex flex-col gap-5 border-b border-white/10 p-6 lg:flex-row lg:items-end lg:justify-between"
-  >
+  <div class="flex flex-col gap-5 border-b border-white/10 p-6 lg:flex-row lg:items-end lg:justify-between">
+
+    <!-- <button type="button" [disabled]="creatingAppointment() !== null" (click)="startCreating()"
+      class="h-11 rounded-lg bg-cyan-300 px-5 text-sm font-bold text-slate-950 transition hover:bg-cyan-200 disabled:opacity-50">
+      add
+    </button> -->
     <div>
       <h2 class="text-2xl font-bold text-white">{{ copy().appointmentsHeading }}</h2>
       <p class="mt-2 text-sm text-slate-400">{{ copy().appointmentsDescription }}</p>
@@ -9,19 +12,13 @@
     <div class="grid w-full gap-3 sm:grid-cols-[1fr_180px] lg:max-w-xl">
       <label>
         <span class="sr-only">{{ copy().searchAppointmentsLabel }}</span>
-        <input
-          type="search"
-          [placeholder]="copy().searchAppointmentsLabel"
-          (input)="updateQuery($event)"
-          class="h-11 w-full rounded-lg border border-white/10 bg-slate-950 px-4 text-sm text-white outline-none transition placeholder:text-slate-600 focus:border-cyan-300/50"
-        />
+        <input type="search" [placeholder]="copy().searchAppointmentsLabel" (input)="updateQuery($event)"
+          class="h-11 w-full rounded-lg border border-white/10 bg-slate-950 px-4 text-sm text-white outline-none transition placeholder:text-slate-600 focus:border-cyan-300/50" />
       </label>
       <label>
         <span class="sr-only">{{ copy().statusLabel }}</span>
-        <select
-          (change)="updateStatus($event)"
-          class="h-11 w-full rounded-lg border border-white/10 bg-slate-950 px-3 text-sm text-white outline-none focus:border-cyan-300/50"
-        >
+        <select (change)="updateStatus($event)"
+          class="h-11 w-full rounded-lg border border-white/10 bg-slate-950 px-3 text-sm text-white outline-none focus:border-cyan-300/50">
           <option value="all">{{ copy().allStatusesLabel }}</option>
           <option value="pending">{{ copy().pendingLabel }}</option>
           <option value="accepted">{{ copy().acceptedLabel }}</option>
@@ -30,11 +27,8 @@
     </div>
   </div>
 
-  <p
-    *ngIf="acceptError()"
-    role="alert"
-    class="m-6 rounded-xl border border-rose-300/20 bg-rose-300/10 p-4 text-sm text-rose-100"
-  >
+  <p *ngIf="acceptError()" role="alert"
+    class="m-6 rounded-xl border border-rose-300/20 bg-rose-300/10 p-4 text-sm text-rose-100">
     {{ copy().acceptErrorLabel }}
   </p>
 
@@ -51,10 +45,7 @@
         </tr>
       </thead>
       <tbody class="divide-y divide-white/10">
-        <tr
-          *ngFor="let appointment of paginatedAppointments()"
-          class="transition hover:bg-white/[0.03]"
-        >
+        <tr *ngFor="let appointment of paginatedAppointments()" class="transition hover:bg-white/[0.03]">
           <td class="px-6 py-4">
             <p class="font-semibold text-white">{{ appointment.customerName || '-' }}</p>
             <p class="mt-1 text-xs text-slate-400">{{ appointment.customerEmail }}</p>
@@ -67,29 +58,23 @@
           </td>
           <td class="px-6 py-4 text-slate-300">{{ formatDate(appointment.localDateTime) }}</td>
           <td class="px-6 py-4">
-            <span
-              class="rounded-full border px-2.5 py-1 text-xs font-bold"
-              [ngClass]="
+            <span class="rounded-full border px-2.5 py-1 text-xs font-bold" [ngClass]="
                 appointment.accepted
                   ? 'border-emerald-300/25 bg-emerald-300/10 text-emerald-200'
                   : 'border-amber-300/25 bg-amber-300/10 text-amber-200'
-              "
-            >
+              ">
               {{ appointment.accepted ? copy().acceptedLabel : copy().pendingLabel }}
             </span>
           </td>
           <td class="px-6 py-4">
             <div class="flex gap-2">
-              <button
-                *ngIf="!appointment.accepted"
-                type="button"
-                [disabled]="isAccepting(appointment.id)"
+              <button *ngIf="!appointment.accepted" type="button" [disabled]="isAccepting(appointment.id)"
                 (click)="appointmentAccepted.emit(appointment)"
-                class="inline-flex min-h-10 items-center rounded-lg border border-emerald-300/25 bg-emerald-300/10 px-4 text-sm font-bold text-emerald-100 transition hover:bg-emerald-300/20 disabled:cursor-wait disabled:opacity-60"
-              >
+                class="inline-flex min-h-10 items-center rounded-lg border border-emerald-300/25 bg-emerald-300/10 px-4 text-sm font-bold text-emerald-100 transition hover:bg-emerald-300/20 disabled:cursor-wait disabled:opacity-60">
                 {{ isAccepting(appointment.id) ? copy().acceptingLabel : copy().acceptLabel }}
               </button>
-              <button type="button" (click)="startEditing(appointment)" class="min-h-10 rounded-lg border border-white/10 px-4 font-semibold text-slate-200 hover:bg-white/5">
+              <button type="button" (click)="startEditing(appointment)"
+                class="min-h-10 rounded-lg border border-white/10 px-4 font-semibold text-slate-200 hover:bg-white/5">
                 {{ copy().editLabel }}
               </button>
             </div>
@@ -103,66 +88,65 @@
     {{ copy().noAppointmentsLabel }}
   </p>
 
-  <div
-    *ngIf="filteredAppointments().length"
-    class="flex items-center justify-between gap-4 border-t border-white/10 px-6 py-4"
-  >
-    <button
-      type="button"
-      [disabled]="page() === 1"
-      (click)="changePage(-1)"
-      class="rounded-lg border border-white/10 px-4 py-2 text-sm font-semibold text-slate-200 transition hover:bg-white/5 disabled:cursor-not-allowed disabled:opacity-40"
-    >
+  <div *ngIf="filteredAppointments().length"
+    class="flex items-center justify-between gap-4 border-t border-white/10 px-6 py-4">
+    <button type="button" [disabled]="page() === 1" (click)="changePage(-1)"
+      class="rounded-lg border border-white/10 px-4 py-2 text-sm font-semibold text-slate-200 transition hover:bg-white/5 disabled:cursor-not-allowed disabled:opacity-40">
       {{ copy().previousLabel }}
     </button>
     <span class="text-sm text-slate-400">
       {{ copy().pageLabel }} {{ page() }} {{ copy().ofLabel }} {{ pageCount() }}
     </span>
-    <button
-      type="button"
-      [disabled]="page() === pageCount()"
-      (click)="changePage(1)"
-      class="rounded-lg border border-white/10 px-4 py-2 text-sm font-semibold text-slate-200 transition hover:bg-white/5 disabled:cursor-not-allowed disabled:opacity-40"
-    >
+    <button type="button" [disabled]="page() === pageCount()" (click)="changePage(1)"
+      class="rounded-lg border border-white/10 px-4 py-2 text-sm font-semibold text-slate-200 transition hover:bg-white/5 disabled:cursor-not-allowed disabled:opacity-40">
       {{ copy().nextLabel }}
     </button>
   </div>
 </section>
 
 @if (editingAppointment(); as appointment) {
-  <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4" (click)="cancelEditing()">
-    <section role="dialog" aria-modal="true" class="w-full max-w-xl rounded-lg border border-white/10 bg-slate-950 p-6 text-white" (click)="$event.stopPropagation()">
-      <div class="flex items-center justify-between gap-4">
-        <h2 class="text-xl font-bold">{{ copy().editLabel }}: {{ appointment.customerName }}</h2>
-        <button type="button" [attr.aria-label]="copy().closeLabel" (click)="cancelEditing()" class="grid h-10 w-10 place-items-center rounded-lg border border-white/10 text-2xl">&times;</button>
-      </div>
+<div class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4" (click)="cancelEditing()">
+  <section role="dialog" aria-modal="true"
+    class="w-full max-w-xl rounded-lg border border-white/10 bg-slate-950 p-6 text-white"
+    (click)="$event.stopPropagation()">
+    <div class="flex items-center justify-between gap-4">
+      <h2 class="text-xl font-bold">{{ copy().editLabel }}: {{ appointment.customerName }}</h2>
+      <button type="button" [attr.aria-label]="copy().closeLabel" (click)="cancelEditing()"
+        class="grid h-10 w-10 place-items-center rounded-lg border border-white/10 text-2xl">&times;</button>
+    </div>
 
-      @if (editError()) {
-        <p role="alert" class="mt-4 rounded-lg border border-rose-300/20 bg-rose-300/10 p-4 text-sm text-rose-100">{{ copy().acceptErrorLabel }}</p>
-      }
+    @if (editError()) {
+    <p role="alert" class="mt-4 rounded-lg border border-rose-300/20 bg-rose-300/10 p-4 text-sm text-rose-100">{{
+      copy().acceptErrorLabel }}</p>
+    }
 
-      <div class="mt-6 grid gap-4 sm:grid-cols-2">
-        <label class="text-sm font-semibold text-slate-300">
-          {{ copy().treatmentLabel }}
-          <select [(ngModel)]="appointment.washType" class="mt-2 h-11 w-full rounded-lg border border-white/10 bg-slate-900 px-3 text-white">
-            @for (washType of washTypes; track washType) {
-              <option [value]="washType">{{ treatmentName(washType) }}</option>
-            }
-          </select>
-        </label>
-        <label class="text-sm font-semibold text-slate-300">
-          {{ copy().dateLabel }}
-          <input [(ngModel)]="appointment.localDateTime" type="datetime-local" class="mt-2 h-11 w-full rounded-lg border border-white/10 bg-slate-900 px-3 text-white" />
-        </label>
-      </div>
-      <label class="mt-5 flex items-center gap-3 text-sm font-semibold text-slate-300">
-        <input [(ngModel)]="appointment.accepted" type="checkbox" class="h-5 w-5" />
-        {{ copy().acceptedLabel }}
+    <div class="mt-6 grid gap-4 sm:grid-cols-2">
+      <label class="text-sm font-semibold text-slate-300">
+        {{ copy().treatmentLabel }}
+        <select [(ngModel)]="appointment.washType"
+          class="mt-2 h-11 w-full rounded-lg border border-white/10 bg-slate-900 px-3 text-white">
+          @for (washType of washTypes; track washType) {
+          <option [value]="washType">{{ treatmentName(washType) }}</option>
+          }
+        </select>
       </label>
-      <div class="mt-6 flex justify-end gap-2">
-        <button type="button" [disabled]="savingEdit()" (click)="cancelEditing()" class="min-h-10 rounded-lg border border-white/10 px-4 text-slate-300">{{ copy().cancelLabel }}</button>
-        <button type="button" [disabled]="savingEdit()" (click)="saveAppointment()" class="min-h-10 rounded-lg bg-cyan-300 px-4 font-semibold text-slate-950 disabled:opacity-60">{{ savingEdit() ? copy().savingLabel : copy().saveLabel }}</button>
-      </div>
-    </section>
-  </div>
+      <label class="text-sm font-semibold text-slate-300">
+        {{ copy().dateLabel }}
+        <input [(ngModel)]="appointment.localDateTime" type="datetime-local"
+          class="mt-2 h-11 w-full rounded-lg border border-white/10 bg-slate-900 px-3 text-white" />
+      </label>
+    </div>
+    <label class="mt-5 flex items-center gap-3 text-sm font-semibold text-slate-300">
+      <input [(ngModel)]="appointment.accepted" type="checkbox" class="h-5 w-5" />
+      {{ copy().acceptedLabel }}
+    </label>
+    <div class="mt-6 flex justify-end gap-2">
+      <button type="button" [disabled]="savingEdit()" (click)="cancelEditing()"
+        class="min-h-10 rounded-lg border border-white/10 px-4 text-slate-300">{{ copy().cancelLabel }}</button>
+      <button type="button" [disabled]="savingEdit()" (click)="saveAppointment()"
+        class="min-h-10 rounded-lg bg-cyan-300 px-4 font-semibold text-slate-950 disabled:opacity-60">{{ savingEdit() ?
+        copy().savingLabel : copy().saveLabel }}</button>
+    </div>
+  </section>
+</div>
 }

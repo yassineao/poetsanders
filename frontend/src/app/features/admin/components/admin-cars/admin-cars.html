@@ -144,10 +144,6 @@
         <button type="button" [attr.aria-label]="copy().closeLabel" (click)="cancelCreating()" class="grid h-10 w-10 place-items-center rounded-lg border border-white/10 text-2xl">&times;</button>
       </div>
 
-      @if (createError()) {
-        <p role="alert" class="mt-4 rounded-lg border border-rose-300/20 bg-rose-300/10 p-4 text-sm text-rose-100">{{ copy().carCreateErrorLabel }}</p>
-      }
-
       <div class="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         @for (field of createFields; track field.key) {
           <label class="text-sm font-semibold text-slate-300">
@@ -191,6 +187,15 @@
           />
           @if (newCarPictures().length) {
             <span class="mt-2 block text-xs text-slate-400">{{ newCarPictures().length }} {{ copy().picturesLabel }}</span>
+            <span class="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+              @for (previewUrl of newCarPicturePreviews(); track previewUrl; let index = $index) {
+                <img
+                  [src]="previewUrl"
+                  [alt]="newCarPictures()[index].name"
+                  class="aspect-[4/3] w-full rounded-lg border border-white/10 object-cover"
+                />
+              }
+            </span>
           }
         </label>
       </div>
@@ -216,39 +221,36 @@
       }
 
       <div class="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        <label class="text-sm font-semibold text-slate-300">Brand
-          <input [(ngModel)]="car.brand" class="mt-2 h-11 w-full rounded-lg border border-white/10 bg-slate-900 px-3 text-white" />
+        @for (field of createFields; track field.key) {
+          <label class="text-sm font-semibold text-slate-300">
+            {{ createFieldLabel(field.key) }}
+            <input
+              [(ngModel)]="car[field.key]"
+              [type]="field.type"
+              [step]="field.step || null"
+              [min]="field.type === 'number' ? 0 : null"
+              [required]="field.key === 'brand' || field.key === 'model'"
+              class="mt-2 h-11 w-full rounded-lg border border-white/10 bg-slate-900 px-3 text-white outline-none focus:border-cyan-300/50"
+            />
+          </label>
+        }
+        @for (field of createSelectFields; track field.key) {
+          <label class="text-sm font-semibold text-slate-300">
+            {{ createFieldLabel(field.key) }}
+            <select [(ngModel)]="car[field.key]" class="mt-2 h-11 w-full rounded-lg border border-white/10 bg-slate-900 px-3 text-white outline-none focus:border-cyan-300/50">
+              @for (option of field.options; track option) {
+                <option [value]="option">{{ humanize(option) }}</option>
+              }
+            </select>
+          </label>
+        }
+        <label class="flex min-h-11 items-center gap-3 rounded-lg border border-white/10 bg-slate-900 px-3 text-sm font-semibold text-slate-300">
+          <input [(ngModel)]="car.taxDeductible" type="checkbox" class="h-5 w-5" />
+          {{ createFieldLabel('taxDeductible') }}
         </label>
-        <label class="text-sm font-semibold text-slate-300">Model
-          <input [(ngModel)]="car.model" class="mt-2 h-11 w-full rounded-lg border border-white/10 bg-slate-900 px-3 text-white" />
-        </label>
-        <label class="text-sm font-semibold text-slate-300">{{ copy().nameLabel }}
-          <input [(ngModel)]="car.title" class="mt-2 h-11 w-full rounded-lg border border-white/10 bg-slate-900 px-3 text-white" />
-        </label>
-        <label class="text-sm font-semibold text-slate-300">{{ copy().licensePlateLabel }}
-          <input [(ngModel)]="car.licensePlate" class="mt-2 h-11 w-full rounded-lg border border-white/10 bg-slate-900 px-3 text-white" />
-        </label>
-        <label class="text-sm font-semibold text-slate-300">{{ copy().yearLabel }}
-          <input [(ngModel)]="car.yearOfManufacture" type="number" min="0" class="mt-2 h-11 w-full rounded-lg border border-white/10 bg-slate-900 px-3 text-white" />
-        </label>
-        <label class="text-sm font-semibold text-slate-300">Mileage
-          <input [(ngModel)]="car.mileage" type="number" min="0" class="mt-2 h-11 w-full rounded-lg border border-white/10 bg-slate-900 px-3 text-white" />
-        </label>
-        <label class="text-sm font-semibold text-slate-300">{{ copy().priceLabel }}
-          <input [(ngModel)]="car.price" type="number" min="0" step="0.01" class="mt-2 h-11 w-full rounded-lg border border-white/10 bg-slate-900 px-3 text-white" />
-        </label>
-        <label class="text-sm font-semibold text-slate-300">Colour
-          <input [(ngModel)]="car.colour" class="mt-2 h-11 w-full rounded-lg border border-white/10 bg-slate-900 px-3 text-white" />
-        </label>
-        <label class="text-sm font-semibold text-slate-300">Location
-          <input [(ngModel)]="car.location" class="mt-2 h-11 w-full rounded-lg border border-white/10 bg-slate-900 px-3 text-white" />
-        </label>
-        <label class="text-sm font-semibold text-slate-300">{{ copy().statusLabel }}
-          <select [(ngModel)]="car.status" class="mt-2 h-11 w-full rounded-lg border border-white/10 bg-slate-900 px-3 text-white">
-            @for (statusOption of statuses; track statusOption) {
-              <option [value]="statusOption">{{ statusLabel(statusOption) }}</option>
-            }
-          </select>
+        <label class="flex min-h-11 items-center gap-3 rounded-lg border border-white/10 bg-slate-900 px-3 text-sm font-semibold text-slate-300">
+          <input [(ngModel)]="car.serviceDocumentation" type="checkbox" class="h-5 w-5" />
+          {{ createFieldLabel('serviceDocumentation') }}
         </label>
       </div>
       <div class="mt-6 flex justify-end gap-2">
@@ -356,6 +358,31 @@
             }
           </figure>
         }
+      </div>
+    </section>
+  </div>
+}
+
+@if (createError(); as errorMessage) {
+  <div class="fixed inset-0 z-[70] flex items-center justify-center bg-black/70 p-4" (click)="closeCreateError()">
+    <section
+      role="alertdialog"
+      aria-modal="true"
+      [attr.aria-label]="copy().carCreateErrorLabel"
+      class="w-full max-w-md rounded-lg border border-rose-300/25 bg-slate-950 p-6 text-white shadow-2xl"
+      (click)="$event.stopPropagation()"
+    >
+      <div class="flex items-start gap-4">
+        <div class="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-rose-300/10 text-xl font-bold text-rose-200">!</div>
+        <div class="min-w-0 flex-1">
+          <h2 class="text-lg font-bold text-rose-100">{{ copy().carCreateErrorLabel }}</h2>
+          <p class="mt-2 break-words text-sm leading-6 text-slate-300">{{ errorMessage }}</p>
+        </div>
+      </div>
+      <div class="mt-6 flex justify-end">
+        <button type="button" autofocus (click)="closeCreateError()" class="min-h-10 rounded-lg bg-rose-200 px-5 font-semibold text-slate-950 hover:bg-rose-100">
+          {{ copy().closeLabel }}
+        </button>
       </div>
     </section>
   </div>

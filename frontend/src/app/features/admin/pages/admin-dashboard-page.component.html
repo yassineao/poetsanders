@@ -31,6 +31,7 @@
         @switch (activeSection()) {
           @case ('overview') {
             <app-admin-dashboard-stats [dashboard]="data" />
+            <admin-button (sectionSelected)="activeSection.set($event)" />
           }
           @case ('users') {
             <app-admin-users
