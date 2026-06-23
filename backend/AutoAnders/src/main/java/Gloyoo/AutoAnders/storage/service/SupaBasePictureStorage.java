@@ -50,7 +50,7 @@ public class SupaBasePictureStorage {
                     .retrieve()
                     .toBodilessEntity();
 
-            return path;
+            return getPublicUrl(path);
 
         } catch (IOException e) {
             throw new RuntimeException("Could not upload file", e);
@@ -63,6 +63,13 @@ public class SupaBasePictureStorage {
                 + bucket
                 + "/"
                 + storagePath;
+    }
+
+    public String resolvePublicUrl(String storagePath) {
+        if (storagePath == null || storagePath.isBlank() || storagePath.startsWith("http://") || storagePath.startsWith("https://")) {
+            return storagePath;
+        }
+        return getPublicUrl(storagePath);
     }
 
     private String getExtension(String filename) {

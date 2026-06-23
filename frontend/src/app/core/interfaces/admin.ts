@@ -1,5 +1,5 @@
 import type { WashType } from '../booking/booking.service';
-import type { Car, CarStatus } from './Car';
+import type { CarRequest } from './Car';
 
 export interface AdminUser {
   id: string;
@@ -113,18 +113,7 @@ export type AdminAppointmentUpdate = Pick<
   'washType' | 'localDateTime' | 'accepted'
 >;
 
-export type AdminCarUpdate = Pick<
-  Car,
-  | 'brand'
-  | 'model'
-  | 'title'
-  | 'licensePlate'
-  | 'yearOfManufacture'
-  | 'mileage'
-  | 'price'
-  | 'colour'
-  | 'location'
-> & { status: CarStatus };
+export type AdminCarUpdate = CarRequest;
 
 export type AdminCarCreate = AdminCarUpdate;
 

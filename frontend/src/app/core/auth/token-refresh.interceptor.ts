@@ -1,42 +1,42 @@
 import {
+  HttpErrorResponse,
+  HttpEvent,
+  HttpHandler,
   HttpInterceptor,
   HttpRequest,
-  HttpHandler,
-  HttpEvent,
-  HttpErrorResponse,
 } from '@angular/common/http';
-import { Injectable, inject } from '@angular/core';
-import { Observable, throwError, BehaviorSubject } from 'rxjs';
-import { catchError, filter, take, switchMap } from 'rxjs/operators';
+import { Injectable } from '@angular/core';
+import { BehaviorSubject, Observable, throwError } from 'rxjs';
+import { catchError, filter, switchMap, take } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 
-/**
- * HttpInterceptor that automatically refreshes expired access tokens.
- *
- * When a 401 response is received:
- * 1. Call `/auth/refresh` to obtain a new access token
- * 2. Retry the original request with the new token
- * 3. If refresh fails, allow the 401 to propagate (user must login again)
- *
- * Multiple simultaneous 401s are handled by queuing requests until
- * a single refresh completes.
- */
+interface RefreshResponse {
+  accessToken: string;
+}
+
 @Injectable()
 export class TokenRefreshInterceptor implements HttpInterceptor {
   private readonly apiBaseUrl = environment.apiBaseUrl;
-
-  // Tracks whether a refresh is in progress
+  private readonly refreshSubject = new BehaviorSubject<string | null>(null);
   private isRefreshing = false;
-  private refreshSubject = new BehaviorSubject<void>(undefined);
+  private accessToken: string | null = null;
 
   intercept(
     req: HttpRequest<unknown>,
     next: HttpHandler,
   ): Observable<HttpEvent<unknown>> {
-    return next.handle(req).pipe(
+    if (this.resetsAuthentication(req.url)) {
+      this.accessToken = null;
+    }
+
+    const request = this.withAccessToken(req, this.accessToken);
+    return next.handle(request).pipe(
       catchError((error) => {
-        // Only intercept 401 Unauthorized responses
-        if (error instanceof HttpErrorResponse && error.status === 401) {
+        if (
+          error instanceof HttpErrorResponse &&
+          error.status === 401 &&
+          !this.isAuthenticationRequest(req.url)
+        ) {
           return this.handleUnauthorized(req, next);
         }
         return throwError(() => error);
@@ -48,54 +48,74 @@ export class TokenRefreshInterceptor implements HttpInterceptor {
     req: HttpRequest<unknown>,
     next: HttpHandler,
   ): Observable<HttpEvent<unknown>> {
-    // Skip refresh for refresh endpoint itself (prevent infinite loop)
-    if (req.url.includes('/auth/refresh')) {
-      return throwError(() => new Error('Token refresh failed'));
-    }
-
-    // If not already refreshing, start the refresh process
     if (!this.isRefreshing) {
       this.isRefreshing = true;
+      this.accessToken = null;
+      this.refreshSubject.next(null);
 
       return this.refreshToken().pipe(
-        switchMap(() => {
+        switchMap((token) => {
           this.isRefreshing = false;
-          this.refreshSubject.next(undefined); // Notify waiting requests
-          return next.handle(req); // Retry original request
+          this.accessToken = token;
+          this.refreshSubject.next(token);
+          return next.handle(this.withAccessToken(req, token));
         }),
-        catchError((err) => {
+        catchError((error) => {
           this.isRefreshing = false;
-          return throwError(() => err);
+          this.accessToken = null;
+          this.refreshSubject.next(null);
+          return throwError(() => error);
         }),
       );
     }
 
-    // If refresh is already in progress, wait for it to complete then retry
     return this.refreshSubject.pipe(
-      filter(() => !this.isRefreshing),
+      filter((token): token is string => token !== null),
       take(1),
-      switchMap(() => next.handle(req)),
+      switchMap((token) => next.handle(this.withAccessToken(req, token))),
     );
   }
 
-  private refreshToken(): Observable<void> {
+  private refreshToken(): Observable<string> {
     return new Observable((observer) => {
-      // Use fetch instead of HttpClient to avoid interceptor loop
       fetch(`${this.apiBaseUrl}/auth/refresh`, {
         method: 'POST',
-        credentials: 'include', // Include cookies
+        credentials: 'include',
+        cache: 'no-store',
       })
-        .then((response) => {
-          if (response.ok) {
-            observer.next(undefined);
-            observer.complete();
-          } else {
-            observer.error(new Error('Token refresh failed'));
+        .then(async (response) => {
+          if (!response.ok) {
+            throw new Error('Token refresh failed');
           }
+
+          const body = (await response.json()) as RefreshResponse;
+          if (!body.accessToken) {
+            throw new Error('Refresh response did not include an access token');
+          }
+
+          observer.next(body.accessToken);
+          observer.complete();
         })
-        .catch((err) => {
-          observer.error(err);
-        });
+        .catch((error) => observer.error(error));
     });
+  }
+
+  private withAccessToken(
+    request: HttpRequest<unknown>,
+    token: string | null,
+  ): HttpRequest<unknown> {
+    return token
+      ? request.clone({ setHeaders: { Authorization: `Bearer ${token}` } })
+      : request;
+  }
+
+  private isAuthenticationRequest(url: string): boolean {
+    return ['/auth/login', '/auth/register', '/auth/refresh', '/auth/logout'].some((path) =>
+      url.includes(path),
+    );
+  }
+
+  private resetsAuthentication(url: string): boolean {
+    return ['/auth/login', '/auth/register', '/auth/logout'].some((path) => url.includes(path));
   }
 }
