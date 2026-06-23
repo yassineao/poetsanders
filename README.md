@@ -1,11 +1,15 @@
-# Poets Anders
+# Poets Anders / Auto Anders
 
-Full-stack business platform for **Poets Anders**, a vehicle cleaning and detailing company in Papendrecht, the Netherlands.
+Full-stack business platform for two connected business areas:
 
-The project combines a multilingual public website, a booking system, authenticated customer accounts, a role-protected admin dashboard, and a car-selling inventory module with multi-picture uploads. It is built as a practical full-stack portfolio project: Angular on the frontend, Spring Boot on the backend, PostgreSQL for relational data, and Supabase Storage for vehicle pictures.
+- **Poets Anders**: vehicle cleaning/detailing website, booking system, customer accounts, and appointment administration.
+- **Auto Anders**: car-selling inventory management with detailed vehicle data and multi-picture uploads.
+
+The project is built as a practical full-stack portfolio application: Angular on the frontend, Spring Boot on the backend, PostgreSQL for relational data, and Supabase Storage for vehicle pictures.
 
 ## Table of Contents
 
+- [Product Areas](#product-areas)
 - [Feature Overview](#feature-overview)
 - [Technology Stack](#technology-stack)
 - [System Architecture](#system-architecture)
@@ -25,18 +29,31 @@ The project combines a multilingual public website, a booking system, authentica
 - [Known Issues and Security Gaps](#known-issues-and-security-gaps)
 - [Development Guidelines](#development-guidelines)
 
+## Product Areas
+
+| Product area | Purpose | Main users | Main features |
+| --- | --- | --- | --- |
+| **Poets Anders** | Vehicle cleaning and detailing business | Customers and admins | Public website, treatment pages, booking flow, customer accounts, appointment management |
+| **Auto Anders** | Car selling and inventory management | Admins and potential car buyers | Car inventory, full vehicle details, availability status, multiple pictures, Supabase-hosted images |
+
+Both parts share the same Angular frontend, Spring Boot backend, authentication system, PostgreSQL database, and admin dashboard. The split is functional: Poets Anders handles services and appointments, while Auto Anders handles cars and pictures.
+
 ## Feature Overview
 
-### Public Website
+### Poets Anders
 
-- Responsive business website for Poets Anders.
+Poets Anders is the customer-facing detailing and booking side of the project.
+
+#### Public Website
+
+- Responsive business website for the detailing company.
 - Service/treatment overview and individual treatment detail pages.
 - FAQ, testimonials, location, contact, and business information.
 - Runtime language switching for English, Dutch, and German.
 - Shared navbar and footer.
-- Configurable external dealership link through `DEALERSHIP_URL`.
+- Configurable link to the Auto Anders/dealership side through `DEALERSHIP_URL`.
 
-### Booking System
+#### Booking System
 
 - Customers can book one or more detailing treatments.
 - Booking supports date, time, treatment selection, and customer details.
@@ -46,17 +63,18 @@ The project combines a multilingual public website, a booking system, authentica
 - Customers can cancel appointment rows.
 - Admins can accept and edit appointments.
 
-### Customer Account
+#### Customer Account
 
 - Cookie-based login.
 - Session restore through `/auth/me`.
 - Profile editing for name, phone number, and password.
 - Appointment history with localized date formatting.
 
-### Admin Dashboard
+#### Appointment Administration
 
 - `/admin` is protected with Angular `canMatch` and backend role checks.
 - Dashboard loads users, appointments, summary statistics, and cars.
+- Poets Anders admin work focuses on users and appointments.
 - Admin sections are controlled by query params:
 
 ```text
@@ -72,15 +90,24 @@ Admins can:
 - Create new users.
 - Edit user name, email, phone number, and role.
 - Search, filter, paginate, accept, and edit appointments.
+
+### Auto Anders
+
+Auto Anders is the car-selling and vehicle inventory side of the project. It shares the same backend, authentication, admin area, and database, but focuses on vehicle data instead of detailing appointments.
+
+#### Car Selling / Inventory Module
+
+Admins can:
+
 - Search, filter, paginate, create, edit, and update cars.
 - Change car availability status.
+- Add cars as the logged-in admin.
 - Upload multiple pictures for a car.
 - Preview selected pictures before upload.
 - Open a per-car picture gallery.
+- See backend creation errors in a popup.
 
-### Car Selling / Inventory Module
-
-The active frontend includes admin car management for a vehicle selling workflow. Cars support detailed commercial and technical data:
+Cars support detailed commercial and technical data:
 
 - Brand, model, title, subtitle, year, mileage, power, reference number, and price.
 - First registration date, license plate, chassis number, APK/MOT date, location, and service documentation.
@@ -120,9 +147,10 @@ flowchart LR
 
     subgraph Frontend["Angular frontend"]
         Router[Angular Router]
-        Public[Public website]
-        Booking[Booking flow]
+        PoetsPublic[Poets Anders website]
+        Booking[Poets Anders booking]
         Account[Customer account]
+        AutoInventory[Auto Anders inventory admin]
         AdminUI[Admin dashboard]
         AuthClient[AuthService]
         Refresh[TokenRefreshInterceptor]
@@ -149,16 +177,17 @@ flowchart LR
 
     Customer --> Router
     Admin --> Router
-    Router --> Public
+    Router --> PoetsPublic
     Router --> Booking
     Router --> Account
+    Router --> AutoInventory
     Router --> AdminUI
-    Public --> I18n
+    PoetsPublic --> I18n
     Account --> AuthClient
     AuthClient --> Refresh
     Booking --> BookingClient
     AdminUI --> AdminClient
-    AdminUI --> CarsClient
+    AutoInventory --> CarsClient
     AuthClient --> CORS
     BookingClient --> CORS
     AdminClient --> CORS
