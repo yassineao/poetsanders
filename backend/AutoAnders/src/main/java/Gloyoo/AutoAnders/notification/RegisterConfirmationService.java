@@ -79,10 +79,10 @@ public class RegisterConfirmationService {
 
         } catch (MessagingException | MailException exception) {
             log.error(
-                    "User {} was saved, but registration confirmation email delivery to {} failed",
+                    "User {} was saved, but registration confirmation email delivery to {} failed: {}",
                     user.getId(),
                     customerEmail,
-                    exception
+                    exception.getMessage()
             );
         }
     }

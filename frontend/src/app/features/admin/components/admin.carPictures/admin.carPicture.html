@@ -1,0 +1,131 @@
+@if (car(); as selectedCar) {
+  <div
+    class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4"
+    role="presentation"
+    (click)="closePictures()"
+  >
+    <section
+      role="dialog"
+      aria-modal="true"
+      [attr.aria-label]="copy().picturesLabel"
+      class="max-h-[92vh] w-full max-w-6xl overflow-y-auto rounded-lg border border-white/10 bg-slate-950 text-slate-100 shadow-2xl"
+      (click)="$event.stopPropagation()"
+    >
+      <header class="sticky top-0 z-10 flex flex-col gap-4 border-b border-white/10 bg-slate-950 px-5 py-4 sm:px-6 lg:flex-row lg:items-start lg:justify-between">
+        <div>
+          <p class="text-xs font-bold uppercase text-cyan-300">{{ copy().picturesLabel }}</p>
+          <h2 class="mt-1 text-xl font-bold text-white sm:text-2xl">
+            {{ selectedCar.brand }} {{ selectedCar.model }}
+          </h2>
+          <p class="mt-1 text-sm text-slate-400">
+            {{ pictures().length + pendingPictures().length }} {{ copy().picturesLabel }}
+          </p>
+        </div>
+        <div class="flex flex-wrap items-center gap-2">
+          <label class="inline-flex min-h-10 cursor-pointer items-center rounded-lg border border-cyan-300/25 bg-cyan-300/10 px-4 text-sm font-semibold text-cyan-100 transition hover:bg-cyan-300/20">
+            Add pictures
+            <input type="file" accept="image/*" multiple class="sr-only" (change)="addPictures($event)" />
+          </label>
+          <button
+            type="button"
+            [disabled]="!hasChanges() || saving()"
+            class="min-h-10 rounded-lg bg-cyan-300 px-4 text-sm font-bold text-slate-950 transition hover:bg-cyan-200 disabled:cursor-not-allowed disabled:opacity-50"
+            (click)="saveChanges()"
+          >
+            {{ saving() ? 'Saving...' : 'Save' }}
+          </button>
+          <button
+            type="button"
+            class="grid h-10 w-10 shrink-0 place-items-center rounded-lg border border-white/10 text-2xl text-slate-300 transition hover:bg-white/5 hover:text-white"
+            [attr.aria-label]="copy().closeLabel"
+            (click)="closePictures()"
+          >
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+      </header>
+
+      @if (loading()) {
+        <p class="p-5 text-sm text-slate-400 sm:p-6">Loading pictures...</p>
+      }
+
+      @if (errorMessage()) {
+        <p class="mx-5 mt-5 rounded-lg border border-red-400/30 bg-red-500/10 p-4 text-sm text-red-200 sm:mx-6">
+          {{ errorMessage() }}
+        </p>
+      }
+
+      @if (pictures().length || pendingPictures().length) {
+        <div class="grid gap-5 p-5 sm:grid-cols-2 sm:p-6 lg:grid-cols-3">
+          @for (picture of pictures(); track picture.id) {
+            <figure class="relative overflow-hidden rounded-lg border border-white/10 bg-slate-900">
+              <button
+                type="button"
+                class="absolute right-2 top-2 z-10 grid h-9 w-9 place-items-center rounded-lg border border-white/10 bg-slate-950/85 text-xl text-slate-200 shadow-lg transition hover:bg-rose-500/20 hover:text-rose-100"
+                aria-label="Delete picture"
+                [disabled]="saving()"
+                (click)="removePicture(picture)"
+              >
+                <span aria-hidden="true">&times;</span>
+              </button>
+              @if (imageUrl(picture.id); as url) {
+                <img
+                  [src]="url"
+                  [alt]="picture.title || selectedCar.brand + ' ' + selectedCar.model"
+                  [attr.width]="pictureWidth(picture)"
+                  [attr.height]="pictureHeight(picture)"
+                  [ngStyle]="pictureStyles(picture)"
+                  class="block max-h-[70vh] max-w-full object-contain"
+                />
+              } @else {
+                <div
+                  class="grid max-h-[70vh] max-w-full place-items-center bg-slate-900 text-sm text-slate-500"
+                  [ngStyle]="pictureStyles(picture)"
+                >
+                  Image unavailable
+                </div>
+              }
+              @if (picture.title || picture.description) {
+                <figcaption class="border-t border-white/10 p-4">
+                  @if (picture.title) {
+                    <p class="font-semibold text-white">{{ picture.title }}</p>
+                  }
+                  @if (picture.description) {
+                    <p class="mt-1 text-sm text-slate-400">{{ picture.description }}</p>
+                  }
+                </figcaption>
+              }
+            </figure>
+          }
+          @for (picture of pendingPictures(); track picture.id) {
+            <figure class="relative overflow-hidden rounded-lg border border-cyan-300/25 bg-slate-900">
+              <button
+                type="button"
+                class="absolute right-2 top-2 z-10 grid h-9 w-9 place-items-center rounded-lg border border-white/10 bg-slate-950/85 text-xl text-slate-200 shadow-lg transition hover:bg-rose-500/20 hover:text-rose-100"
+                aria-label="Remove pending picture"
+                [disabled]="saving()"
+                (click)="removePendingPicture(picture)"
+              >
+                <span aria-hidden="true">&times;</span>
+              </button>
+              <img
+                [src]="picture.previewUrl"
+                [alt]="picture.file.name"
+                [attr.width]="picture.width || null"
+                [attr.height]="picture.height || null"
+                [ngStyle]="{ width: picture.width ? picture.width + 'px' : null, height: picture.height ? picture.height + 'px' : null, 'aspect-ratio': picture.width && picture.height ? picture.width + ' / ' + picture.height : null }"
+                class="block max-h-[70vh] max-w-full object-contain"
+              />
+              <figcaption class="border-t border-cyan-300/20 p-4">
+                <p class="font-semibold text-white">{{ picture.file.name }}</p>
+                <p class="mt-1 text-sm text-cyan-200">New picture</p>
+              </figcaption>
+            </figure>
+          }
+        </div>
+      } @else {
+        <p class="p-5 text-sm text-slate-400 sm:p-6">No pictures uploaded for this car yet.</p>
+      }
+    </section>
+  </div>
+}

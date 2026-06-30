@@ -8,10 +8,11 @@ import { getDictionary, isValidLocale, Locale } from "../../../core/lib/i18n";
 import { AuthService } from "../../../core/auth/auth.service";
 import type { FormField } from "../../../core/interfaces/Infos";
 import type { UpdateProfileRequest } from "../../../core/interfaces/updateProfile";
+import { ProfileCarsComponent } from "./profile-cars.component";
 
 @Component({
     selector: "app-form-profile",
-    imports: [FormsModule],
+    imports: [FormsModule, ProfileCarsComponent],
     templateUrl: "./profile.form.html",
 })
 export class ProfileForm {

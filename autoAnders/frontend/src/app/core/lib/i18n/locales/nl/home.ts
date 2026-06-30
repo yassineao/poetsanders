@@ -157,7 +157,7 @@ export const nlHomeCopy: Copy["home"] = {
       vat: "BTW aftrekbaar",
       vehicle: "Stationwagen",
       colour: "Grijs",
-      image: "/cars/audi.jpg",
+      image: "/404.png",
       tags: {
         de: ["LED", "Kamera", "Tempomat"],
         en: ["LED", "Camera", "Cruise Control"],

@@ -13,6 +13,7 @@ import java.util.UUID;
 public interface CarRepository extends JpaRepository<Car, UUID> {
     boolean existsByLicensePlate(String licensePlate);
     boolean existsByLicensePlateAndIdNot(String licensePlate, UUID id);
+    List<Car> findByStatus(Status status);
 
     List<Car> findByUserId(UUID userId);
 }

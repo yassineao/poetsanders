@@ -71,14 +71,23 @@
                 @if (fileUrlItems(field).length > 0) {
                   <div class="mt-3 space-y-2">
                     @for (item of fileUrlItems(field); track item.name) {
-                      <a
-                        [href]="item.url"
-                        target="_blank"
-                        rel="noreferrer"
-                        class="block rounded-xl border border-white/10 bg-zinc-950 px-3 py-2 text-xs text-zinc-300 transition hover:border-red-500/60 hover:text-white">
-                        <span class="block truncate font-bold">{{ item.name }}</span>
-                        <span class="mt-1 block truncate text-zinc-500">{{ item.url }}</span>
-                      </a>
+                      <div class="flex items-start gap-2 rounded-xl border border-white/10 bg-zinc-950 px-3 py-2 text-xs text-zinc-300 transition hover:border-red-500/60 hover:text-white">
+                        <a
+                          [href]="item.url"
+                          target="_blank"
+                          rel="noreferrer"
+                          class="min-w-0 flex-1">
+                          <span class="block truncate font-bold">{{ item.name }}</span>
+                          <span class="mt-1 block truncate text-zinc-500">{{ item.url }}</span>
+                        </a>
+                        <button
+                          type="button"
+                          (click)="removeFile(field, item.index)"
+                          [attr.aria-label]="'Remove ' + item.name"
+                          class="flex size-7 shrink-0 items-center justify-center rounded-full border border-white/10 bg-white/5 text-sm font-black text-zinc-300 transition hover:border-red-500/70 hover:bg-red-600 hover:text-white">
+                          x
+                        </button>
+                      </div>
                     }
                   </div>
                 }
@@ -191,7 +200,8 @@
 
         <button
           id="submit-button"
-          [disabled]="form.invalid || sending()"
+          type="submit"
+          [disabled]="!isLastPage() || form.invalid || sending()"
           class="w-full rounded-xl bg-red-600 px-5 py-4 font-bold shadow-lg shadow-red-950/30 transition hover:bg-red-500 focus:outline-none focus:ring-4 focus:ring-red-500/25 disabled:cursor-not-allowed disabled:opacity-50">
           {{ sending() ? content().sendingLabel : content().submitLabel }}
         </button>
@@ -250,7 +260,7 @@
     <div class="fixed inset-0 z-[80] flex items-center justify-center bg-black/75 p-4 backdrop-blur-sm">
       <div class="w-full max-w-sm rounded-2xl border border-white/10 bg-zinc-900 p-7 text-center shadow-2xl">
         <h2 class="text-xl font-bold text-red-300">{{ content().popup.errorTitle }}</h2>
-        <p class="mt-3 text-zinc-300">{{ content().popup.errorMessage }}</p>
+        <p class="mt-3 text-zinc-300">{{ failureMessage() || content().popup.errorMessage }}</p>
         <button type="button" (click)="failureClosed.emit()" class="mt-6 w-full rounded-xl bg-red-600 py-3 font-bold transition hover:bg-red-500">
           {{ content().popup.closeLabel }}
         </button>

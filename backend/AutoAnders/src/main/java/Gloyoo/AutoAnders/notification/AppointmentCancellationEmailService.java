@@ -112,9 +112,9 @@ public class AppointmentCancellationEmailService {
 
         } catch (MessagingException | MailException exception) {
             log.error(
-                    "Appointment was cancelled, but cancellation email delivery to {} failed",
+                    "Appointment was cancelled, but cancellation email delivery to {} failed: {}",
                     cancellation.customerEmail(),
-                    exception
+                    exception.getMessage()
             );
         }
     }

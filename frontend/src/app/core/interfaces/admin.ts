@@ -110,8 +110,12 @@ export interface AdminSidebar{
 
 export type AdminAppointmentUpdate = Pick<
   AdminAppointment,
-  'washType' | 'localDateTime' | 'accepted'
+  'userId' | 'washType' | 'localDateTime' | 'accepted'
 >;
+
+export interface AdminAppointmentCreate extends AdminAppointmentUpdate {
+  userId: string;
+}
 
 export type AdminCarUpdate = CarRequest;
 

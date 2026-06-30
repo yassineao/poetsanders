@@ -3,6 +3,7 @@ package Gloyoo.AutoAnders.user.controller;
 import Gloyoo.AutoAnders.Cars.entity.Car;
 import Gloyoo.AutoAnders.config.JwtService;
 import Gloyoo.AutoAnders.notification.RegisterConfirmationService;
+import Gloyoo.AutoAnders.user.service.ProfileAccessTokenService;
 import Gloyoo.AutoAnders.user.dto.AuthRequest;
 import Gloyoo.AutoAnders.user.dto.AuthResponse;
 import Gloyoo.AutoAnders.user.dto.TokenResponse;
@@ -37,15 +38,21 @@ public class AuthController {
     private final UserService userService;
     private final JwtService jwt;
     private final RegisterConfirmationService registerConfirmationService;
+    private final ProfileAccessTokenService profileAccessTokenService;
+    private final String appBaseUrl;
 
     public AuthController(
             UserService userService,
             JwtService jwt,
-            RegisterConfirmationService registerConfirmationService
+            RegisterConfirmationService registerConfirmationService,
+            ProfileAccessTokenService profileAccessTokenService,
+            @org.springframework.beans.factory.annotation.Value("${app.base-url}") String appBaseUrl
     ) {
         this.userService = userService;
         this.jwt = jwt;
         this.registerConfirmationService = registerConfirmationService;
+        this.profileAccessTokenService = profileAccessTokenService;
+        this.appBaseUrl = removeTrailingSlash(appBaseUrl);
     }
 
     @PostMapping("/register")
@@ -182,6 +189,27 @@ public class AuthController {
         return "OK";
     }
 
+    @GetMapping("/profile-access")
+    public ResponseEntity<Void> profileAccess(
+            @RequestParam String token,
+            HttpServletRequest request
+    ) {
+        User user = profileAccessTokenService.consumeToken(token);
+        String access = jwt.generateToken(user.getEmail(),
+                Map.of(
+                        "uid", user.getId().toString(),
+                        "role", user.getRole(),
+                        "user", user.getName(),
+                        "profileAccess", true
+                ),
+                ACCESS_TTL);
+
+        return ResponseEntity.status(HttpStatus.FOUND)
+                .header(HttpHeaders.SET_COOKIE, authCookie(request, ACCESS_COOKIE, access, ACCESS_TTL).toString())
+                .header(HttpHeaders.LOCATION, appBaseUrl + "/nl/profile")
+                .build();
+    }
+
     private ResponseEntity.BodyBuilder withAuthCookies(
             ResponseEntity.BodyBuilder builder,
             HttpServletRequest request,
@@ -193,48 +221,23 @@ public class AuthController {
     }
 
     private ResponseCookie authCookie(HttpServletRequest request, String name, String value, Duration maxAge) {
-        boolean secure = isSecureRequest(request);
         return ResponseCookie.from(name, value)
                 .httpOnly(true)
-                .secure(secure)
-                .sameSite(secure ? "None" : "Lax")
+                .secure(true)
+                .sameSite("None")
                 .path("/")
                 .maxAge(maxAge)
                 .build();
     }
 
     private ResponseCookie expiredCookie(HttpServletRequest request, String name) {
-        boolean secure = isSecureRequest(request);
         return ResponseCookie.from(name, "")
                 .httpOnly(true)
-                .secure(secure)
-                .sameSite(secure ? "None" : "Lax")
+                .secure(true)
+                .sameSite("None")
                 .path("/")
                 .maxAge(Duration.ZERO)
                 .build();
-    }
-
-    private boolean isSecureRequest(HttpServletRequest request) {
-        String forwardedProto = request.getHeader("X-Forwarded-Proto");
-        String forwarded = request.getHeader("Forwarded");
-        String forwardedSsl = request.getHeader("X-Forwarded-Ssl");
-        String origin = request.getHeader("Origin");
-        String referer = request.getHeader("Referer");
-
-        return request.isSecure()
-                || containsHttps(forwardedProto)
-                || containsHttps(forwarded)
-                || "on".equalsIgnoreCase(forwardedSsl)
-                || startsWithHttps(origin)
-                || startsWithHttps(referer);
-    }
-
-    private boolean containsHttps(String value) {
-        return value != null && value.toLowerCase().contains("https");
-    }
-
-    private boolean startsWithHttps(String value) {
-        return value != null && value.toLowerCase().startsWith("https://");
     }
 
     private String readCookie(HttpServletRequest request, String name) {
@@ -281,5 +284,17 @@ public class AuthController {
         }
 
         return UUID.fromString(uid.toString());
+    }
+
+    private String removeTrailingSlash(String value) {
+        if (value == null || value.isBlank()) {
+            return "";
+        }
+
+        while (value.endsWith("/")) {
+            value = value.substring(0, value.length() - 1);
+        }
+
+        return value;
     }
 }

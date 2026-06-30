@@ -74,8 +74,8 @@ export interface CarPicture {
     storage_path: string;
     title: string;
     description: string;
-    width: Int16Array;
-    height: Int16Array;
+    width: number;
+    height: number;
 }
 
 export interface AutoCatalogueLabels {

@@ -1,15 +1,15 @@
 <section id="appointments" class="mt-10 scroll-mt-8 overflow-hidden rounded-2xl border border-white/10 bg-slate-900/70">
   <div class="flex flex-col gap-5 border-b border-white/10 p-6 lg:flex-row lg:items-end lg:justify-between">
 
-    <!-- <button type="button" [disabled]="creatingAppointment() !== null" (click)="startCreating()"
-      class="h-11 rounded-lg bg-cyan-300 px-5 text-sm font-bold text-slate-950 transition hover:bg-cyan-200 disabled:opacity-50">
-      add
-    </button> -->
     <div>
       <h2 class="text-2xl font-bold text-white">{{ copy().appointmentsHeading }}</h2>
       <p class="mt-2 text-sm text-slate-400">{{ copy().appointmentsDescription }}</p>
     </div>
-    <div class="grid w-full gap-3 sm:grid-cols-[1fr_180px] lg:max-w-xl">
+    <div class="grid w-full gap-3 sm:grid-cols-[auto_1fr_180px] lg:max-w-3xl">
+      <button type="button" (click)="startCreating()"
+        class="h-11 rounded-lg bg-cyan-300 px-5 text-sm font-bold text-slate-950 transition hover:bg-cyan-200">
+        Add appointment
+      </button>
       <label>
         <span class="sr-only">{{ copy().searchAppointmentsLabel }}</span>
         <input type="search" [placeholder]="copy().searchAppointmentsLabel" (input)="updateQuery($event)"
@@ -77,6 +77,10 @@
                 class="min-h-10 rounded-lg border border-white/10 px-4 font-semibold text-slate-200 hover:bg-white/5">
                 {{ copy().editLabel }}
               </button>
+              <button type="button" [disabled]="isDeleting(appointment.id)" (click)="deleteAppointment(appointment)"
+                class="min-h-10 rounded-lg border border-rose-300/25 bg-rose-300/10 px-4 font-semibold text-rose-100 hover:bg-rose-300/20 disabled:cursor-wait disabled:opacity-60">
+                {{ isDeleting(appointment.id) ? copy().savingLabel : 'Delete' }}
+              </button>
             </div>
           </td>
         </tr>
@@ -104,6 +108,118 @@
   </div>
 </section>
 
+@if (creatingAppointment()) {
+<div class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4" (click)="cancelCreating()">
+  <section role="dialog" aria-modal="true"
+    class="max-h-[92vh] w-full max-w-2xl overflow-y-auto rounded-lg border border-white/10 bg-slate-950 p-6 text-white"
+    (click)="$event.stopPropagation()">
+    <div class="flex items-center justify-between gap-4">
+      <h2 class="text-xl font-bold">Add appointment</h2>
+      <button type="button" [attr.aria-label]="copy().closeLabel" (click)="cancelCreating()"
+        class="grid h-10 w-10 place-items-center rounded-lg border border-white/10 text-2xl">&times;</button>
+    </div>
+
+    <div class="mt-6 grid grid-cols-2 gap-2 rounded-lg border border-white/10 bg-slate-900 p-1">
+      <button type="button" (click)="setCreateMode('existing')"
+        [ngClass]="createMode() === 'existing' ? 'bg-cyan-300 text-slate-950' : 'text-slate-300 hover:bg-white/5'"
+        class="min-h-10 rounded-md px-3 text-sm font-bold transition">
+        Existing user
+      </button>
+      <button type="button" (click)="setCreateMode('new')"
+        [ngClass]="createMode() === 'new' ? 'bg-cyan-300 text-slate-950' : 'text-slate-300 hover:bg-white/5'"
+        class="min-h-10 rounded-md px-3 text-sm font-bold transition">
+        New user
+      </button>
+    </div>
+
+    @if (createMode() === 'new') {
+      @if (newUser(); as user) {
+        <div class="mt-6 grid gap-4 sm:grid-cols-2">
+          <label class="text-sm font-semibold text-slate-300">
+            {{ copy().nameLabel }}
+            <input [(ngModel)]="user.name" type="text"
+              class="mt-2 h-11 w-full rounded-lg border border-white/10 bg-slate-900 px-3 text-white outline-none focus:border-cyan-300/50" />
+          </label>
+          <label class="text-sm font-semibold text-slate-300">
+            {{ copy().emailLabel }}
+            <input [(ngModel)]="user.email" type="email"
+              class="mt-2 h-11 w-full rounded-lg border border-white/10 bg-slate-900 px-3 text-white outline-none focus:border-cyan-300/50" />
+          </label>
+          <label class="text-sm font-semibold text-slate-300">
+            {{ copy().phoneLabel }}
+            <input [(ngModel)]="user.phoneNumber" type="tel"
+              class="mt-2 h-11 w-full rounded-lg border border-white/10 bg-slate-900 px-3 text-white outline-none focus:border-cyan-300/50" />
+          </label>
+          <label class="text-sm font-semibold text-slate-300">
+            Password
+            <input [(ngModel)]="user.password" type="password"
+              class="mt-2 h-11 w-full rounded-lg border border-white/10 bg-slate-900 px-3 text-white outline-none focus:border-cyan-300/50" />
+          </label>
+        </div>
+        <p *ngIf="createUserError()" role="alert"
+          class="mt-4 rounded-lg border border-rose-300/20 bg-rose-300/10 p-4 text-sm text-rose-100">
+          {{ createUserError() }}
+        </p>
+        <div class="mt-5 flex justify-end">
+          <button type="button" [disabled]="savingUser()" (click)="createUserFirst()"
+            class="min-h-10 rounded-lg bg-cyan-300 px-4 font-semibold text-slate-950 disabled:opacity-60">
+            {{ savingUser() ? copy().savingLabel : 'Create user' }}
+          </button>
+        </div>
+      }
+    }
+
+    @if (appointmentDraft(); as draft) {
+      <div class="mt-6 border-t border-white/10 pt-6">
+        <div class="grid gap-4 sm:grid-cols-2">
+          <label class="text-sm font-semibold text-slate-300 sm:col-span-2">
+            {{ copy().customerLabel }}
+            <select [ngModel]="draft.userId || selectedCreateUserId()" (change)="selectAppointmentUser($event)"
+              [disabled]="!selectableUsers().length"
+              class="mt-2 h-11 w-full rounded-lg border border-white/10 bg-slate-900 px-3 text-white outline-none focus:border-cyan-300/50">
+              @for (user of selectableUsers(); track user.id) {
+                <option [value]="user.id">{{ user.name }} - {{ user.email }}</option>
+              }
+            </select>
+          </label>
+          <label class="text-sm font-semibold text-slate-300">
+            {{ copy().treatmentLabel }}
+            <select [(ngModel)]="draft.washType"
+              class="mt-2 h-11 w-full rounded-lg border border-white/10 bg-slate-900 px-3 text-white">
+              @for (washType of washTypes; track washType) {
+                <option [value]="washType">{{ treatmentName(washType) }}</option>
+              }
+            </select>
+          </label>
+          <label class="text-sm font-semibold text-slate-300">
+            {{ copy().dateLabel }}
+            <input [(ngModel)]="draft.localDateTime" type="datetime-local"
+              class="mt-2 h-11 w-full rounded-lg border border-white/10 bg-slate-900 px-3 text-white" />
+          </label>
+        </div>
+        <label class="mt-5 flex items-center gap-3 text-sm font-semibold text-slate-300">
+          <input [(ngModel)]="draft.accepted" type="checkbox" class="h-5 w-5" />
+          {{ copy().acceptedLabel }}
+        </label>
+      </div>
+    }
+
+    <p *ngIf="createAppointmentError()" role="alert"
+      class="mt-4 rounded-lg border border-rose-300/20 bg-rose-300/10 p-4 text-sm text-rose-100">
+      {{ createAppointmentError() }}
+    </p>
+    <div class="mt-6 flex justify-end gap-2">
+      <button type="button" [disabled]="savingUser() || savingAppointment()" (click)="cancelCreating()"
+        class="min-h-10 rounded-lg border border-white/10 px-4 text-slate-300">{{ copy().cancelLabel }}</button>
+      <button type="button" [disabled]="savingUser() || savingAppointment()" (click)="saveNewAppointment()"
+        class="min-h-10 rounded-lg bg-cyan-300 px-4 font-semibold text-slate-950 disabled:opacity-60">
+        {{ savingAppointment() ? copy().savingLabel : copy().saveLabel }}
+      </button>
+    </div>
+  </section>
+</div>
+}
+
 @if (editingAppointment(); as appointment) {
 <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4" (click)="cancelEditing()">
   <section role="dialog" aria-modal="true"
@@ -121,6 +237,15 @@
     }
 
     <div class="mt-6 grid gap-4 sm:grid-cols-2">
+      <label class="text-sm font-semibold text-slate-300 sm:col-span-2">
+        {{ copy().customerLabel }}
+        <select [(ngModel)]="appointment.userId"
+          class="mt-2 h-11 w-full rounded-lg border border-white/10 bg-slate-900 px-3 text-white">
+          @for (user of selectableUsers(); track user.id) {
+          <option [value]="user.id">{{ user.name }} - {{ user.email }}</option>
+          }
+        </select>
+      </label>
       <label class="text-sm font-semibold text-slate-300">
         {{ copy().treatmentLabel }}
         <select [(ngModel)]="appointment.washType"
@@ -135,17 +260,25 @@
         <input [(ngModel)]="appointment.localDateTime" type="datetime-local"
           class="mt-2 h-11 w-full rounded-lg border border-white/10 bg-slate-900 px-3 text-white" />
       </label>
+      <label class="text-sm font-semibold text-slate-300 sm:col-span-2">
+        {{ copy().statusLabel }}
+        <select [(ngModel)]="appointment.accepted"
+          class="mt-2 h-11 w-full rounded-lg border border-white/10 bg-slate-900 px-3 text-white">
+          <option [ngValue]="false">{{ copy().pendingLabel }}</option>
+          <option [ngValue]="true">{{ copy().acceptedLabel }}</option>
+        </select>
+      </label>
     </div>
-    <label class="mt-5 flex items-center gap-3 text-sm font-semibold text-slate-300">
-      <input [(ngModel)]="appointment.accepted" type="checkbox" class="h-5 w-5" />
-      {{ copy().acceptedLabel }}
-    </label>
     <div class="mt-6 flex justify-end gap-2">
       <button type="button" [disabled]="savingEdit()" (click)="cancelEditing()"
         class="min-h-10 rounded-lg border border-white/10 px-4 text-slate-300">{{ copy().cancelLabel }}</button>
       <button type="button" [disabled]="savingEdit()" (click)="saveAppointment()"
         class="min-h-10 rounded-lg bg-cyan-300 px-4 font-semibold text-slate-950 disabled:opacity-60">{{ savingEdit() ?
         copy().savingLabel : copy().saveLabel }}</button>
+      <button type="button" [disabled]="savingEdit() || isDeleting(appointment.id)" (click)="deleteAppointment(appointment)"
+        class="min-h-10 rounded-lg border border-rose-300/25 bg-rose-300/10 px-4 font-semibold text-rose-100 disabled:opacity-60">
+        {{ isDeleting(appointment.id) ? copy().savingLabel : 'Delete' }}
+      </button>
     </div>
   </section>
 </div>

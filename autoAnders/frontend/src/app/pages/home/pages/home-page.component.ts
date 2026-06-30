@@ -2,14 +2,20 @@ import { isPlatformBrowser } from "@angular/common";
 import { Component, PLATFORM_ID, computed, inject } from "@angular/core";
 import { toSignal } from "@angular/core/rxjs-interop";
 import { ActivatedRoute, RouterLink } from "@angular/router";
-import { catchError, map, of, startWith, type Observable } from "rxjs";
+import { catchError, forkJoin, from, map, of, startWith, switchMap, type Observable } from "rxjs";
 import { CarsService } from "../../../core/cars/cars.service";
-import type { Car } from "../../../core/interfaces/Car";
+import type { Car, CarPicture } from "../../../core/interfaces/Car";
 import type { CatalogueCar } from "../../../core/interfaces/LocaleDictionary";
 import { getDictionary, isValidLocale } from "../../../core/lib/i18n";
 import type { Locale } from "../../../core/interfaces/locale";
 import { CatalogueComponent } from "../../catalogue/components/catalogue.component";
 import { FaqComponent } from "../../faq/components/faq.component";
+import { SupabaseService } from "../../../core/supabase/supabase.service";
+
+type CatalogueApiCar = Car & {
+  catalogueImage: string;
+  catalogueImages: string[];
+};
 
 @Component({
   selector: "app-home",
@@ -21,16 +27,53 @@ export class HomeComponent {
   private readonly platformId = inject(PLATFORM_ID);
   private readonly isBrowser = isPlatformBrowser(this.platformId);
   private readonly carsService = inject(CarsService);
+  private readonly supabase = inject(SupabaseService);
   private readonly carsSource$: Observable<Car[] | null> = this.isBrowser
     ? this.carsService.getCars()
     : of(null);
   private readonly apiCars = toSignal(
     this.carsSource$.pipe(
-      map((cars) => (cars ?? []).slice(0, 3)),
+      switchMap((cars) => {
+        if (cars === null) {
+          return of(null);
+        }
+
+        const previewCars = cars.slice(0, 3);
+
+        if (previewCars.length === 0) {
+          return of([] as CatalogueApiCar[]);
+        }
+
+        return forkJoin(
+          previewCars.map((car) =>
+            this.carsService.getCarPictures(car.id).pipe(
+              switchMap((pictures) =>
+                from(this.resolveCatalogueImages(pictures)).pipe(
+                  map((catalogueImages) => ({
+                    ...car,
+                    pictures,
+                    catalogueImage: catalogueImages[0] ?? this.fallbackImage(),
+                    catalogueImages,
+                  })),
+                ),
+              ),
+              catchError((error) => {
+                console.error(`Loading pictures for car ${car.id} failed:`, error);
+                return of({
+                  ...car,
+                  pictures: [],
+                  catalogueImage: this.fallbackImage(),
+                  catalogueImages: [this.fallbackImage()],
+                });
+              }),
+            ),
+          ),
+        );
+      }),
       startWith(null),
       catchError((error) => {
         console.error("Loading cars failed:", error);
-        return of([] as Car[]);
+        return of([] as CatalogueApiCar[]);
       }),
     ),
     { initialValue: null },
@@ -55,7 +98,7 @@ export class HomeComponent {
     (this.apiCars() ?? []).map((car) => this.toCatalogueCar(car)),
   );
 
-  private toCatalogueCar(car: Car): CatalogueCar {
+  private toCatalogueCar(car: CatalogueApiCar): CatalogueCar {
     const fallbackTags = [
       car.bodyType,
       car.fuel,
@@ -81,7 +124,8 @@ export class HomeComponent {
       vat: car.taxDeductible ? "VAT deductible" : "",
       vehicle: String(car.bodyType ?? ""),
       colour: car.colour ?? "",
-      image: car.pictures?.[0]?.storage_path ?? "/cars/audi.jpg",
+      image: car.catalogueImage,
+      images: car.catalogueImages?.length ? car.catalogueImages : [car.catalogueImage],
       tags: {
         de: fallbackTags,
         en: fallbackTags,
@@ -93,5 +137,36 @@ export class HomeComponent {
   private yearFromDate(value: string): number {
     const year = new Date(value).getFullYear();
     return Number.isNaN(year) ? new Date().getFullYear() : year;
+  }
+
+  private async resolveCatalogueImages(pictures: CarPicture[]): Promise<string[]> {
+    const storagePaths = pictures
+      .map((picture) => picture.storage_path)
+      .filter((storagePath): storagePath is string => Boolean(storagePath));
+
+    if (!storagePaths.length) {
+      return [this.fallbackImage()];
+    }
+
+    const images = await Promise.all(
+      storagePaths.map(async (storagePath) => {
+        if (this.isRenderableUrl(storagePath)) {
+          return storagePath;
+        }
+
+        return await this.supabase.getPrivateImageUrl("car-pictures", storagePath);
+      }),
+    );
+
+    const renderableImages = images.filter((image): image is string => Boolean(image));
+    return renderableImages.length ? renderableImages : [this.fallbackImage()];
+  }
+
+  private isRenderableUrl(value: string): boolean {
+    return /^https?:\/\//i.test(value) || value.startsWith("/");
+  }
+
+  private fallbackImage(): string {
+    return "/no-image-icon.png";
   }
 }

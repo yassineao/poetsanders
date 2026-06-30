@@ -4,6 +4,7 @@ import type { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import type {
   AdminAppointment,
+  AdminAppointmentCreate,
   AdminAppointmentUpdate,
   AdminCarCreate,
   AdminCarUpdate,
@@ -54,6 +55,20 @@ export class AdminService {
     );
   }
 
+  createAppointment(appointment: AdminAppointmentCreate): Observable<AdminAppointment> {
+    return this.http.post<AdminAppointment>(
+      `${this.apiBaseUrl}/admin/appointments`,
+      appointment,
+      { withCredentials: true },
+    );
+  }
+
+  deleteAppointment(id: string): Observable<void> {
+    return this.http.delete<void>(`${this.apiBaseUrl}/admin/appointments/${id}`, {
+      withCredentials: true,
+    });
+  }
+
   updateCar(id: string, car: AdminCarUpdate): Observable<Car> {
     return this.http.patch<Car>(`${this.apiBaseUrl}/admin/cars/${id}`, car, {
       withCredentials: true,
@@ -62,6 +77,12 @@ export class AdminService {
 
   createCar(car: AdminCarCreate): Observable<Car> {
     return this.http.post<Car>(`${this.apiBaseUrl}/admin/cars`, car, {
+      withCredentials: true,
+    });
+  }
+
+  deleteCar(id: string): Observable<void> {
+    return this.http.delete<void>(`${this.apiBaseUrl}/admin/cars/${id}`, {
       withCredentials: true,
     });
   }

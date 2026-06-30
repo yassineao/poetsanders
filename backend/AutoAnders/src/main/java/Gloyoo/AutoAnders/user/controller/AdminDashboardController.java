@@ -1,17 +1,20 @@
 package Gloyoo.AutoAnders.user.controller;
 
 import Gloyoo.AutoAnders.user.dto.AdminDashboardResponse;
+import Gloyoo.AutoAnders.user.dto.AdminAppointmentCreateRequest;
 import Gloyoo.AutoAnders.user.dto.AdminAppointmentResponse;
 import Gloyoo.AutoAnders.user.dto.AdminAppointmentUpdateRequest;
 import Gloyoo.AutoAnders.user.dto.AdminCarCreateRequest;
 import Gloyoo.AutoAnders.Cars.entity.Car;
 import Gloyoo.AutoAnders.Cars.dto.CarRequest;
+import Gloyoo.AutoAnders.notification.AppointmentCancellationEmailService;
 import Gloyoo.AutoAnders.user.dto.AdminUserCreateRequest;
 import Gloyoo.AutoAnders.user.dto.AdminUserUpdateRequest;
 import Gloyoo.AutoAnders.user.dto.AdminUserResponse;
 import Gloyoo.AutoAnders.user.service.AdminDashboardService;
 import jakarta.validation.Valid;
 import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -31,9 +34,14 @@ import java.util.Map;
 public class AdminDashboardController {
 
     private final AdminDashboardService adminDashboardService;
+    private final AppointmentCancellationEmailService appointmentCancellationEmailService;
 
-    public AdminDashboardController(AdminDashboardService adminDashboardService) {
+    public AdminDashboardController(
+            AdminDashboardService adminDashboardService,
+            AppointmentCancellationEmailService appointmentCancellationEmailService
+    ) {
         this.adminDashboardService = adminDashboardService;
+        this.appointmentCancellationEmailService = appointmentCancellationEmailService;
     }
 
     @GetMapping("/dashboard")
@@ -62,6 +70,31 @@ public class AdminDashboardController {
             @Valid @RequestBody AdminAppointmentUpdateRequest request
     ) {
         return ResponseEntity.ok(adminDashboardService.updateAppointment(id, request));
+    }
+
+    @PostMapping("/appointments")
+    public ResponseEntity<AdminAppointmentResponse> createAppointment(
+            @Valid @RequestBody AdminAppointmentCreateRequest request
+    ) {
+        return ResponseEntity.status(201).body(adminDashboardService.createAppointment(request));
+    }
+
+    @DeleteMapping("/appointments/{id}")
+    public ResponseEntity<Void> deleteAppointment(
+            @PathVariable UUID id
+    ) {
+        appointmentCancellationEmailService.sendCancellationConfirmation(
+                adminDashboardService.deleteAppointment(id)
+        );
+        return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping("/cars/{id}")
+    public ResponseEntity<Void> deleteCar(
+            @PathVariable UUID id
+    ) {
+        adminDashboardService.deleteCar(id);
+        return ResponseEntity.noContent().build();
     }
 
     @PatchMapping("/cars/{id}")

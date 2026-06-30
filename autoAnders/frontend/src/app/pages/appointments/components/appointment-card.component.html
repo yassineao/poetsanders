@@ -1,0 +1,27 @@
+<article class="rounded-2xl border border-white/10 bg-zinc-900 p-5 text-white shadow-xl shadow-black/30">
+  <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+    <div>
+      <p class="text-xs font-bold uppercase tracking-[0.18em] text-red-500">Appointment</p>
+      <h3 class="mt-2 text-xl font-black">{{ treatmentLabel() }}</h3>
+      <p class="mt-2 text-sm text-zinc-400">{{ dateLabel() }}</p>
+    </div>
+
+    <span
+      class="w-fit rounded-full px-3 py-1 text-xs font-bold"
+      [ngClass]="appointment().accepted ? 'bg-emerald-500/15 text-emerald-200' : 'bg-amber-500/15 text-amber-200'"
+    >
+      {{ statusLabel() }}
+    </span>
+  </div>
+
+  <div class="mt-5 flex justify-end">
+    <button
+      type="button"
+      [disabled]="cancelling()"
+      (click)="cancelRequested.emit(appointment())"
+      class="rounded-xl border border-red-500/40 bg-red-500/10 px-4 py-2 text-sm font-bold text-red-100 transition hover:bg-red-600 hover:text-white disabled:cursor-wait disabled:opacity-60"
+    >
+      {{ cancelling() ? "Cancelling..." : "Cancel appointment" }}
+    </button>
+  </div>
+</article>

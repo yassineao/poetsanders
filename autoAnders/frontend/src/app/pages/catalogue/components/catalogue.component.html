@@ -1,85 +1,326 @@
-<section class="bg-black px-4 py-12 text-white">
-  <div class="mx-auto max-w-7xl">
-    <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-      <div>
-        <p class="font-semibold text-red-500">{{ subtitle() }}</p>
-        <h2 class="mt-1 text-3xl font-black sm:text-4xl">{{ title() }}</h2>
+<section class="relative overflow-hidden bg-zinc-950 px-4 py-16 text-white sm:px-6 sm:py-20 lg:px-8">
+  <div
+    class="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(220,38,38,0.15),transparent_32%),radial-gradient(circle_at_bottom_right,rgba(220,38,38,0.08),transparent_30%)]"
+  ></div>
+
+  <div class="relative mx-auto max-w-7xl">
+    <div class="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
+      <div class="max-w-2xl">
+        <p class="text-sm font-bold uppercase tracking-[0.2em] text-red-500">
+          {{ subtitle() }}
+        </p>
+
+        <h2 class="mt-2 text-3xl font-black tracking-tight text-white sm:text-4xl lg:text-5xl">
+          {{ title() }}
+        </h2>
       </div>
-      <div class="flex items-center gap-3">
-        <span class="rounded-lg border border-white/10 px-4 py-2 text-sm text-zinc-300">{{ filteredCars().length }} {{ labels().vehiclesFound }}</span>
+
+      <div class="flex flex-col gap-3 xs:flex-row xs:items-center">
+        <span
+          class="inline-flex min-h-11 items-center justify-center rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-zinc-300 shadow-sm backdrop-blur-sm"
+        >
+          {{ filteredCars().length }} {{ labels().vehiclesFound }}
+        </span>
+
         @if (showMoreButton()) {
-          <a [routerLink]="['/', locale(), 'Catalogue']" class="rounded-lg bg-red-600 px-5 py-2 font-bold">{{ labels().moreButton }}</a>
+          <a
+            [routerLink]="['/', locale(), 'Catalogue']"
+            class="inline-flex min-h-11 items-center justify-center rounded-xl bg-red-600 px-5 py-2 text-sm font-bold text-white shadow-lg shadow-red-950/40 transition duration-200 hover:bg-red-500 hover:shadow-red-900/50 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:ring-offset-zinc-950"
+          >
+            {{ labels().moreButton }}
+          </a>
         }
       </div>
     </div>
 
-    <div class="my-8 grid gap-3 rounded-xl border border-white/10 bg-zinc-900 p-4 sm:grid-cols-2">
-      <input [ngModel]="search()" (ngModelChange)="search.set($event)" [placeholder]="labels().searchPlaceholder" class="h-12 rounded-lg border border-white/10 bg-zinc-950 px-4 outline-none focus:border-red-500" />
-      <select [ngModel]="brand()" (ngModelChange)="brand.set($event)" class="h-12 rounded-lg border border-white/10 bg-zinc-950 px-4">
+    <div
+      class="my-8 grid gap-4 rounded-2xl border border-white/10 bg-white/[0.04] p-4 shadow-2xl shadow-black/20 backdrop-blur-sm sm:grid-cols-2 sm:p-5"
+    >
+      <input
+        [ngModel]="search()"
+        (ngModelChange)="search.set($event)"
+        [placeholder]="labels().searchPlaceholder"
+        class="h-12 w-full rounded-xl border border-white/10 bg-black/40 px-4 text-sm text-white placeholder:text-zinc-500 outline-none transition duration-200 hover:border-white/20 focus:border-red-500 focus:ring-4 focus:ring-red-500/10"
+      />
+
+      <select
+        [ngModel]="brand()"
+        (ngModelChange)="brand.set($event)"
+        class="h-12 w-full cursor-pointer rounded-xl border border-white/10 bg-black/40 px-4 text-sm text-white outline-none transition duration-200 hover:border-white/20 focus:border-red-500 focus:ring-4 focus:ring-red-500/10"
+      >
         @for (option of brands(); track option) {
-          <option [value]="option">{{ option === "All" ? labels().allBrands : option }}</option>
+          <option [value]="option">
+            {{ option === "All" ? labels().allBrands : option }}
+          </option>
         }
       </select>
     </div>
 
     @if (!loaded()) {
-      <div class="rounded-xl border border-white/10 bg-zinc-900 p-6 text-zinc-300">
+      <div
+        class="flex min-h-40 items-center justify-center rounded-2xl border border-white/10 bg-white/[0.04] p-6 text-center text-zinc-300 shadow-xl shadow-black/20"
+      >
         Loading cars...
       </div>
     } @else if (filteredCars().length === 0) {
-      <div class="rounded-xl border border-white/10 bg-zinc-900 p-6">
-        <p class="text-zinc-300">No cars found.</p>
+      <div
+        class="flex min-h-40 items-center justify-center rounded-2xl border border-dashed border-white/15 bg-white/[0.03] p-6 text-center"
+      >
+        <p class="text-zinc-400">No cars found.</p>
       </div>
     } @else {
       <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-      @for (car of filteredCars(); track car.id) {
-        <article class="overflow-hidden rounded-xl border border-white/10 bg-zinc-900 shadow-xl">
-          <img [src]="car.image" [alt]="car.brand + ' ' + car.model" class="h-56 w-full object-cover" />
-          <div class="p-5">
-            <div class="flex justify-between gap-3">
-              <h3 class="text-xl font-black">{{ car.brand }} {{ car.model }}</h3>
-              <span class="font-bold text-emerald-400">{{ formatPrice(car.price) }}</span>
+        @for (car of filteredCars(); track car.id) {
+          <article
+            class="group flex h-full flex-col overflow-hidden rounded-2xl border border-white/10 bg-zinc-900/80 shadow-xl shadow-black/25 transition duration-300 hover:-translate-y-1 hover:border-red-500/30 hover:shadow-2xl hover:shadow-red-950/20"
+          >
+            <div class="relative overflow-hidden bg-black">
+              <img
+                [src]="imagesFor(car)[0]"
+                [alt]="car.brand + ' ' + car.model"
+                (click)="selectedImages.set(imagesFor(car)); selectedImage.set(imagesFor(car)[0])"
+                class="h-56 w-full cursor-zoom-in object-cover transition duration-500 group-hover:scale-105"
+              />
+
+              <div
+                class="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/45 via-transparent to-transparent"
+              ></div>
+
+              @if (imagesFor(car).length > 1) {
+  <div class="grid grid-cols-4 gap-2 border-t border-white/10 bg-zinc-950 p-2">
+    @for (image of imagesFor(car).slice(1, 5); track image) {
+      <div
+        class="group/image relative aspect-[4/3] overflow-hidden rounded-lg border border-white/10 bg-zinc-900"
+      >
+        <img
+          [src]="image"
+          [alt]="car.brand + ' ' + car.model"
+          (click)="selectedImages.set(imagesFor(car)); selectedImage.set(image)"
+          class="h-full w-full cursor-zoom-in object-cover opacity-80 transition duration-300 group-hover/image:scale-110 group-hover/image:opacity-100"
+        />
+
+        <div
+          class="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-70 transition group-hover/image:opacity-30"
+        ></div>
+      </div>
+    }
+  </div>
+}
             </div>
-            <div class="mt-4 grid grid-cols-2 gap-2 text-sm text-zinc-300">
-              <span>{{ car.firstRegistrationDate }}</span><span>{{ car.mileage | number }} km</span>
-              <span>{{ car.transmission }}</span><span>{{ car.fuel }}</span>
+
+            <div class="flex flex-1 flex-col p-5 sm:p-6">
+              <div class="flex items-start justify-between gap-4">
+                <h3 class="text-xl font-black leading-tight tracking-tight text-white">
+                  {{ car.brand }} {{ car.model }}
+                </h3>
+
+                <span
+                  class="shrink-0 rounded-lg bg-emerald-500/10 px-2.5 py-1 text-sm font-extrabold text-emerald-400"
+                >
+                  {{ formatPrice(car.price) }}
+                </span>
+              </div>
+
+              <div
+                class="mt-5 grid grid-cols-2 gap-x-4 gap-y-3 border-y border-white/5 py-4 text-sm text-zinc-300"
+              >
+                <span class="flex items-center rounded-lg bg-white/[0.03] px-3 py-2">
+                  {{ car.firstRegistrationDate }}
+                </span>
+
+                <span class="flex items-center rounded-lg bg-white/[0.03] px-3 py-2">
+                  {{ car.mileage | number }} km
+                </span>
+
+                <span class="flex items-center rounded-lg bg-white/[0.03] px-3 py-2">
+                  {{ car.transmission }}
+                </span>
+
+                <span class="flex items-center rounded-lg bg-white/[0.03] px-3 py-2">
+                  {{ car.fuel }}
+                </span>
+              </div>
+
+              <div class="mt-4 flex flex-wrap gap-2">
+                @for (tag of car.tags[locale()]; track tag) {
+                  <span
+                    class="rounded-full border border-red-500/15 bg-red-500/10 px-3 py-1 text-xs font-semibold text-red-200"
+                  >
+                    {{ tag }}
+                  </span>
+                }
+              </div>
+
+              <button
+                type="button"
+                (click)="selectedCar.set(car)"
+                class="mt-auto flex h-12 w-full items-center justify-center rounded-xl bg-white px-5 pt-0 font-bold text-zinc-950 shadow-lg transition duration-200 hover:bg-red-600 hover:text-white focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:ring-offset-zinc-900"
+              >
+                {{ labels().viewDetails }}
+              </button>
             </div>
-            <div class="mt-4 flex flex-wrap gap-2">
-              @for (tag of car.tags[locale()]; track tag) {
-                <span class="rounded-full bg-red-950 px-3 py-1 text-xs text-red-100">{{ tag }}</span>
-              }
-            </div>
-            <button type="button" (click)="selectedCar.set(car)" class="mt-5 h-12 w-full rounded-lg bg-white font-bold text-black">{{ labels().viewDetails }}</button>
-          </div>
-        </article>
-      }
+          </article>
+        }
       </div>
     }
   </div>
 </section>
 
 @if (selectedCar(); as car) {
-  <div class="fixed inset-0 z-[70] flex items-center justify-center bg-black/80 p-4" (click)="selectedCar.set(null)">
-    <article class="max-h-[92vh] w-full max-w-5xl overflow-y-auto rounded-2xl border border-white/10 bg-zinc-950 text-white" (click)="$event.stopPropagation()">
+  <div
+    class="fixed inset-0 z-[70] flex items-center justify-center bg-black/85 p-3 backdrop-blur-md sm:p-6"
+    (click)="selectedCar.set(null)"
+  >
+    <article
+      class="max-h-[92vh] w-full max-w-5xl overflow-y-auto rounded-2xl border border-white/10 bg-zinc-950 text-white shadow-2xl shadow-black/70 sm:rounded-3xl"
+      (click)="$event.stopPropagation()"
+    >
       <div class="grid lg:grid-cols-2">
-        <img [src]="car.image" [alt]="car.brand + ' ' + car.model" class="h-full min-h-80 w-full object-cover" />
-        <div class="p-6">
-          <button type="button" (click)="selectedCar.set(null)" class="float-right h-10 w-10 rounded-full bg-white/10">×</button>
-          <h2 class="text-3xl font-black">{{ car.brand }} {{ car.model }}</h2>
-          <p class="mt-2 text-2xl font-bold text-emerald-400">{{ formatPrice(car.price) }}</p>
-          <div class="mt-6 grid grid-cols-2 gap-3 text-sm">
-            <span class="rounded-lg bg-white/5 p-3">Year: {{ car.year }}</span>
-            <span class="rounded-lg bg-white/5 p-3">{{ car.mileage | number }} km</span>
-            <span class="rounded-lg bg-white/5 p-3">{{ car.transmission }}</span>
-            <span class="rounded-lg bg-white/5 p-3">{{ car.fuel }}</span>
-            <span class="rounded-lg bg-white/5 p-3">{{ car.colour }}</span>
-            <span class="rounded-lg bg-white/5 p-3">{{ car.engineCapacity }} cc</span>
-            <span class="rounded-lg bg-white/5 p-3">{{ car.numberOfDoors }} doors</span>
-            <span class="rounded-lg bg-white/5 p-3">{{ car.numberOfSeats }} seats</span>
+        <div class="overflow-hidden bg-black">
+          <img
+            [src]="imagesFor(car)[0]"
+            [alt]="car.brand + ' ' + car.model"
+            (click)="selectedImages.set(imagesFor(car)); selectedImage.set(imagesFor(car)[0])"
+            class="h-72 w-full cursor-zoom-in object-cover sm:h-96 lg:h-full lg:min-h-[34rem]"
+          />
+
+          @if (imagesFor(car).length > 1) {
+            <div class="grid grid-cols-3 gap-2 border-t border-white/10 bg-black p-2 sm:grid-cols-4">
+              @for (image of imagesFor(car).slice(1); track image) {
+                <div class="overflow-hidden rounded-lg border border-white/10">
+                  <img
+                    [src]="image"
+                    [alt]="car.brand + ' ' + car.model"
+                    (click)="selectedImages.set(imagesFor(car)); selectedImage.set(image)"
+                    class="aspect-[4/3] w-full cursor-zoom-in object-cover opacity-80 transition duration-300 hover:scale-105 hover:opacity-100"
+                  />
+                </div>
+              }
+            </div>
+          }
+        </div>
+
+        <div class="relative p-5 sm:p-8 lg:p-10">
+          <button
+            type="button"
+            (click)="selectedCar.set(null)"
+            class="absolute right-4 top-4 flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-white/10 text-xl text-zinc-300 transition duration-200 hover:rotate-90 hover:bg-red-600 hover:text-white focus:outline-none focus:ring-2 focus:ring-red-500 sm:right-6 sm:top-6"
+          >
+            ×
+          </button>
+
+          <div class="pr-12">
+            <h2 class="text-3xl font-black tracking-tight text-white sm:text-4xl">
+              {{ car.brand }} {{ car.model }}
+            </h2>
+
+            <p class="mt-3 text-2xl font-black text-emerald-400">
+              {{ formatPrice(car.price) }}
+            </p>
           </div>
-          <a [routerLink]="['/', locale(), 'form']" class="mt-6 block rounded-lg bg-red-600 px-5 py-3 text-center font-bold">Request</a>
+
+          <div class="mt-8 grid grid-cols-2 gap-3 text-sm">
+            <span class="rounded-xl border border-white/5 bg-white/[0.04] p-3.5 text-zinc-300">
+              Year:
+              <strong class="font-semibold text-white">{{ car.year }}</strong>
+            </span>
+
+            <span class="rounded-xl border border-white/5 bg-white/[0.04] p-3.5 text-zinc-300">
+              {{ car.mileage | number }} km
+            </span>
+
+            <span class="rounded-xl border border-white/5 bg-white/[0.04] p-3.5 text-zinc-300">
+              {{ car.transmission }}
+            </span>
+
+            <span class="rounded-xl border border-white/5 bg-white/[0.04] p-3.5 text-zinc-300">
+              {{ car.fuel }}
+            </span>
+
+            <span class="rounded-xl border border-white/5 bg-white/[0.04] p-3.5 text-zinc-300">
+              {{ car.colour }}
+            </span>
+
+            <span class="rounded-xl border border-white/5 bg-white/[0.04] p-3.5 text-zinc-300">
+              {{ car.engineCapacity }} cc
+            </span>
+
+            <span class="rounded-xl border border-white/5 bg-white/[0.04] p-3.5 text-zinc-300">
+              {{ car.numberOfDoors }} doors
+            </span>
+
+            <span class="rounded-xl border border-white/5 bg-white/[0.04] p-3.5 text-zinc-300">
+              {{ car.numberOfSeats }} seats
+            </span>
+          </div>
+
+          <a
+            [routerLink]="['/', locale(), 'form']"
+            class="mt-8 flex min-h-12 w-full items-center justify-center rounded-xl bg-red-600 px-5 py-3 text-center font-bold text-white shadow-lg shadow-red-950/40 transition duration-200 hover:bg-red-500 hover:shadow-red-900/40 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:ring-offset-zinc-950"
+          >
+            Request
+          </a>
         </div>
       </div>
     </article>
+  </div>
+}
+
+@if (selectedImage(); as image) {
+  <div
+    class="fixed inset-0 z-[90] flex items-center justify-center bg-black/95 p-3 backdrop-blur-md sm:p-6"
+    (click)="selectedImage.set(null); selectedImages.set([])"
+  >
+    <button
+      type="button"
+      (click)="selectedImage.set(null); selectedImages.set([])"
+      class="absolute right-4 top-4 z-20 flex h-11 w-11 items-center justify-center rounded-full border border-white/15 bg-black/60 text-2xl text-white shadow-lg backdrop-blur-sm transition duration-200 hover:rotate-90 hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 sm:right-8 sm:top-8"
+      aria-label="Close image"
+    >
+      ×
+    </button>
+
+    <div
+      class="flex max-h-[96vh] w-full max-w-6xl flex-col gap-3"
+      (click)="$event.stopPropagation()"
+    >
+      <div class="flex min-h-0 flex-1 items-center justify-center overflow-hidden rounded-2xl bg-black/40">
+        <img
+          [src]="image"
+          alt="Selected vehicle image"
+          class="max-h-[78vh] max-w-full object-contain shadow-2xl shadow-black/80"
+        />
+      </div>
+
+      @if (selectedImages().length > 1) {
+        <div class="rounded-2xl border border-white/10 bg-zinc-950/90 p-2 shadow-2xl backdrop-blur-sm sm:p-3">
+          <div class="flex gap-2 overflow-x-auto pb-1 [scrollbar-color:rgb(220_38_38)_rgb(39_39_42)] [scrollbar-width:thin]">
+            @for (thumbnail of selectedImages(); track thumbnail) {
+              <button
+                type="button"
+                (click)="selectedImage.set(thumbnail)"
+                class="group/thumb relative h-16 w-24 shrink-0 overflow-hidden rounded-lg border-2 border-white/10 bg-zinc-900 transition duration-200 hover:-translate-y-0.5 hover:border-red-400 sm:h-20 sm:w-28"
+                [class.ring-2]="thumbnail === image"
+                [class.ring-red-500]="thumbnail === image"
+                [attr.aria-label]="'Open vehicle image ' + ($index + 1)"
+                [attr.aria-pressed]="thumbnail === image"
+              >
+                <img
+                  [src]="thumbnail"
+                  alt="Vehicle thumbnail"
+                  class="h-full w-full object-cover transition duration-300 group-hover/thumb:scale-105"
+                  [class.opacity-100]="thumbnail === image"
+                  [class.opacity-60]="thumbnail !== image"
+                />
+
+                @if (thumbnail === image) {
+                  <span class="pointer-events-none absolute inset-x-0 bottom-0 h-1 bg-red-500"></span>
+                }
+              </button>
+            }
+          </div>
+        </div>
+      }
+    </div>
   </div>
 }

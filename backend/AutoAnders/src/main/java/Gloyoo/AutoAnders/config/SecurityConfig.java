@@ -18,6 +18,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Configuration
@@ -25,6 +26,7 @@ import java.util.List;
 public class SecurityConfig {
 
     @Value("${app.base-url:http://localhost:8080}") String productionUrl;
+    @Value("${app.cors.allowed-origins:}") String configuredAllowedOrigins;
     private final JwtAuthFilter jwtAuthFilter;
 
     public SecurityConfig(JwtAuthFilter jwtAuthFilter) {
@@ -54,6 +56,7 @@ public class SecurityConfig {
                         // Car status management: only ADMIN
                         .requestMatchers(HttpMethod.PATCH, "/cars/statusUpdate/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.POST, "/cars/statusUpdate/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/cars/*/pictures/**").hasRole("ADMIN")
 
                         // Authenticated car submission
                         .requestMatchers(HttpMethod.POST, "/cars").authenticated()
@@ -101,15 +104,26 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration cfg = new CorsConfiguration();
 
-        cfg.setAllowedOriginPatterns(List.of(
+        List<String> allowedOrigins = new ArrayList<>(List.of(
                 "http://localhost:3000",
                 "http://localhost:4200",
                 "http://localhost:5173",
+                "https://auto-anders.vercel.app",
+                "https://www.auto-anders.vercel.app",
                 "https://poetsanders.nl",
                 "https://www.poetsanders.nl",
                 "https://poetsanders.vercel.app",
                 productionUrl
         ));
+
+        for (String origin : configuredAllowedOrigins.split(",")) {
+            String trimmedOrigin = origin.trim();
+            if (!trimmedOrigin.isBlank()) {
+                allowedOrigins.add(trimmedOrigin);
+            }
+        }
+
+        cfg.setAllowedOriginPatterns(allowedOrigins);
 
         cfg.setAllowedMethods(List.of(
                 "GET",

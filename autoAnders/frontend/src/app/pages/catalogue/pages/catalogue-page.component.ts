@@ -2,13 +2,19 @@ import { isPlatformBrowser } from "@angular/common";
 import { Component, PLATFORM_ID, computed, inject } from "@angular/core";
 import { toSignal } from "@angular/core/rxjs-interop";
 import { ActivatedRoute } from "@angular/router";
-import { catchError, forkJoin, map, of, startWith, switchMap, type Observable } from "rxjs";
+import { catchError, forkJoin, from, map, of, startWith, switchMap, type Observable } from "rxjs";
 import { getDictionary, isValidLocale } from "../../../core/lib/i18n";
 import type { Locale } from "../../../core/interfaces/locale";
 import { CatalogueComponent } from "../components/catalogue.component";
 import { CarsService } from "../../../core/cars/cars.service";
-import type { Car } from "../../../core/interfaces/Car";
+import type { Car, CarPicture } from "../../../core/interfaces/Car";
 import type { CatalogueCar } from "../../../core/interfaces/LocaleDictionary";
+import { SupabaseService } from "../../../core/supabase/supabase.service";
+
+type CatalogueApiCar = Car & {
+  catalogueImage: string;
+  catalogueImages: string[];
+};
 
 @Component({
   imports: [CatalogueComponent],
@@ -25,8 +31,9 @@ export class CataloguePageComponent {
     { initialValue: "de" },
   );
   private readonly carsService = inject(CarsService);
+  private readonly supabase = inject(SupabaseService);
   private readonly carsSource$: Observable<Car[] | null> = this.isBrowser
-    ? this.carsService.GetCars()
+    ? this.carsService.GetAvailableCars()
     : of(null);
 
   private readonly apiCars = toSignal(
@@ -45,10 +52,24 @@ export class CataloguePageComponent {
           return forkJoin(
             cars.map((car) =>
               this.carsService.getCarPictures(car.id).pipe(
-                map((pictures) => ({ ...car, pictures })),
+                switchMap((pictures) =>
+                  from(this.resolveCatalogueImages(pictures)).pipe(
+                    map((catalogueImages) => ({
+                      ...car,
+                      pictures,
+                      catalogueImage: catalogueImages[0] ?? this.fallbackImage(),
+                      catalogueImages,
+                    })),
+                  ),
+                ),
                 catchError((error) => {
                   console.error(`Loading pictures for car ${car.id} failed:`, error);
-                  return of({ ...car, pictures: [] });
+                  return of({
+                    ...car,
+                    pictures: [],
+                    catalogueImage: this.fallbackImage(),
+                    catalogueImages: [this.fallbackImage()],
+                  });
                 }),
               ),
             ),
@@ -56,7 +77,7 @@ export class CataloguePageComponent {
         }),
         catchError((error) => {
           console.error("Loading cars failed:", error);
-          return of([] as Car[]);
+          return of([] as CatalogueApiCar[]);
         }),
 
       ));
@@ -68,10 +89,10 @@ export class CataloguePageComponent {
   protected readonly catalogue = computed(() => getDictionary(this.locale()).home.catalogue);
   protected readonly carsLoaded = computed(() => this.apiCars() !== null);
   protected readonly cars = computed<CatalogueCar[]>(() =>
-    (this.apiCars() ?? []).map((car) => this.toCatalogueCar(car)),
+    ((this.apiCars() as CatalogueApiCar[] | null) ?? []).map((car) => this.toCatalogueCar(car)),
   );
 
-  private toCatalogueCar(car: Car): CatalogueCar {
+  private toCatalogueCar(car: CatalogueApiCar): CatalogueCar {
     const fallbackTags = [
       car.bodyType,
       car.fuel,
@@ -97,7 +118,8 @@ export class CataloguePageComponent {
       vat: car.taxDeductible ? "VAT deductible" : "",
       vehicle: String(car.bodyType ?? ""),
       colour: car.colour ?? "",
-      image: car.pictures?.[0]?.storage_path ?? "/cars/audi.jpg",
+      image: car.catalogueImage,
+      images: car.catalogueImages?.length ? car.catalogueImages : [car.catalogueImage],
       tags: {
         de: fallbackTags,
         en: fallbackTags,
@@ -109,5 +131,36 @@ export class CataloguePageComponent {
   private yearFromDate(value: string): number {
     const year = new Date(value).getFullYear();
     return Number.isNaN(year) ? new Date().getFullYear() : year;
+  }
+
+  private async resolveCatalogueImages(pictures: CarPicture[]): Promise<string[]> {
+    const storagePaths = pictures
+      .map((picture) => picture.storage_path)
+      .filter((storagePath): storagePath is string => Boolean(storagePath));
+
+    if (!storagePaths.length) {
+      return [this.fallbackImage()];
+    }
+
+    const images = await Promise.all(
+      storagePaths.map(async (storagePath) => {
+        if (this.isRenderableUrl(storagePath)) {
+          return storagePath;
+        }
+
+        return await this.supabase.getPrivateImageUrl("car-pictures", storagePath);
+      }),
+    );
+
+    const renderableImages = images.filter((image): image is string => Boolean(image));
+    return renderableImages.length ? renderableImages : [this.fallbackImage()];
+  }
+
+  private isRenderableUrl(value: string): boolean {
+    return /^https?:\/\//i.test(value) || value.startsWith("/");
+  }
+
+  private fallbackImage(): string {
+    return "/no-image-icon.png";
   }
 }

@@ -1,0 +1,15 @@
+@if (pictures().length > 0) {
+    <section class="bg-zinc-950 px-4 pb-16 text-white sm:px-6">
+        <div class="mx-auto max-w-7xl rounded-2xl border border-white/10 bg-zinc-900 p-5">
+            <h2 class="text-lg font-black">Uploaded pictures</h2>
+            <div class="mt-4 space-y-2">
+                @for (picture of pictures(); track picture.id) {
+                    <div class="rounded-xl border border-white/10 bg-zinc-950 px-4 py-3 text-sm">
+                        <p class="font-bold text-zinc-200">{{ picture.title || picture.id }}</p>
+                        <p class="mt-1 break-all text-xs text-zinc-500">{{ picture.storage_path }}</p>
+                    </div>
+                }
+            </div>
+        </div>
+    </section>
+}

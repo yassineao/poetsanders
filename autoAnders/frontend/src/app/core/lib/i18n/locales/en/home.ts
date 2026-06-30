@@ -157,7 +157,7 @@ export const enHomeCopy: Copy["home"] = {
       vat: "VAT deductible",
       vehicle: "Estate",
       colour: "Grey",
-      image: "/cars/audi.jpg",
+      image: "/404.png",
       tags: {
         de: ["LED", "Kamera", "Tempomat"],
         en: ["LED", "Camera", "Cruise Control"],

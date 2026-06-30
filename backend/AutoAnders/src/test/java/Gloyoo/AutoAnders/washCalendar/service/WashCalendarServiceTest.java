@@ -1,5 +1,6 @@
 package Gloyoo.AutoAnders.washCalendar.service;
 
+import Gloyoo.AutoAnders.notification.StatusChangeEmailService;
 import Gloyoo.AutoAnders.user.entity.User;
 import Gloyoo.AutoAnders.user.service.UserService;
 import Gloyoo.AutoAnders.washCalendar.dto.GuestWashCalendarRequest;
@@ -27,12 +28,23 @@ import static org.mockito.Mockito.when;
 
 class WashCalendarServiceTest {
 
+    private WashCalendarService service(
+            WashCalendarRepository washCalendarRepository,
+            UserService userService
+    ) {
+        return new WashCalendarService(
+                washCalendarRepository,
+                userService,
+                mock(StatusChangeEmailService.class)
+        );
+    }
+
     @Test
     void bookingAssignsAuthenticatedUserBeforeSaving() {
         WashCalendarRepository washCalendarRepository = mock(WashCalendarRepository.class);
         UserService userService = mock(UserService.class);
         WashCalendarService service =
-                new WashCalendarService(washCalendarRepository, userService);
+                service(washCalendarRepository, userService);
 
         UUID userId = UUID.randomUUID();
         User user = User.builder().id(userId).build();
@@ -57,7 +69,7 @@ class WashCalendarServiceTest {
         WashCalendarRepository washCalendarRepository = mock(WashCalendarRepository.class);
         UserService userService = mock(UserService.class);
         WashCalendarService service =
-                new WashCalendarService(washCalendarRepository, userService);
+                service(washCalendarRepository, userService);
 
         UUID userId = UUID.randomUUID();
         User user = User.builder().id(userId).build();
@@ -95,7 +107,7 @@ class WashCalendarServiceTest {
         WashCalendarRepository washCalendarRepository = mock(WashCalendarRepository.class);
         UserService userService = mock(UserService.class);
         WashCalendarService service =
-                new WashCalendarService(washCalendarRepository, userService);
+                service(washCalendarRepository, userService);
 
         User guest = User.builder().id(UUID.randomUUID()).build();
         LocalDateTime appointment = LocalDateTime.of(2026, 6, 12, 10, 30);
@@ -138,7 +150,7 @@ class WashCalendarServiceTest {
         WashCalendarRepository washCalendarRepository = mock(WashCalendarRepository.class);
         UserService userService = mock(UserService.class);
         WashCalendarService service =
-                new WashCalendarService(washCalendarRepository, userService);
+                service(washCalendarRepository, userService);
 
         UUID appointmentId = UUID.randomUUID();
         UUID authenticatedUserId = UUID.randomUUID();
@@ -161,7 +173,7 @@ class WashCalendarServiceTest {
         WashCalendarRepository washCalendarRepository = mock(WashCalendarRepository.class);
         UserService userService = mock(UserService.class);
         WashCalendarService service =
-                new WashCalendarService(washCalendarRepository, userService);
+                service(washCalendarRepository, userService);
 
         UUID authenticatedUserId = UUID.randomUUID();
         UUID ownedId = UUID.randomUUID();
@@ -193,7 +205,7 @@ class WashCalendarServiceTest {
         WashCalendarRepository washCalendarRepository = mock(WashCalendarRepository.class);
         UserService userService = mock(UserService.class);
         WashCalendarService service =
-                new WashCalendarService(washCalendarRepository, userService);
+                service(washCalendarRepository, userService);
 
         UUID authenticatedUserId = UUID.randomUUID();
         UUID existingId = UUID.randomUUID();
@@ -221,7 +233,7 @@ class WashCalendarServiceTest {
         WashCalendarRepository washCalendarRepository = mock(WashCalendarRepository.class);
         UserService userService = mock(UserService.class);
         WashCalendarService service =
-                new WashCalendarService(washCalendarRepository, userService);
+                service(washCalendarRepository, userService);
 
         UUID authenticatedUserId = UUID.randomUUID();
         UUID firstId = UUID.randomUUID();
@@ -245,7 +257,7 @@ class WashCalendarServiceTest {
         WashCalendarRepository washCalendarRepository = mock(WashCalendarRepository.class);
         UserService userService = mock(UserService.class);
         WashCalendarService service =
-                new WashCalendarService(washCalendarRepository, userService);
+                service(washCalendarRepository, userService);
         String token = "secure-cancellation-token";
         User user = User.builder()
                 .id(UUID.randomUUID())
@@ -284,7 +296,7 @@ class WashCalendarServiceTest {
         WashCalendarRepository washCalendarRepository = mock(WashCalendarRepository.class);
         UserService userService = mock(UserService.class);
         WashCalendarService service =
-                new WashCalendarService(washCalendarRepository, userService);
+                service(washCalendarRepository, userService);
         User guest = User.builder()
                 .id(UUID.randomUUID())
                 .name("Guest Customer")
@@ -325,7 +337,7 @@ class WashCalendarServiceTest {
         WashCalendarRepository washCalendarRepository = mock(WashCalendarRepository.class);
         UserService userService = mock(UserService.class);
         WashCalendarService service =
-                new WashCalendarService(washCalendarRepository, userService);
+                service(washCalendarRepository, userService);
         UUID userId = UUID.randomUUID();
         User registered = User.builder()
                 .id(userId)
@@ -357,7 +369,7 @@ class WashCalendarServiceTest {
         WashCalendarRepository washCalendarRepository = mock(WashCalendarRepository.class);
         UserService userService = mock(UserService.class);
         WashCalendarService service =
-                new WashCalendarService(washCalendarRepository, userService);
+                service(washCalendarRepository, userService);
 
         when(washCalendarRepository.findByCancellationTokenHash(any()))
                 .thenReturn(List.of());
@@ -374,7 +386,7 @@ class WashCalendarServiceTest {
         WashCalendarRepository washCalendarRepository = mock(WashCalendarRepository.class);
         UserService userService = mock(UserService.class);
         WashCalendarService service =
-                new WashCalendarService(washCalendarRepository, userService);
+                service(washCalendarRepository, userService);
         User guest = User.builder()
                 .id(UUID.randomUUID())
                 .email("guest::customer@example.com")
@@ -411,7 +423,7 @@ class WashCalendarServiceTest {
         WashCalendarRepository washCalendarRepository = mock(WashCalendarRepository.class);
         UserService userService = mock(UserService.class);
         WashCalendarService service =
-                new WashCalendarService(washCalendarRepository, userService);
+                service(washCalendarRepository, userService);
         User guest = User.builder()
                 .id(UUID.randomUUID())
                 .email("guest::customer@example.com")
@@ -440,7 +452,7 @@ class WashCalendarServiceTest {
     void expiredCleanupDoesNothingWhenNoAppointmentsHavePassed() {
         WashCalendarRepository washCalendarRepository = mock(WashCalendarRepository.class);
         WashCalendarService service =
-                new WashCalendarService(washCalendarRepository, mock(UserService.class));
+                service(washCalendarRepository, mock(UserService.class));
         LocalDateTime cutoff = LocalDateTime.of(2026, 6, 12, 11, 0);
 
         when(washCalendarRepository.findByLocalDateTimeBefore(cutoff))

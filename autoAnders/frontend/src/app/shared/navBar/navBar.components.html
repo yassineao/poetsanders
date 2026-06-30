@@ -111,9 +111,10 @@
           class="rounded-lg border border-white/10 py-2 text-sm text-white">{{ language.toUpperCase() }}</button>
         }
       </div>
-      <a [routerLink]="['/', locale(), 'auth']" (click)="closeMenus()"
-        class="block rounded-xl border border-white/10 px-4 py-3 text-center font-semibold text-white">{{
-        content().authLabel }}</a>
+      <a [routerLink]="['/', locale(), isAuthenticated() ? 'profile' : 'auth']" (click)="closeMenus()"
+        class="block rounded-xl border border-white/10 px-4 py-3 text-center font-semibold text-white">
+        {{ isAuthenticated() ? 'My account' : content().authLabel }}
+      </a>
       <a [routerLink]="['/', locale(), 'form']" (click)="closeMenus()"
         class="block rounded-xl bg-red-600 px-4 py-3 text-center font-semibold text-white">{{ content().contactLabel
         }}</a>

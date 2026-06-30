@@ -14,7 +14,6 @@ import type { LoginCredentials } from "../../../core/interfaces/loginCridentials
 import { createAuthFormContent } from "../components/auth-form-content";
 import { RegisterCredentials } from "../../../core/interfaces/registerCredentials";
 import { createCredentials } from "../components/auth-form-submit";
-import { log } from "console";
 
 @Component({
     selector: "app-auth",
@@ -29,6 +28,12 @@ export class AuthPageComponent {
             map((params) => params.get("locale") ?? "de"),
         ),
         { initialValue: "de" },
+    );
+    private readonly returnUrlParam = toSignal(
+        this.route.queryParamMap.pipe(
+            map((params) => params.get("returnUrl") ?? "/"),
+        ),
+        { initialValue: "/" },
     );
     protected readonly locale = computed<Locale>(() => {
         const value = this.localeParam();
@@ -47,7 +52,7 @@ export class AuthPageComponent {
     protected readonly sending = signal(false);
     protected readonly sent = signal(false);
     protected readonly failed = signal(false);
-    protected readonly sent_Url = signal("/");
+    protected readonly sent_Url = computed(() => this.returnUrlParam());
 
     protected submit(submission: FormSubmission): void {
         const credentials = createCredentials(submission, this.registring());
