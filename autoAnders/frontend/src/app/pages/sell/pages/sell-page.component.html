@@ -1,0 +1,7 @@
+<app-sell-car-form
+    [locale]="locale()"
+    [content]="content()"
+    (picturesUploaded)="uploadedPictures.set($event)"
+/>
+
+<app-sell-uploaded-pictures [pictures]="uploadedPictures()" />

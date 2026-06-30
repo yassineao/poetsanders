@@ -1,6 +1,6 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable, inject, signal } from '@angular/core';
-import { Observable, tap } from 'rxjs';
+import { forkJoin, Observable, of, tap } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { Car, CarPicture , CarPictureRequest , CarRequest} from "../interfaces/Car"
 
@@ -41,7 +41,14 @@ export class CarsService {
 
   updateCarStatus(id: string, status: Car['status']): Observable<Car> {
     return this.http
-      .patch<Car>(`${this.carsUrl}/statusUpdate/${id}`, status, this.requestOptions)
+      .patch<Car>(
+        `${this.carsUrl}/statusUpdate/${id}`,
+        JSON.stringify(status),
+        {
+          ...this.requestOptions,
+          headers: new HttpHeaders({ 'Content-Type': 'application/json' }),
+        },
+      )
       .pipe(tap((updatedCar) => this.currentCar.set(updatedCar)));
   }
 
@@ -55,6 +62,13 @@ export class CarsService {
           }
         })
       );
+  }
+
+  deleteCarPicture(carId: string, pictureId: string): Observable<void> {
+    return this.http.delete<void>(
+      `${this.carsUrl}/${carId}/pictures/${pictureId}`,
+      this.requestOptions
+    );
   }
 
   addCarPicture(carId: string, picture: CarPictureRequest): Observable<CarPicture> {
@@ -79,20 +93,11 @@ export class CarsService {
   }
 
   addCarPictures(carId: string, pictures: CarPictureRequest[]): Observable<CarPicture[]> {
-    const formData = new FormData();
-
-    for (const picture of pictures) {
-      formData.append('files', picture.file);
+    if (!pictures.length) {
+      return of([]);
     }
 
-    formData.append('width', String(pictures[0]?.width ?? 0));
-    formData.append('height', String(pictures[0]?.height ?? 0));
-
-    return this.http.post<CarPicture[]>(
-      `${this.carsUrl}/${carId}/pictures/batch`,
-      formData,
-      this.requestOptions
-    );
+    return forkJoin(pictures.map((picture) => this.addCarPicture(carId, picture)));
   }
 
 
@@ -121,6 +126,10 @@ export class CarsService {
 
   DeleteCar(id: string): Observable<void> {
     return this.deleteCar(id);
+  }
+
+  DeleteCarPicture(carId: string, pictureId: string): Observable<void> {
+    return this.deleteCarPicture(carId, pictureId);
   }
 
   AddCarPicture(carId: string, picture: CarPictureRequest): Observable<CarPicture> {

@@ -1,5 +1,6 @@
 package Gloyoo.AutoAnders.washCalendar.service;
 
+import Gloyoo.AutoAnders.notification.StatusChangeEmailService;
 import Gloyoo.AutoAnders.user.entity.User;
 import Gloyoo.AutoAnders.user.service.UserService;
 import Gloyoo.AutoAnders.washCalendar.dto.GuestWashCalendarRequest;
@@ -33,13 +34,16 @@ public class WashCalendarService {
 
     private final WashCalendarRepository washCalendarRepository;
     private final UserService userService;
+    private final StatusChangeEmailService statusChangeEmailService;
 
     public WashCalendarService(
             WashCalendarRepository washCalendarRepository,
-            UserService userService
+            UserService userService,
+            StatusChangeEmailService statusChangeEmailService
     ) {
         this.washCalendarRepository = washCalendarRepository;
         this.userService = userService;
+        this.statusChangeEmailService = statusChangeEmailService;
     }
 
     public WashCalendar book_a_wash_calendar(
@@ -108,6 +112,17 @@ public class WashCalendarService {
     @Transactional
     public AppointmentCancellation deleteWashCalendar(UUID uuid, UUID userId) {
         WashCalendar washCalendar = findOwnedWashCalendar(uuid, userId);
+        return cancelAppointments(List.of(washCalendar));
+    }
+
+    @Transactional
+    public AppointmentCancellation deleteWashCalendarAsAdmin(UUID uuid) {
+        WashCalendar washCalendar = washCalendarRepository.findById(uuid)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "Wash calendar not found"
+                ));
+
         return cancelAppointments(List.of(washCalendar));
     }
 
@@ -203,9 +218,15 @@ public class WashCalendarService {
                         "Wash calendar not found"
                 ));
 
+        boolean previousAccepted = washCalendar.isAccepted();
         washCalendar.setAccepted(true);
 
-        washCalendarRepository.save(washCalendar);
+        WashCalendar savedWashCalendar = washCalendarRepository.save(washCalendar);
+        statusChangeEmailService.sendAppointmentStatusChanged(
+                savedWashCalendar,
+                previousAccepted,
+                savedWashCalendar.isAccepted()
+        );
     }
 
     private WashCalendar findOwnedWashCalendar(UUID washCalendarId, UUID userId) {

@@ -121,6 +121,10 @@ export class AdminDashboardPageComponent {
       return;
     }
 
+    if (!window.confirm(`Accept appointment for ${appointment.customerName}?`)) {
+      return;
+    }
+
     this.acceptError.set(false);
     this.acceptingIds.update((ids) => [...ids, appointment.id]);
     this.admin
@@ -173,12 +177,35 @@ export class AdminDashboardPageComponent {
     });
   }
 
+  protected addAppointment(createdAppointment: AdminAppointment): void {
+    this.dashboard.update((dashboard) => {
+      if (!dashboard) {
+        return dashboard;
+      }
+
+      const appointments = [createdAppointment, ...dashboard.appointments];
+      const acceptedAppointments = appointments.filter((appointment) => appointment.accepted).length;
+
+      return {
+        ...dashboard,
+        totalAppointments: dashboard.totalAppointments + 1,
+        appointments,
+        acceptedAppointments,
+        pendingAppointments: appointments.length - acceptedAppointments,
+      };
+    });
+  }
+
   protected link(): void {
   console.log('Button clicked');
 }
 
   protected updateCarStatus(change: CarStatusChange): void {
     if (this.updatingCarIds().includes(change.car.id)) {
+      return;
+    }
+
+    if (!window.confirm(`Change status for ${change.car.brand} ${change.car.model}?`)) {
       return;
     }
 
@@ -212,6 +239,31 @@ export class AdminDashboardPageComponent {
 
   protected addCar(createdCar: Car): void {
     this.cars.update((cars) => [createdCar, ...cars]);
+  }
+
+  protected removeCar(carId: string): void {
+    this.cars.update((cars) => cars.filter((car) => car.id !== carId));
+  }
+
+  protected removeAppointment(appointmentId: string): void {
+    this.dashboard.update((dashboard) => {
+      if (!dashboard) {
+        return dashboard;
+      }
+
+      const appointments = dashboard.appointments.filter(
+        (appointment) => appointment.id !== appointmentId,
+      );
+      const acceptedAppointments = appointments.filter((appointment) => appointment.accepted).length;
+
+      return {
+        ...dashboard,
+        totalAppointments: Math.max(0, dashboard.totalAppointments - 1),
+        appointments,
+        acceptedAppointments,
+        pendingAppointments: appointments.length - acceptedAppointments,
+      };
+    });
   }
 
   protected updateUser(updatedUser: AdminUser): void {

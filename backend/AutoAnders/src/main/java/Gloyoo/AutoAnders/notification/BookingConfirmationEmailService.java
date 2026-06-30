@@ -142,10 +142,10 @@ public class BookingConfirmationEmailService {
 
         } catch (MessagingException | MailException exception) {
             log.error(
-                    "Appointment {} was saved, but confirmation email delivery to {} failed",
+                    "Appointment {} was saved, but confirmation email delivery to {} failed: {}",
                     firstAppointment.getId(),
                     customerEmail,
-                    exception
+                    exception.getMessage()
             );
         }
     }

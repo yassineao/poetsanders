@@ -302,6 +302,7 @@ export interface CatalogueCar  {
   vehicle: string;
   colour: string;
   image: string;
+  images?: string[];
   tags: {
     de: string[];
     en: string[];

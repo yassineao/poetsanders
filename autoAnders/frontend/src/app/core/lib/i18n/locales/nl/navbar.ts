@@ -25,6 +25,7 @@ export const nlNavbarCopy: Copy["nav"] = {
       },
       
       { label: "Auto verkopen", href: "/Sell" },
+      { label: "Uw afspraken", href: "/appointments" },
       { label: "FAQ", href: "/faq" },
       { label: "Over Ons", href: "/about" },
     ],

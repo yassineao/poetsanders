@@ -32,13 +32,19 @@ spring:
     properties:
       mail:
         smtp:
-          auth: true
+          auth: ${MAIL_SMTP_AUTH:true}
           starttls:
-            enable: true
-            required: true
-          connectiontimeout: 10000
-          timeout: 10000
-          writetimeout: 10000
+            enable: ${MAIL_STARTTLS_ENABLE:true}
+            required: ${MAIL_STARTTLS_REQUIRED:true}
+          ssl:
+            enable: ${MAIL_SSL_ENABLE:false}
+          connectiontimeout: ${MAIL_CONNECTION_TIMEOUT:5000}
+          timeout: ${MAIL_TIMEOUT:5000}
+          writetimeout: ${MAIL_WRITE_TIMEOUT:5000}
+  servlet:
+    multipart:
+      max-file-size: ${MAX_IMAGE_UPLOAD_SIZE:10MB}
+      max-request-size: ${MAX_IMAGE_UPLOAD_REQUEST_SIZE:40MB}
 jwt:
   secret: ${SUPABASE_JWT_SECRET}
 
@@ -50,6 +56,11 @@ app:
     enabled: ${MAIL_ENABLED:false}
     from: ${MAIL_FROM:${MAIL_USERNAME:}}
   base-url: ${BASE_URL:https://poetsanders.vercel.app}
+  api-base-url: ${API_BASE_URL:http://localhost:8080}
+  cors:
+    allowed-origins: ${CORS_ALLOWED_ORIGINS:}
+  profile-access-token:
+    ttl: ${PROFILE_ACCESS_TOKEN_TTL:PT48H}
   appointments:
     cleanup-cron: "${APPOINTMENT_CLEANUP_CRON:0 */15 * * * *}"
     time-zone: ${APPOINTMENT_TIME_ZONE:Europe/Amsterdam}

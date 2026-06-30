@@ -1,0 +1,51 @@
+<section class="bg-black px-4 py-16 text-white sm:px-6">
+  <div class="mx-auto max-w-5xl">
+    <div class="flex flex-col gap-4 border-b border-white/10 pb-6 sm:flex-row sm:items-end sm:justify-between">
+      <div>
+        <p class="text-sm font-bold uppercase tracking-[0.2em] text-red-500">Profile</p>
+        <h1 class="mt-2 text-3xl font-black sm:text-4xl">Your appointments</h1>
+      </div>
+      <button
+        type="button"
+        (click)="loadAppointments()"
+        [disabled]="loading()"
+        class="rounded-xl border border-white/10 px-4 py-2 text-sm font-bold text-zinc-200 transition hover:border-red-500/50 hover:bg-white/5 disabled:cursor-not-allowed disabled:opacity-50"
+      >
+        Refresh
+      </button>
+    </div>
+
+    @if (loading()) {
+      <p class="mt-6 rounded-2xl border border-white/10 bg-zinc-900 px-5 py-4 text-zinc-400">
+        Loading appointments...
+      </p>
+    } @else if (failed()) {
+      <p class="mt-6 rounded-2xl border border-red-500/30 bg-red-950/30 px-5 py-4 text-red-100">
+        Could not load or update your appointments. Please try again.
+      </p>
+    } @else if (!hasAppointments()) {
+      <div class="mt-6 rounded-2xl border border-white/10 bg-zinc-900 px-5 py-6">
+        <p class="text-zinc-300">You do not have any appointments yet.</p>
+        <a
+          [routerLink]="['/', locale(), 'form']"
+          class="mt-5 inline-flex rounded-xl bg-red-600 px-5 py-3 font-bold text-white transition hover:bg-red-500"
+        >
+          Contact us
+        </a>
+      </div>
+    }
+
+    @if (hasAppointments()) {
+      <div class="mt-6 grid gap-4">
+        @for (appointment of appointments(); track appointment.id) {
+          <app-appointment-card
+            [appointment]="appointment"
+            [locale]="locale()"
+            [cancelling]="isCancelling(appointment)"
+            (cancelRequested)="cancelAppointment($event)"
+          />
+        }
+      </div>
+    }
+  </div>
+</section>

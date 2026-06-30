@@ -6,9 +6,11 @@ import Gloyoo.AutoAnders.Cars.entity.Car;
 import Gloyoo.AutoAnders.Cars.repository.CarRepository;
 import Gloyoo.AutoAnders.storage.service.SupaBasePictureStorage;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 @Service
@@ -34,10 +36,13 @@ public class CarPictureService {
             String title,
             String description,
             int width,
-            int height
+            int height,
+            UUID userId,
+            String role
     ) {
         Car car = carRepository.findById(carId)
                 .orElseThrow(() -> new IllegalArgumentException("Car not found"));
+        ensureOwnerOrAdmin(car, userId, role);
 
         String storage_path = storageService.uploadCarPicture(carId, file);
 
@@ -57,7 +62,9 @@ public class CarPictureService {
             UUID carId,
             List<MultipartFile> files,
             int width,
-            int height
+            int height,
+            UUID userId,
+            String role
     ) {
         if (files == null || files.isEmpty()) {
             throw new IllegalArgumentException("At least one picture is required");
@@ -65,6 +72,7 @@ public class CarPictureService {
 
         Car car = carRepository.findById(carId)
                 .orElseThrow(() -> new IllegalArgumentException("Car not found"));
+        ensureOwnerOrAdmin(car, userId, role);
 
         List<CarPicture> pictures = files.stream()
                 .filter(file -> file != null && !file.isEmpty())
@@ -96,8 +104,32 @@ public class CarPictureService {
                 .toList();
     }
 
+    @Transactional
+    public void deletePictureFromCar(UUID carId, UUID pictureId, UUID userId, String role) {
+        CarPicture picture = carPictureRepository.findById(pictureId)
+                .orElseThrow(() -> new IllegalArgumentException("Picture not found"));
+
+        if (!picture.getCar().getId().equals(carId)) {
+            throw new IllegalArgumentException("Picture does not belong to this car");
+        }
+        ensureOwnerOrAdmin(picture.getCar(), userId, role);
+
+        storageService.deleteCarPicture(picture.getStorage_path());
+        carPictureRepository.delete(picture);
+    }
+
+    private void ensureOwnerOrAdmin(Car car, UUID userId, String role) {
+        if ("ADMIN".equals(role)) {
+            return;
+        }
+
+        if (car.getUser() == null || !Objects.equals(car.getUser().getId(), userId)) {
+            throw new IllegalArgumentException("You can only manage pictures for your own cars");
+        }
+    }
+
     private void resolvePictureUrl(CarPicture picture) {
-        picture.setStorage_path(storageService.resolvePublicUrl(picture.getStorage_path()));
+        picture.setStorage_path(storageService.resolveAccessibleUrl(picture.getStorage_path()));
     }
 
     private String defaultText(String value) {

@@ -94,10 +94,10 @@ public class CarManagementEmail {
 
         } catch (MessagingException | MailException exception) {
             log.error(
-                    "Car {} was saved, but confirmation email delivery to {} failed",
+                    "Car {} was saved, but confirmation email delivery to {} failed: {}",
                     car.getId(),
                     safeCustomerEmail,
-                    exception
+                    exception.getMessage()
             );
         }
     }

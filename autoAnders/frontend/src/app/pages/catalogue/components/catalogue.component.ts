@@ -20,6 +20,8 @@ export class CatalogueComponent {
   readonly loaded = input(true);
 
   protected readonly search = signal("");
+  protected readonly selectedImage = signal<string | null>(null);
+  protected readonly selectedImages = signal<string[]>([]);
   protected readonly brand = signal("All");
   protected readonly selectedCar = signal<CatalogueCar | null>(null);
   protected readonly brands = computed(() => ["All", ...new Set(this.cars().map((car) => car.brand))]);
@@ -47,5 +49,10 @@ export class CatalogueComponent {
 
   protected formatPrice(value: number): string {
     return new Intl.NumberFormat("nl-NL", { style: "currency", currency: "EUR", maximumFractionDigits: 0 }).format(value);
+  }
+
+  protected imagesFor(car: CatalogueCar): string[] {
+    const images = car.images?.length ? car.images : [car.image];
+    return images.filter(Boolean);
   }
 }

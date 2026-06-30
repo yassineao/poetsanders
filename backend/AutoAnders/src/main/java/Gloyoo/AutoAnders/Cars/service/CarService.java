@@ -5,6 +5,7 @@ import Gloyoo.AutoAnders.Cars.dto.CarRequest;
 import Gloyoo.AutoAnders.Cars.entity.*;
 import Gloyoo.AutoAnders.Cars.repository.CarRepository;
 
+import Gloyoo.AutoAnders.notification.StatusChangeEmailService;
 import Gloyoo.AutoAnders.user.entity.User;
 import Gloyoo.AutoAnders.user.repository.UserRepository;
 import Gloyoo.AutoAnders.storage.service.SupaBasePictureStorage;
@@ -23,15 +24,18 @@ public class CarService {
     private final CarRepository carRepository;
     private final UserRepository userRepository;
     private final SupaBasePictureStorage pictureStorage;
+    private final StatusChangeEmailService statusChangeEmailService;
 
     public CarService(
             CarRepository carRepository,
             UserRepository userRepository,
-            SupaBasePictureStorage pictureStorage
+            SupaBasePictureStorage pictureStorage,
+            StatusChangeEmailService statusChangeEmailService
     ) {
         this.carRepository = carRepository;
         this.userRepository = userRepository;
         this.pictureStorage = pictureStorage;
+        this.statusChangeEmailService = statusChangeEmailService;
     }
 
     public Car addCar(@NotNull CarRequest carRequest, @NotNull UUID userId) {
@@ -100,6 +104,7 @@ public class CarService {
     public Car updateCar(@NotNull CarRequest carRequest,@NotNull UUID id) {
         Car car = carRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Car not found"));
+        Status previousStatus = car.getStatus();
 
         String licensePlate = normalizeOptional(carRequest.licensePlate());
         if (!Objects.equals(car.getLicensePlate(), licensePlate)
@@ -154,13 +159,42 @@ public class CarService {
         car.setUpholstery(carRequest.upholstery());
         car.setStatus(carRequest.status());
 
-        return carRepository.save(car);
+        Car savedCar = carRepository.save(car);
+        statusChangeEmailService.sendCarUpdated(savedCar);
+        statusChangeEmailService.sendCarStatusChanged(
+                savedCar,
+                previousStatus,
+                savedCar.getStatus()
+        );
+        return savedCar;
     }
 
     public void deleteCar(UUID id) {
         Car car = carRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Car not found"));
+        statusChangeEmailService.sendCarDeleted(car);
         carRepository.deleteById(car.getId());
+    }
+
+    public void deleteCarForUser(UUID id, UUID userId, String role) {
+        Car car = carRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Car not found"));
+        ensureOwnerOrAdmin(car, userId, role);
+        statusChangeEmailService.sendCarDeleted(car);
+        carRepository.deleteById(car.getId());
+    }
+
+    public Car updateCarForUser(
+            @NotNull CarRequest carRequest,
+            @NotNull UUID id,
+            @NotNull UUID userId,
+            String role
+    ) {
+        Car car = carRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Car not found"));
+        ensureOwnerOrAdmin(car, userId, role);
+        ensureStatusEditableByAdmin(car, carRequest, role);
+        return updateCar(carRequest, id);
     }
 
     public List<Car> findAllCars() {
@@ -182,12 +216,24 @@ public class CarService {
         return cars;
     }
 
+    public List<Car> findAvailableCars(){
+        List<Car> cars = carRepository.findByStatus(Status.Available);
+        cars.forEach(this::resolvePictureUrls);
+        return cars;
+    }
+
     public Car updateCarStatus(UUID id, Status status) {
         Car car = carRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Car not found"));
+        Status previousStatus = car.getStatus();
         car.setStatus(status);
-        carRepository.save(car);
-        return car;
+        Car savedCar = carRepository.save(car);
+        statusChangeEmailService.sendCarStatusChanged(
+                savedCar,
+                previousStatus,
+                savedCar.getStatus()
+        );
+        return savedCar;
     }
 
     private void addPicturesFromRequest(Car car, CarRequest carRequest) {
@@ -220,9 +266,29 @@ public class CarService {
         return value == null || value.isBlank() ? null : value.trim();
     }
 
+    private void ensureOwnerOrAdmin(Car car, UUID userId, String role) {
+        if ("ADMIN".equals(role)) {
+            return;
+        }
+
+        if (car.getUser() == null || !car.getUser().getId().equals(userId)) {
+            throw new IllegalArgumentException("You can only manage your own cars");
+        }
+    }
+
+    private void ensureStatusEditableByAdmin(Car car, CarRequest carRequest, String role) {
+        if ("ADMIN".equals(role)) {
+            return;
+        }
+
+        if (!Objects.equals(car.getStatus(), carRequest.status())) {
+            throw new IllegalArgumentException("Only admins can change car status");
+        }
+    }
+
     private void resolvePictureUrls(Car car) {
         car.getPictures().forEach(picture ->
-                picture.setStorage_path(pictureStorage.resolvePublicUrl(picture.getStorage_path()))
+                picture.setStorage_path(pictureStorage.resolveAccessibleUrl(picture.getStorage_path()))
         );
     }
 

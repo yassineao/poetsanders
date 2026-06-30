@@ -62,18 +62,32 @@ public class CarController {
         return ResponseEntity.ok(car);
     }
 
+    @GetMapping("/accepted")
+    public ResponseEntity<List<Car>> getAvailableCars() {
+        return ResponseEntity.ok(carService.findAvailableCars());
+    }
+
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteCar(@PathVariable UUID id) {
-        carService.deleteCar(id);
+    public ResponseEntity<Void> deleteCar(
+            @PathVariable UUID id,
+            Authentication authentication
+    ) {
+        carService.deleteCarForUser(id, authenticatedUserId(authentication), authenticatedRole(authentication));
         return ResponseEntity.noContent().build();
     }
 
     @RequestMapping(value = "/{id}", method = {RequestMethod.PUT, RequestMethod.POST})
     public ResponseEntity<Car> updateCar(
             @PathVariable UUID id,
-            @Valid @RequestBody CarRequest carRequest
+            @Valid @RequestBody CarRequest carRequest,
+            Authentication authentication
     ) {
-        Car savedCar = carService.updateCar(carRequest, id);
+        Car savedCar = carService.updateCarForUser(
+                carRequest,
+                id,
+                authenticatedUserId(authentication),
+                authenticatedRole(authentication)
+        );
         return ResponseEntity.ok(savedCar);
     }
 
@@ -108,6 +122,14 @@ public class CarController {
         return UUID.fromString(uid.toString());
     }
 
+    private String authenticatedRole(Authentication authentication) {
+        if (authentication == null || !(authentication.getDetails() instanceof Map<?, ?> details)) {
+            throw new IllegalArgumentException("Not authenticated");
+        }
+        Object role = details.get("role");
+        return role == null ? "" : role.toString();
+    }
+
     private void sendCarRequestConfirmation(User user, Car car) {
         carManagementEmail.sendCarRequestConfirmation(
                 user.getName(),
@@ -131,6 +153,12 @@ public class CarController {
         String normalized = message.toLowerCase();
         if (normalized.contains("not authenticated") || normalized.contains("user id missing")) {
             return HttpStatus.UNAUTHORIZED;
+        }
+        if (normalized.contains("only manage your own cars")) {
+            return HttpStatus.FORBIDDEN;
+        }
+        if (normalized.contains("only admins can change car status")) {
+            return HttpStatus.FORBIDDEN;
         }
         if (normalized.contains("not found")) {
             return HttpStatus.NOT_FOUND;

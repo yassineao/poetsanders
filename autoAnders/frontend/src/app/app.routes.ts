@@ -10,6 +10,7 @@ import { ContactPageComponent } from "./pages/contact/pages/contact-page.compone
 import { AuthPageComponent } from "./pages/auth/pages/auth-page.component";
 import { ProfileForm } from "./pages/profile/components/profile.form";
 import { authGuard } from "./guards/auth.guard";
+import { AppointmentsPageComponent } from "./pages/appointments/pages/appointments-page.component";
 
 export const routes: Routes = [
   { path: "", pathMatch: "full", redirectTo: "de" },
@@ -31,6 +32,11 @@ export const routes: Routes = [
       { path: "auth", component: AuthPageComponent },
       { path: "login", redirectTo: "auth" },
       { path: "profile", component: ProfileForm },
+      {
+        path: "appointments",
+        component: AppointmentsPageComponent,
+        canActivate: [authGuard],
+      },
       { path: "advantages", component: AdvantagesPageComponent },
       { path: "about", component: LegalPageComponent, data: { page: "about" } },
       { path: "privacy", component: LegalPageComponent, data: { page: "privacy" } },

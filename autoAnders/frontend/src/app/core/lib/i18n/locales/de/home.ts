@@ -171,7 +171,7 @@ export const deHomeCopy: Copy["home"] = {
           vat: "MwSt. ausweisbar",
           vehicle: "Kombi",
           colour: "Grau",
-          image: "/cars/audi.jpg",
+          image: "/404.png",
           tags: {
             de: ["LED", "Kamera", "Tempomat"],
             en: ["LED", "Camera", "Cruise Control"],

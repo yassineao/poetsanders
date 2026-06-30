@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable, inject, signal } from '@angular/core';
 import { Observable, tap } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { Car, CarPicture , CarPictureRequest , CarRequest  } from '../interfaces/Car';
+import { Car, CarPicture, CarPictureRequest, CarRequest } from '../interfaces/Car';
 
 
 
@@ -57,6 +57,13 @@ export class CarsService {
       );
   }
 
+  deleteCarPicture(carId: string, pictureId: string): Observable<void> {
+    return this.http.delete<void>(
+      `${this.carsUrl}/${carId}/pictures/${pictureId}`,
+      this.requestOptions,
+    );
+  }
+
   addCarPicture(carId: string, picture: CarPictureRequest): Observable<CarPicture> {
     const formData = new FormData();
     formData.append('file', picture.file);
@@ -103,6 +110,14 @@ export class CarsService {
     );
   }
 
+  getAvailableCars(): Observable<Car[]> {
+    return this.http.get<Car[]>(
+      `${this.carsUrl}/accepted`,
+      this.requestOptions
+    );
+
+  }
+
   getCarsByCurrentUser(): Observable<Car[]> {
     return this.http.get<Car[]>(`${this.carsUrl}/by_user`, this.requestOptions);
   }
@@ -115,12 +130,20 @@ export class CarsService {
     return this.getCars();
   }
 
+  GetAvailableCars(): Observable<Car[]>{
+    return this.getAvailableCars();
+  }
+
   UpdateCar(car: Car): Observable<Car> {
     return this.updateCar(car.id, car);
   }
 
   DeleteCar(id: string): Observable<void> {
     return this.deleteCar(id);
+  }
+
+  DeleteCarPicture(carId: string, pictureId: string): Observable<void> {
+    return this.deleteCarPicture(carId, pictureId);
   }
 
   AddCarPicture(carId: string, picture: CarPictureRequest): Observable<CarPicture> {

@@ -22,6 +22,7 @@ import type {
   CarRequest,
   CarStatus,
 } from '../../../../core/interfaces/Car';
+import { AdminCarPicturesComponent } from '../admin.carPictures/admin.carPictures';
 
 export interface CarStatusChange {
   car: Car;
@@ -47,7 +48,7 @@ const pageSize = 10;
 @Component({
   selector: 'app-admin-cars',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, AdminCarPicturesComponent],
   templateUrl: './admin-cars.html',
 })
 export class AdminCarsComponent {
@@ -57,6 +58,7 @@ export class AdminCarsComponent {
   readonly statusChanged = output<CarStatusChange>();
   readonly carUpdated = output<Car>();
   readonly carCreated = output<Car>();
+  readonly carDeleted = output<string>();
 
   private readonly admin = inject(AdminService);
   private readonly carsService = inject(CarsService);
@@ -70,6 +72,7 @@ export class AdminCarsComponent {
   protected readonly selectedPicturesCar = signal<Car | null>(null);
   protected readonly editingCar = signal<Car | null>(null);
   protected readonly savingEdit = signal(false);
+  protected readonly deletingIds = signal<string[]>([]);
   protected readonly editError = signal(false);
   protected readonly creatingCar = signal<CarRequest | null>(null);
   protected readonly newCarPictures = signal<File[]>([]);
@@ -171,9 +174,8 @@ export class AdminCarsComponent {
     this.page.set(1);
   }
 
-  protected updateCarStatus(car: Car, event: Event): void {
-    const status = (event.target as HTMLSelectElement).value as CarStatus;
-    if (status !== car.status) {
+  protected updateCarStatus(car: Car, status: CarStatus): void {
+    if (status !== this.currentStatus(car)) {
       this.statusChanged.emit({ car, status });
     }
   }
@@ -195,6 +197,14 @@ export class AdminCarsComponent {
       Cancelled: copy.cancelledLabel,
     };
     return labels[status];
+  }
+
+  protected currentStatus(car: Car): CarStatus {
+    return this.statuses.includes(car.status) ? car.status : 'Pending_Confirmation';
+  }
+
+  protected pictureCount(car: Car): number {
+    return car.pictures?.length ?? 0;
   }
 
   protected formatPrice(value: number): string {
@@ -223,9 +233,19 @@ export class AdminCarsComponent {
     this.selectedPicturesCar.set(null);
   }
 
+  protected openPictures(car: Car): void {
+    this.selectedPicturesCar.set(car);
+  }
+
+  protected updateCarPictures(car: Car, pictures: Car['pictures']): void {
+    const updatedCar = { ...car, pictures };
+    this.selectedPicturesCar.set(updatedCar);
+    this.carUpdated.emit(updatedCar);
+  }
+
   protected startEditing(car: Car): void {
     this.editError.set(false);
-    this.editingCar.set({ ...car });
+    this.editingCar.set({ ...car, status: this.currentStatus(car) });
   }
 
   protected startCreating(): void {
@@ -288,7 +308,7 @@ export class AdminCarsComponent {
     }
   }
 
-  protected saveNewCar(): void {
+  protected async saveNewCar(): Promise<void> {
     const car = this.creatingCar();
     if (!car || this.creating() || !car.brand.trim() || !car.model.trim()) {
       return;
@@ -296,7 +316,9 @@ export class AdminCarsComponent {
 
     this.creating.set(true);
     this.createError.set(null);
-    const pictures = this.toPictureRequests(this.newCarPictures());
+
+    const pictures = await this.toPictureRequests(this.newCarPictures());
+
     this.carsService
       .addCar(car)
       .pipe(
@@ -348,6 +370,10 @@ export class AdminCarsComponent {
       return;
     }
 
+    if (!window.confirm(`Save changes to ${car.brand} ${car.model}?`)) {
+      return;
+    }
+
     this.savingEdit.set(true);
     this.editError.set(false);
     const { id, user: _user, pictures: _pictures, ...request } = car;
@@ -366,6 +392,46 @@ export class AdminCarsComponent {
       });
   }
 
+  protected deleteCar(car: Car): void {
+    if (this.deletingIds().includes(car.id)) {
+      return;
+    }
+
+    if (!window.confirm(`Delete ${car.brand} ${car.model}? This cannot be undone.`)) {
+      return;
+    }
+
+    this.deletingIds.update((ids) => [...ids, car.id]);
+    this.editError.set(false);
+    this.admin
+      .deleteCar(car.id)
+      .pipe(
+        finalize(() =>
+          this.deletingIds.update((ids) => ids.filter((id) => id !== car.id)),
+        ),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe({
+        next: () => {
+          this.carDeleted.emit(car.id);
+          if (this.editingCar()?.id === car.id) {
+            this.cancelEditing();
+          }
+          if (this.selectedCar()?.id === car.id) {
+            this.closeDetails();
+          }
+          if (this.selectedPicturesCar()?.id === car.id) {
+            this.closePictures();
+          }
+        },
+        error: () => this.editError.set(true),
+      });
+  }
+
+  protected isDeleting(id: string): boolean {
+    return this.deletingIds().includes(id);
+  }
+
   @HostListener('document:keydown.escape')
   protected closeDialogs(): void {
     this.closeDetails();
@@ -382,14 +448,36 @@ export class AdminCarsComponent {
     return words.charAt(0).toUpperCase() + words.slice(1);
   }
 
-  private toPictureRequests(files: File[]): CarPictureRequest[] {
-    return files.map((file) => ({
-      file,
-      title: file.name,
-      description: file.name,
-      width: 0,
-      height: 0,
-    }));
+  private async toPictureRequests(files: File[]): Promise<CarPictureRequest[]> {
+    return Promise.all(
+      files.map(async (file) => {
+        const dimensions = await this.readImageDimensions(file);
+
+        return {
+          file,
+          title: file.name,
+          description: file.name,
+          width: dimensions.width,
+          height: dimensions.height,
+        };
+      }),
+    );
+  }
+
+  private readImageDimensions(file: File): Promise<{ width: number; height: number }> {
+    return new Promise((resolve) => {
+      const previewUrl = URL.createObjectURL(file);
+      const image = new Image();
+
+      const finish = (width = 0, height = 0) => {
+        URL.revokeObjectURL(previewUrl);
+        resolve({ width, height });
+      };
+
+      image.onload = () => finish(image.naturalWidth, image.naturalHeight);
+      image.onerror = () => finish();
+      image.src = previewUrl;
+    });
   }
 
   private clearNewCarPictures(): void {

@@ -4,6 +4,9 @@ import Gloyoo.AutoAnders.Cars.entity.Car;
 import Gloyoo.AutoAnders.Cars.dto.CarRequest;
 import Gloyoo.AutoAnders.Cars.repository.CarRepository;
 import Gloyoo.AutoAnders.Cars.service.CarService;
+import Gloyoo.AutoAnders.notification.ProfileAccessEmailService;
+import Gloyoo.AutoAnders.notification.StatusChangeEmailService;
+import Gloyoo.AutoAnders.user.dto.AdminAppointmentCreateRequest;
 import Gloyoo.AutoAnders.user.dto.AdminAppointmentResponse;
 import Gloyoo.AutoAnders.user.dto.AdminAppointmentUpdateRequest;
 import Gloyoo.AutoAnders.user.dto.AdminCarCreateRequest;
@@ -14,7 +17,9 @@ import Gloyoo.AutoAnders.user.dto.AdminUserResponse;
 import Gloyoo.AutoAnders.user.entity.User;
 import Gloyoo.AutoAnders.user.repository.UserRepository;
 import Gloyoo.AutoAnders.washCalendar.repository.WashCalendarRepository;
+import Gloyoo.AutoAnders.washCalendar.dto.WashCalendarRequest;
 import Gloyoo.AutoAnders.washCalendar.entity.WashCalendar;
+import Gloyoo.AutoAnders.washCalendar.service.WashCalendarService;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -34,19 +39,31 @@ public class AdminDashboardService {
     private final PasswordEncoder passwordEncoder;
     private final CarRepository carRepository;
     private final CarService carService;
+    private final WashCalendarService washCalendarService;
+    private final ProfileAccessTokenService profileAccessTokenService;
+    private final ProfileAccessEmailService profileAccessEmailService;
+    private final StatusChangeEmailService statusChangeEmailService;
 
     public AdminDashboardService(
             UserRepository userRepository,
             WashCalendarRepository washCalendarRepository,
             PasswordEncoder passwordEncoder,
             CarRepository carRepository,
-            CarService carService
+            CarService carService,
+            WashCalendarService washCalendarService,
+            ProfileAccessTokenService profileAccessTokenService,
+            ProfileAccessEmailService profileAccessEmailService,
+            StatusChangeEmailService statusChangeEmailService
     ) {
         this.userRepository = userRepository;
         this.washCalendarRepository = washCalendarRepository;
         this.passwordEncoder = passwordEncoder;
         this.carRepository = carRepository;
         this.carService = carService;
+        this.washCalendarService = washCalendarService;
+        this.profileAccessTokenService = profileAccessTokenService;
+        this.profileAccessEmailService = profileAccessEmailService;
+        this.statusChangeEmailService = statusChangeEmailService;
     }
 
     @Transactional(readOnly = true)
@@ -98,7 +115,11 @@ public class AdminDashboardService {
         user.setPhoneNumber(normalizeOptional(request.phoneNumber()));
         user.setRole(request.role());
 
-        return AdminUserResponse.from(userRepository.save(user));
+        User savedUser = userRepository.save(user);
+        String profileAccessToken = profileAccessTokenService.createToken(savedUser);
+        profileAccessEmailService.sendProfileAccess(savedUser, profileAccessToken);
+
+        return AdminUserResponse.from(savedUser);
     }
 
     @Transactional
@@ -126,15 +147,53 @@ public class AdminDashboardService {
     ) {
         WashCalendar appointment = washCalendarRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Appointment not found"));
+        User user = userRepository.findById(request.userId())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+        boolean previousAccepted = appointment.isAccepted();
+        appointment.setUser(user);
         appointment.setWashType(request.washType());
         appointment.setLocalDateTime(request.localDateTime());
         appointment.setAccepted(request.accepted());
-        return AdminAppointmentResponse.from(washCalendarRepository.save(appointment));
+        WashCalendar savedAppointment = washCalendarRepository.save(appointment);
+        statusChangeEmailService.sendAppointmentUpdated(savedAppointment);
+        statusChangeEmailService.sendAppointmentStatusChanged(
+                savedAppointment,
+                previousAccepted,
+                savedAppointment.isAccepted()
+        );
+        return AdminAppointmentResponse.from(savedAppointment);
+    }
+
+    @Transactional
+    public AdminAppointmentResponse createAppointment(AdminAppointmentCreateRequest request) {
+        WashCalendar appointment = washCalendarService.book_a_wash_calendar(
+                new WashCalendarRequest(request.washType(), request.localDateTime()),
+                request.userId()
+        );
+        boolean previousAccepted = appointment.isAccepted();
+        appointment.setAccepted(request.accepted());
+        WashCalendar savedAppointment = washCalendarRepository.save(appointment);
+        statusChangeEmailService.sendAppointmentStatusChanged(
+                savedAppointment,
+                previousAccepted,
+                savedAppointment.isAccepted()
+        );
+        return AdminAppointmentResponse.from(savedAppointment);
+    }
+
+    @Transactional
+    public Gloyoo.AutoAnders.washCalendar.dto.AppointmentCancellation deleteAppointment(UUID id) {
+        return washCalendarService.deleteWashCalendarAsAdmin(id);
     }
 
     @Transactional
     public Car updateCar(UUID id, CarRequest request) {
         return carService.updateCar(request, id);
+    }
+
+    @Transactional
+    public void deleteCar(UUID id) {
+        carService.deleteCar(id);
     }
 
     @Transactional

@@ -43,10 +43,14 @@
           @case ('appointments') {
             <app-admin-appointments
               [appointments]="data.appointments"
+              [users]="data.users"
               [acceptingIds]="acceptingIds()"
               [acceptError]="acceptError()"
               (appointmentAccepted)="acceptAppointment($event)"
               (appointmentUpdated)="updateAppointment($event)"
+              (appointmentCreated)="addAppointment($event)"
+              (appointmentDeleted)="removeAppointment($event)"
+              (userCreated)="addUser($event)"
             />
           }
           @case ('cars') {
@@ -57,6 +61,7 @@
               (statusChanged)="updateCarStatus($event)"
               (carUpdated)="updateCar($event)"
               (carCreated)="addCar($event)"
+              (carDeleted)="removeCar($event)"
             />
           }
         }

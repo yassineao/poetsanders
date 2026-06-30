@@ -54,8 +54,8 @@ public class MailConfigurationDiagnostics implements ApplicationRunner {
 
         if (password.chars().anyMatch(Character::isWhitespace)) {
             log.warn(
-                    "MAIL_PASSWORD contains whitespace. Gmail app passwords should be entered "
-                            + "as the 16-character value without spaces."
+                    "MAIL_PASSWORD contains whitespace. The backend will remove whitespace before SMTP login, "
+                            + "but Render should ideally store the Gmail app password as the 16-character value without spaces."
             );
         }
     }

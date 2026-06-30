@@ -130,8 +130,8 @@ export interface CarPicture {
     storage_path: string;
     title: string;
     description: string;
-    width: Int16Array;
-    height: Int16Array;
+    width: number;
+    height: number;
 }
 
 export interface AutoCatalogueLabels {
@@ -163,4 +163,13 @@ export interface CarPictureRequest {
     width: number;
     height: number;
 }
-export type CarRequest = Omit<Car, 'id' | 'user' | 'pictures'>;
+export type CarRequest = Omit<Car, 'id' | 'user' | 'pictures' | 'bodyType' | 'gearbox' | 'fuel' | 'emissionClass' | 'energyLabel' | 'paintType' | 'upholstery' | 'status'> & {
+    bodyType: BodyType | null;
+    gearbox: Gearbox | null;
+    fuel: Fuel | null;
+    emissionClass: EmissionClass | null;
+    energyLabel: EnergyLabel | null;
+    paintType: PaintType | null;
+    upholstery: Upholstery | null;
+    status: CarStatus | null;
+};

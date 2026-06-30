@@ -14,6 +14,10 @@ export class AuthService {
 
   readonly currentUser = signal<AuthUser | null>(null);
 
+  clearCurrentUser(): void {
+    this.currentUser.set(null);
+  }
+
   login(credentials: LoginCredentials): Observable<AuthUser> {
     return this.http
       .post<AuthUser>(`${this.apiBaseUrl}/auth/login`, credentials, { withCredentials: true })

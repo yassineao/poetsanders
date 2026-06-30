@@ -20,6 +20,7 @@ export class FormPageComponent {
   readonly sending = input(false);
   readonly sent = input(false);
   readonly failed = input(false);
+  readonly failureMessage = input<string | null>(null);
   readonly submitted = output<FormSubmission>();
   readonly successClosed = output<void>();
   readonly failureClosed = output<void>();
@@ -114,7 +115,7 @@ export class FormPageComponent {
     form.form.markAllAsTouched();
     this.persistCurrentFormValues();
 
-    if (form.invalid || this.hasMismatch(form) || this.sending()) {
+    if (!this.isLastPage() || form.invalid || this.hasMismatch(form) || this.sending()) {
       return;
     }
 
@@ -137,13 +138,14 @@ export class FormPageComponent {
     return files.map((file) => file.name).join(", ");
   }
 
-  protected fileUrlItems(field: FormField): { name: string; url: string }[] {
+  protected fileUrlItems(field: FormField): { name: string; url: string; index: number }[] {
     const files = this.selectedFiles(field);
     const urls = this.fileUrls()[field.name] ?? [];
 
     return files.map((file, index) => ({
       name: file.name,
       url: urls[index] ?? "",
+      index,
     }));
   }
 
@@ -164,6 +166,13 @@ export class FormPageComponent {
       ...values,
       [name]: value,
     }));
+  }
+
+  protected removeFile(field: FormField, index: number): void {
+    const files = this.selectedFiles(field).filter((_, fileIndex) => fileIndex !== index);
+
+    this.persistFieldValue(field.name, field.multiple ? files : files[0] ?? null);
+    this.setFileUrls(field.name, files);
   }
 
   private persistCurrentFormValues(): void {

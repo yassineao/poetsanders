@@ -129,6 +129,10 @@ export class AppointmentsListComponent {
       return;
     }
 
+    if (!window.confirm('Cancel this appointment? This cannot be undone.')) {
+      return;
+    }
+
     this.cancellingIds.update((current) => [...current, ...ids]);
     this.hasError.set(false);
 

@@ -5,10 +5,11 @@ import {
   HttpEvent,
   HttpErrorResponse,
 } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { Observable, throwError, BehaviorSubject } from 'rxjs';
 import { catchError, filter, take, switchMap } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
+import { AuthService } from './auth.service';
 
 /**
  * HttpInterceptor that automatically refreshes expired access tokens.
@@ -24,6 +25,7 @@ import { environment } from '../../../environments/environment';
 @Injectable()
 export class TokenRefreshInterceptor implements HttpInterceptor {
   private readonly apiBaseUrl = environment.apiBaseUrl;
+  private readonly authService = inject(AuthService);
 
   // Tracks whether a refresh is in progress
   private isRefreshing = false;
@@ -65,6 +67,7 @@ export class TokenRefreshInterceptor implements HttpInterceptor {
         }),
         catchError((err) => {
           this.isRefreshing = false;
+          this.authService.clearCurrentUser();
           return throwError(() => err);
         }),
       );
