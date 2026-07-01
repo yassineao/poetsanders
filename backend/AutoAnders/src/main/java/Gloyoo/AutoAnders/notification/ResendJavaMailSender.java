@@ -19,6 +19,7 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessagePreparator;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientException;
+import org.springframework.web.client.RestClientResponseException;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -147,8 +148,24 @@ public class ResendJavaMailSender implements JavaMailSender {
                     .retrieve()
                     .toBodilessEntity();
         } catch (RestClientException exception) {
-            throw new MailSendException("Resend email delivery failed", exception);
+            throw new MailSendException(buildErrorMessage(exception), exception);
         }
+    }
+
+    private String buildErrorMessage(RestClientException exception) {
+        if (exception instanceof RestClientResponseException responseException) {
+            String responseBody = responseException.getResponseBodyAsString();
+            if (responseBody == null || responseBody.isBlank()) {
+                responseBody = responseException.getStatusText();
+            }
+
+            return "Resend email delivery failed with HTTP "
+                    + responseException.getStatusCode().value()
+                    + ": "
+                    + responseBody;
+        }
+
+        return "Resend email delivery failed: " + exception.getMessage();
     }
 
     private MessageBody extractBody(Part part) throws MessagingException, IOException {
