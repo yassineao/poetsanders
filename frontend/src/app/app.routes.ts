@@ -20,6 +20,7 @@ export const routes: Routes = [
       ),
   },
   { path: 'book', component: BookingPageComponent },
+  { path: 'appointments', component: AppointmentsPageComponent },
   { path: 'faq', component: FaqPageComponent },
   { path: 'login', component: LoginPageComponent },
   { path: 'profile', component: ProfilePageComponent },

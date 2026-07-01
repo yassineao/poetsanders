@@ -25,7 +25,6 @@ export const enNavbarCopy: Copy["nav"] = {
         },
         
         { label: "Sell your car", href: "/Sell" },
-        { label: "Your appointments", href: "/appointments" },
         { label: "FAQ", href: "/faq" },
         { label: "About Us", href: "/about" },
       ],

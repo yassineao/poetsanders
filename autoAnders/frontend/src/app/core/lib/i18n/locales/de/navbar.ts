@@ -25,7 +25,6 @@ export const deNavbarCopy: Copy["nav"] = {
       },
      
       { label: "Auto verkaufen", href: "/Sell" },
-      { label: "Ihre Termine", href: "/appointments" },
        { label: "FAQ", href: "/faq" },
       { label: "Über uns", href: "/about" },
     ],
