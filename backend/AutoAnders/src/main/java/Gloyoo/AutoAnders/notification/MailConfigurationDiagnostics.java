@@ -19,6 +19,7 @@ public class MailConfigurationDiagnostics implements ApplicationRunner {
     private final String username;
     private final String password;
     private final String from;
+    private final String resendApiKey;
 
     public MailConfigurationDiagnostics(
             @Value("${app.mail.enabled:false}") boolean enabled,
@@ -26,7 +27,8 @@ public class MailConfigurationDiagnostics implements ApplicationRunner {
             @Value("${spring.mail.port:587}") int port,
             @Value("${spring.mail.username:}") String username,
             @Value("${spring.mail.password:}") String password,
-            @Value("${app.mail.from:}") String from
+            @Value("${app.mail.from:}") String from,
+            @Value("${resend.api-key:}") String resendApiKey
     ) {
         this.enabled = enabled;
         this.host = host;
@@ -34,6 +36,7 @@ public class MailConfigurationDiagnostics implements ApplicationRunner {
         this.username = username;
         this.password = password;
         this.from = from;
+        this.resendApiKey = resendApiKey;
     }
 
     @Override
@@ -43,12 +46,22 @@ public class MailConfigurationDiagnostics implements ApplicationRunner {
             return;
         }
 
+        if (resendApiKey != null && !resendApiKey.isBlank()) {
+            log.info("Email delivery is enabled via Resend.");
+
+            if (from.isBlank()) {
+                log.error("Email delivery is enabled via Resend but MAIL_FROM is missing.");
+            }
+
+            return;
+        }
+
         log.info("Email delivery is enabled via SMTP host {} on port {}", host, port);
 
         if (host.isBlank() || username.isBlank() || password.isBlank() || from.isBlank()) {
             log.error(
                     "Email delivery is enabled but SMTP configuration is incomplete. "
-                            + "Check MAIL_HOST, MAIL_USERNAME, MAIL_PASSWORD, and MAIL_FROM."
+                            + "Set RESEND_API_KEY to use Resend, or check MAIL_HOST, MAIL_USERNAME, MAIL_PASSWORD, and MAIL_FROM."
             );
         }
 

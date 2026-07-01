@@ -1,5 +1,7 @@
 package Gloyoo.AutoAnders.config;
 
+import Gloyoo.AutoAnders.notification.ResendJavaMailSender;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.mail.MailProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -14,7 +16,20 @@ import java.util.Properties;
 public class MailSenderConfiguration {
 
     @Bean
-    public JavaMailSender javaMailSender(MailProperties mailProperties) {
+    public JavaMailSender javaMailSender(
+            MailProperties mailProperties,
+            @Value("${resend.api-key:}") String resendApiKey,
+            @Value("${resend.emails-url:https://api.resend.com/emails}") String resendEmailsUrl,
+            @Value("${app.mail.from:}") String from
+    ) {
+        if (resendApiKey != null && !resendApiKey.isBlank()) {
+            return new ResendJavaMailSender(
+                    resendApiKey.trim(),
+                    resendEmailsUrl,
+                    from
+            );
+        }
+
         JavaMailSenderImpl sender = new JavaMailSenderImpl();
 
         sender.setHost(mailProperties.getHost());
