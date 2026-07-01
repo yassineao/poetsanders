@@ -64,3 +64,7 @@ app:
   appointments:
     cleanup-cron: "${APPOINTMENT_CLEANUP_CRON:0 */15 * * * *}"
     time-zone: ${APPOINTMENT_TIME_ZONE:Europe/Amsterdam}
+
+resend:
+  api-key: ${RESEND_API_KEY:}
+  emails-url: ${RESEND_EMAILS_URL:https://api.resend.com/emails}

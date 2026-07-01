@@ -10,4 +10,6 @@ import type { HomeCardsSectionCopy } from '../../../../core/interfaces/types';
 })
 export class CardMainComponent {
   @Input({ required: true }) cards!: HomeCardsSectionCopy;
+  @Input() dealershipUrl = '';
+  @Input() dealershipLabel = 'AutoAnders';
 }

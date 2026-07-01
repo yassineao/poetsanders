@@ -74,7 +74,7 @@ export class AppointmentsListComponent {
       return appointments;
     }, {});
 
-    return Object.entries(grouped)
+    const sortedAppointments = Object.entries(grouped)
       .map<AppointmentViewModel>(([localDateTime, appointment]) => ({
         ids: appointment.ids,
         localDateTime,
@@ -98,6 +98,8 @@ export class AppointmentsListComponent {
         const rightTime = new Date(right.localDateTime).getTime();
         return this.pageMode ? rightTime - leftTime : leftTime - rightTime;
       });
+
+    return this.pageMode ? sortedAppointments : sortedAppointments.slice(0, 2);
   });
 
   constructor() {
