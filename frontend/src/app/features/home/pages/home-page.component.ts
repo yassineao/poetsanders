@@ -8,6 +8,7 @@ import { FirstHeroMainComponent } from '../components/firstHero-main/firstHero-m
 import { HeroMainComponent } from '../components/hero-main/hero-main.component';
 import { MapsMainComponent } from '../components/maps-main/maps-main.components';
 import { TestimonialsMainComponent } from '../components/testimonials-main/testimonials-main.components';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-home-page',
@@ -27,6 +28,7 @@ import { TestimonialsMainComponent } from '../components/testimonials-main/testi
 export class HomePageComponent {
   private readonly i18n = inject(I18nService);
   protected readonly copy = this.i18n.copy;
+  protected readonly dealershipUrl = environment.dealershipUrl;
   protected readonly hero = computed(() => ({
     ...this.copy().home.hero,
     description: this.copy().home.meta.description,

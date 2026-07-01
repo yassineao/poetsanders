@@ -16,7 +16,11 @@
   <app-appointments-list />
 
   <div class="mt-12">
-    <app-card-main [cards]="copy().home.cards" />
+    <app-card-main
+      [cards]="copy().home.cards"
+      [dealershipUrl]="dealershipUrl"
+      [dealershipLabel]="copy().navbar.dealership"
+    />
   </div>
 
   <app-testimonials-main
