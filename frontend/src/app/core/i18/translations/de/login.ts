@@ -23,4 +23,5 @@ export const deLoginCopy: LoginCopy = {
   supportHeading: 'Probleme bei der Anmeldung?',
   supportMessage: 'Kontaktieren Sie uns. Wir helfen Ihnen, wieder Zugriff auf Ihr Konto zu erhalten.',
   supportLinkLabel: 'Support kontaktieren',
+  RegisterLinkLabel: 'Noch kein Konto? Registrieren Sie sich hier.',
 };

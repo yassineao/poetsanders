@@ -23,4 +23,5 @@ export const enLoginCopy: LoginCopy = {
   supportHeading: 'Need help signing in?',
   supportMessage: 'Contact us and we will help you regain access to your account.',
   supportLinkLabel: 'Contact support',
+  RegisterLinkLabel: 'Don’t have an account? Register here.',
 };
