@@ -45,6 +45,9 @@ const passwordsMatchValidator: ValidatorFn = (
     : null;
 };
 
+const totalTreatmentSlug = 'total-treatment';
+const treatmentsIncludedInTotal = ['interior-treatment', 'exterior-treatment'];
+
 @Component({
   selector: 'app-booking-form',
   standalone: true,
@@ -215,8 +218,21 @@ export class BookingFormComponent {
   protected toggleTreatment(slug: string): void {
     const control = this.bookingForm.controls.services;
     const current = control.value;
+    const totalSelected = current.includes(totalTreatmentSlug);
+
+    if (totalSelected && treatmentsIncludedInTotal.includes(slug)) {
+      return;
+    }
+
     const next = current.includes(slug)
       ? current.filter((selectedSlug) => selectedSlug !== slug)
+      : slug === totalTreatmentSlug
+        ? [
+            ...current.filter(
+              (selectedSlug) => !treatmentsIncludedInTotal.includes(selectedSlug),
+            ),
+            slug,
+          ]
       : [...current, slug];
 
     control.setValue(next);

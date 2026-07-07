@@ -1,6 +1,8 @@
 package Gloyoo.AutoAnders.user.controller;
 
 import Gloyoo.AutoAnders.user.dto.AdminDashboardResponse;
+import Gloyoo.AutoAnders.contact.AdminContactMessageResponse;
+import Gloyoo.AutoAnders.contact.AdminContactMessageUpdateRequest;
 import Gloyoo.AutoAnders.user.dto.AdminAppointmentCreateRequest;
 import Gloyoo.AutoAnders.user.dto.AdminAppointmentResponse;
 import Gloyoo.AutoAnders.user.dto.AdminAppointmentUpdateRequest;
@@ -113,6 +115,20 @@ public class AdminDashboardController {
         return ResponseEntity.status(201).body(
                 adminDashboardService.createCar(authenticatedUserId(authentication), request)
         );
+    }
+
+    @PatchMapping("/contact-messages/{id}")
+    public ResponseEntity<AdminContactMessageResponse> updateContactMessage(
+            @PathVariable UUID id,
+            @Valid @RequestBody AdminContactMessageUpdateRequest request
+    ) {
+        return ResponseEntity.ok(adminDashboardService.updateContactMessage(id, request));
+    }
+
+    @DeleteMapping("/contact-messages/{id}")
+    public ResponseEntity<Void> deleteContactMessage(@PathVariable UUID id) {
+        adminDashboardService.deleteContactMessage(id);
+        return ResponseEntity.noContent().build();
     }
 
     private UUID authenticatedUserId(Authentication authentication) {

@@ -42,7 +42,7 @@ export const nlFormCopy: Copy["form"] = {
       submitLabel: "Bericht Versturen",
       popup: {
         successTitle: "Bericht verzonden",
-        successMessage: "Bedankt. Uw bericht is verzonden. Controleer uw e-mail.",
+        successMessage: "Bedankt. Uw bericht is verzonden. Antwoorden verschijnen in uw berichten.",
         errorTitle: "Bericht niet verzonden",
         errorMessage: "Er is iets misgegaan. Probeer het opnieuw.",
         closeLabel: "OK",

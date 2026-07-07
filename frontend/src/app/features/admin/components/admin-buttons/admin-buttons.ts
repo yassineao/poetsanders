@@ -8,7 +8,7 @@ import type { AdminSection } from '../../../../core/interfaces/admin';
   standalone: true,
   imports: [RouterLink],
   template: `
-    <nav aria-label="Admin shortcuts" class="mt-8 grid gap-3 sm:grid-cols-3">
+    <nav aria-label="Admin shortcuts" class="mt-8 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
       @for (action of actions(); track action.section) {
         <a
           routerLink="/admin"
@@ -38,6 +38,7 @@ export class AdminButtonComponent {
         label: `${copy.editLabel} ${copy.appointmentsHeading}`,
       },
       { section: 'cars' as const, label: `${copy.editLabel} ${copy.carsManagementHeading}` },
+      { section: 'contacts' as const, label: `${copy.editLabel} ${copy.contactsHeading}` },
     ];
   });
 }

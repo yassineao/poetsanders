@@ -6,6 +6,9 @@ import { I18nService } from '../../../../core/i18/i18n.service';
 import type { ServiceTreatmentCopy } from '../../../../core/interfaces/services';
 import type { BookingFormGroup, BookingMode } from '../booking-form.models';
 
+const totalTreatmentSlug = 'total-treatment';
+const treatmentsIncludedInTotal = ['interior-treatment', 'exterior-treatment'];
+
 @Component({
   selector: 'app-booking-details',
   standalone: true,
@@ -31,5 +34,12 @@ export class BookingDetailsComponent {
 
   protected isTreatmentSelected(slug: string): boolean {
     return this.selectedServiceSlugs.includes(slug);
+  }
+
+  protected isTreatmentDisabled(slug: string): boolean {
+    return (
+      this.isTreatmentSelected(totalTreatmentSlug) &&
+      treatmentsIncludedInTotal.includes(slug)
+    );
   }
 }

@@ -9,6 +9,7 @@ import { CarsService } from '../../../core/cars/cars.service';
 import type { Car } from '../../../core/interfaces/Car';
 import type {
   AdminAppointment,
+  AdminContactMessage,
   AdminDashboard,
   AdminSection,
   AdminSidebar,
@@ -17,6 +18,7 @@ import type {
 import { I18nService } from '../../../core/i18/i18n.service';
 import { AdminAppointmentsComponent } from '../components/admin-appointments/admin-appointments.component';
 import { AdminButtonComponent } from '../components/admin-buttons/admin-buttons';
+import { AdminContactsComponent } from '../components/admin-contacts/admin-contacts.component';
 import {
   AdminCarsComponent,
   type CarStatusChange,
@@ -33,6 +35,7 @@ import { AdminUsersComponent } from '../components/admin-users/admin-users.compo
     AdminAppointmentsComponent,
     AdminButtonComponent,
     AdminCarsComponent,
+    AdminContactsComponent,
     AdminDashboardStatsComponent,
     AdminSidebarComponent,
     AdminUsersComponent,
@@ -57,6 +60,7 @@ export class AdminDashboardPageComponent {
         { name: copy.admin.usersHeading, table: 'users' },
         { name: copy.admin.appointmentsHeading, table: 'appointments' },
         { name: copy.admin.carsManagementHeading, table: 'cars' },
+        { name: copy.admin.contactsHeading, table: 'contacts' },
       ],
       logout: copy.profile.logoutLabel,
     };
@@ -113,7 +117,13 @@ export class AdminDashboardPageComponent {
 }
 
   private isAdminSection(value: string | null): value is AdminSection {
-    return value === 'overview' || value === 'users' || value === 'appointments' || value === 'cars';
+    return (
+      value === 'overview' ||
+      value === 'users' ||
+      value === 'appointments' ||
+      value === 'cars' ||
+      value === 'contacts'
+    );
   }
 
   protected acceptAppointment(appointment: AdminAppointment): void {
@@ -286,6 +296,32 @@ export class AdminDashboardPageComponent {
             ...dashboard,
             totalUsers: dashboard.totalUsers + 1,
             users: [createdUser, ...dashboard.users],
+          }
+        : dashboard,
+    );
+  }
+
+  protected updateContactMessage(updatedMessage: AdminContactMessage): void {
+    this.dashboard.update((dashboard) =>
+      dashboard
+        ? {
+            ...dashboard,
+            contactMessages: dashboard.contactMessages.map((message) =>
+              message.id === updatedMessage.id ? updatedMessage : message,
+            ),
+          }
+        : dashboard,
+    );
+  }
+
+  protected removeContactMessage(messageId: string): void {
+    this.dashboard.update((dashboard) =>
+      dashboard
+        ? {
+            ...dashboard,
+            contactMessages: dashboard.contactMessages.filter(
+              (message) => message.id !== messageId,
+            ),
           }
         : dashboard,
     );

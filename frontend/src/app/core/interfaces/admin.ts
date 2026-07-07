@@ -28,6 +28,25 @@ export interface AdminAppointment {
   customerPhoneNumber: string | null;
 }
 
+export type AdminContactMessageStatus = 'NEW' | 'READ' | 'ARCHIVED';
+
+export interface AdminContactMessage {
+  id: string;
+  companyName: string;
+  userId: string;
+  customerName: string;
+  email: string;
+  phoneNumber: string | null;
+  message: string;
+  status: AdminContactMessageStatus;
+  emailDelivered: boolean;
+  emailError: string | null;
+  adminReply: string | null;
+  repliedAt: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface AdminDashboard {
   totalUsers: number;
   totalAppointments: number;
@@ -35,6 +54,7 @@ export interface AdminDashboard {
   acceptedAppointments: number;
   users: AdminUser[];
   appointments: AdminAppointment[];
+  contactMessages: AdminContactMessage[];
 }
 
 export interface AdminCopy {
@@ -51,6 +71,18 @@ export interface AdminCopy {
   usersDescription: string;
   appointmentsHeading: string;
   appointmentsDescription: string;
+  contactsHeading: string;
+  contactsDescription: string;
+  searchContactsLabel: string;
+  topicLabel: string;
+  messageLabel: string;
+  deliveredLabel: string;
+  markReadLabel: string;
+  markUnreadLabel: string;
+  archiveLabel: string;
+  deleteLabel: string;
+  noContactsLabel: string;
+  contactUpdateErrorLabel: string;
   searchUsersLabel: string;
   searchAppointmentsLabel: string;
   allStatusesLabel: string;
@@ -121,7 +153,7 @@ export type AdminCarUpdate = CarRequest;
 
 export type AdminCarCreate = AdminCarUpdate;
 
-export type AdminSection = 'overview' | 'users' | 'appointments' | 'cars';
+export type AdminSection = 'overview' | 'users' | 'appointments' | 'cars' | 'contacts';
 
 export interface AdminSidebarItems{
   name: string;

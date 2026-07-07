@@ -64,6 +64,13 @@
               (carDeleted)="removeCar($event)"
             />
           }
+          @case ('contacts') {
+            <app-admin-contacts
+              [contactMessages]="data.contactMessages"
+              (contactUpdated)="updateContactMessage($event)"
+              (contactDeleted)="removeContactMessage($event)"
+            />
+          }
         }
       </ng-container>
     </div>

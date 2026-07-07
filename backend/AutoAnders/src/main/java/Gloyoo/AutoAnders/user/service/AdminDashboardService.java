@@ -4,6 +4,10 @@ import Gloyoo.AutoAnders.Cars.entity.Car;
 import Gloyoo.AutoAnders.Cars.dto.CarRequest;
 import Gloyoo.AutoAnders.Cars.repository.CarRepository;
 import Gloyoo.AutoAnders.Cars.service.CarService;
+import Gloyoo.AutoAnders.contact.AdminContactMessageResponse;
+import Gloyoo.AutoAnders.contact.AdminContactMessageUpdateRequest;
+import Gloyoo.AutoAnders.contact.ContactMessage;
+import Gloyoo.AutoAnders.contact.ContactMessageRepository;
 import Gloyoo.AutoAnders.notification.ProfileAccessEmailService;
 import Gloyoo.AutoAnders.notification.StatusChangeEmailService;
 import Gloyoo.AutoAnders.user.dto.AdminAppointmentCreateRequest;
@@ -26,6 +30,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.Instant;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
@@ -43,6 +48,7 @@ public class AdminDashboardService {
     private final ProfileAccessTokenService profileAccessTokenService;
     private final ProfileAccessEmailService profileAccessEmailService;
     private final StatusChangeEmailService statusChangeEmailService;
+    private final ContactMessageRepository contactMessageRepository;
 
     public AdminDashboardService(
             UserRepository userRepository,
@@ -53,7 +59,8 @@ public class AdminDashboardService {
             WashCalendarService washCalendarService,
             ProfileAccessTokenService profileAccessTokenService,
             ProfileAccessEmailService profileAccessEmailService,
-            StatusChangeEmailService statusChangeEmailService
+            StatusChangeEmailService statusChangeEmailService,
+            ContactMessageRepository contactMessageRepository
     ) {
         this.userRepository = userRepository;
         this.washCalendarRepository = washCalendarRepository;
@@ -64,6 +71,7 @@ public class AdminDashboardService {
         this.profileAccessTokenService = profileAccessTokenService;
         this.profileAccessEmailService = profileAccessEmailService;
         this.statusChangeEmailService = statusChangeEmailService;
+        this.contactMessageRepository = contactMessageRepository;
     }
 
     @Transactional(readOnly = true)
@@ -88,14 +96,42 @@ public class AdminDashboardService {
                 .filter(AdminAppointmentResponse::accepted)
                 .count();
 
+        List<AdminContactMessageResponse> contactMessages = contactMessageRepository.findAllByOrderByCreatedAtDesc()
+                .stream()
+                .map(AdminContactMessageResponse::from)
+                .toList();
+
         return new AdminDashboardResponse(
                 users.size(),
                 appointments.size(),
                 appointments.size() - acceptedAppointments,
                 acceptedAppointments,
                 users,
-                appointments
+                appointments,
+                contactMessages
         );
+    }
+
+    @Transactional
+    public AdminContactMessageResponse updateContactMessage(
+            UUID id,
+            AdminContactMessageUpdateRequest request
+    ) {
+        ContactMessage message = contactMessageRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Contact message not found"));
+        message.setStatus(request.status());
+        String reply = normalizeOptional(request.adminReply());
+        message.setAdminReply(reply);
+        message.setRepliedAt(reply == null ? null : Instant.now());
+        return AdminContactMessageResponse.from(contactMessageRepository.save(message));
+    }
+
+    @Transactional
+    public void deleteContactMessage(UUID id) {
+        if (!contactMessageRepository.existsById(id)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Contact message not found");
+        }
+        contactMessageRepository.deleteById(id);
     }
 
     @Transactional
