@@ -51,6 +51,26 @@ export class CatalogueComponent {
     return new Intl.NumberFormat("nl-NL", { style: "currency", currency: "EUR", maximumFractionDigits: 0 }).format(value);
   }
 
+  protected formatOptionalPrice(value: number | null | undefined): string {
+    return value && value > 0 ? this.formatPrice(value) : "-";
+  }
+
+  protected detailValue(value: boolean | number | string | null | undefined, suffix = ""): string {
+    if (typeof value === "boolean") {
+      return value ? "Yes" : "No";
+    }
+
+    if (value === null || value === undefined || value === "") {
+      return "-";
+    }
+
+    if (typeof value === "number") {
+      return value > 0 ? `${new Intl.NumberFormat("nl-NL").format(value)}${suffix}` : "-";
+    }
+
+    return `${value}${suffix}`;
+  }
+
   protected imagesFor(car: CatalogueCar): string[] {
     const images = car.images?.length ? car.images : [car.image];
     return images.filter(Boolean);
