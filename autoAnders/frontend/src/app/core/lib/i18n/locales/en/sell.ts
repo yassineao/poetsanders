@@ -43,6 +43,20 @@ const statusOptions = ["Available", "Pending_Confirmation", "Booked", "Cancelled
   label: value.replaceAll("_", " "),
 }));
 
+const colorOptions = [
+  { value: "#111827", label: "Black" },
+  { value: "#f8fafc", label: "White" },
+  { value: "#6b7280", label: "Gray" },
+  { value: "#cbd5e1", label: "Silver" },
+  { value: "#dc2626", label: "Red" },
+  { value: "#2563eb", label: "Blue" },
+  { value: "#16a34a", label: "Green" },
+  { value: "#facc15", label: "Yellow" },
+  { value: "#f97316", label: "Orange" },
+  { value: "#92400e", label: "Brown" },
+  { value: "#d6c7a1", label: "Beige" },
+];
+
 export const enSellCopy: Copy["sell"] = {
   eyebrow: "Sell your car",
   title: "Send vehicle details",
@@ -55,8 +69,6 @@ export const enSellCopy: Copy["sell"] = {
     // { name: "phone", label: "Phone", type: "tel" },
     { name: "brand", label: "Brand", type: "text", required: true },
     { name: "model", label: "Model", type: "text", required: true },
-    { name: "title", label: "Listing title", type: "text" },
-    { name: "subtitle", label: "Listing subtitle", type: "text" },
     { name: "yearOfManufacture", label: "Year of manufacture", type: "number" },
     { name: "mileage", label: "Mileage", type: "number", required: true },
     { name: "power", label: "Power", type: "text" },
@@ -80,7 +92,7 @@ export const enSellCopy: Copy["sell"] = {
     { name: "numberOfKeys", label: "Number of keys", type: "number" },
     { name: "licensePlate", label: "License plate", type: "text" },
     { name: "engineDisplacement", label: "Engine displacement", type: "number" },
-    { name: "colour", label: "Colour", type: "text" },
+    { name: "colour", label: "Colour", type: "select", options: colorOptions, required: true },
     { name: "emptyWeight", label: "Empty weight", type: "number" },
     { name: "taxAdditionPercentage", label: "Tax addition percentage", type: "number" },
     { name: "apkMotDate", label: "APK/MOT date", type: "text" },

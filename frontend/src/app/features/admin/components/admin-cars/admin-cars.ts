@@ -31,6 +31,7 @@ export interface CarStatusChange {
 
 type CarStatusFilter = 'all' | CarStatus;
 type CarRequestKey = keyof CarRequest;
+type CarFormStep = 0 | 1 | 2 | 3;
 
 interface CarField {
   key: CarRequestKey;
@@ -41,6 +42,11 @@ interface CarField {
 interface CarSelectField {
   key: CarRequestKey;
   options: readonly string[];
+}
+
+interface CarColorOption {
+  label: string;
+  hex: string;
 }
 
 const pageSize = 10;
@@ -79,44 +85,68 @@ export class AdminCarsComponent {
   protected readonly newCarPicturePreviews = signal<string[]>([]);
   protected readonly creating = signal(false);
   protected readonly createError = signal<string | null>(null);
+  protected readonly createStep = signal<CarFormStep>(0);
+  protected readonly editStep = signal<CarFormStep>(0);
+  protected readonly formSteps = [
+    'Basics',
+    'Technical',
+    'Costs',
+    'Options',
+  ] as const;
   protected readonly statuses: CarStatus[] = [
     'Available',
     'Pending_Confirmation',
     'Booked',
     'Cancelled',
   ];
-  protected readonly createFields: CarField[] = [
+  protected readonly colorOptions: CarColorOption[] = [
+    { label: 'Black', hex: '#111827' },
+    { label: 'White', hex: '#f8fafc' },
+    { label: 'Gray', hex: '#6b7280' },
+    { label: 'Silver', hex: '#cbd5e1' },
+    { label: 'Red', hex: '#dc2626' },
+    { label: 'Blue', hex: '#2563eb' },
+    { label: 'Green', hex: '#16a34a' },
+    { label: 'Yellow', hex: '#facc15' },
+    { label: 'Orange', hex: '#f97316' },
+    { label: 'Brown', hex: '#92400e' },
+    { label: 'Beige', hex: '#d6c7a1' },
+  ];
+  protected readonly basicFields: CarField[] = [
     { key: 'brand', type: 'text' },
     { key: 'model', type: 'text' },
-    { key: 'title', type: 'text' },
-    { key: 'subtitle', type: 'text' },
     { key: 'yearOfManufacture', type: 'number' },
     { key: 'mileage', type: 'number' },
-    { key: 'power', type: 'text' },
     { key: 'referenceNumber', type: 'text' },
     { key: 'price', type: 'number', step: '0.01' },
     { key: 'firstRegistrationDate', type: 'date' },
+    { key: 'licensePlate', type: 'text' },
+    { key: 'location', type: 'text' },
+  ];
+  protected readonly technicalFields: CarField[] = [
+    { key: 'power', type: 'text' },
+    { key: 'engineDisplacement', type: 'number' },
+    { key: 'emptyWeight', type: 'number' },
     { key: 'numberOfDoors', type: 'number' },
-    { key: 'wheelbase', type: 'number' },
     { key: 'numberOfCylinders', type: 'number' },
-    { key: 'motorVehicleTax', type: 'text' },
-    { key: 'modelDateFrom', type: 'date' },
-    { key: 'modelDateTo', type: 'date' },
+    { key: 'wheelbase', type: 'number' },
     { key: 'maxTowingWeight', type: 'number' },
     { key: 'maxTowingWeightUnbraked', type: 'number' },
     { key: 'urbanFuelConsumption', type: 'number', step: '0.01' },
     { key: 'combinedFuelConsumption', type: 'number', step: '0.01' },
     { key: 'motorwayFuelConsumption', type: 'number', step: '0.01' },
     { key: 'co2Emissions', type: 'number' },
+  ];
+  protected readonly ownershipFields: CarField[] = [
     { key: 'chassisNumber', type: 'text' },
     { key: 'numberOfKeys', type: 'number' },
-    { key: 'licensePlate', type: 'text' },
-    { key: 'engineDisplacement', type: 'number' },
-    { key: 'colour', type: 'text' },
-    { key: 'emptyWeight', type: 'number' },
-    { key: 'taxAdditionPercentage', type: 'number', step: '0.01' },
     { key: 'apkMotDate', type: 'text' },
-    { key: 'location', type: 'text' },
+    { key: 'modelDateFrom', type: 'date' },
+    { key: 'modelDateTo', type: 'date' },
+    { key: 'motorVehicleTax', type: 'text' },
+    { key: 'taxAdditionPercentage', type: 'number', step: '0.01' },
+  ];
+  protected readonly leaseFields: CarField[] = [
     { key: 'financialLeasePricePerMonth', type: 'number', step: '0.01' },
     { key: 'leasePrice60Months', type: 'number', step: '0.01' },
     { key: 'leasePrice48Months', type: 'number', step: '0.01' },
@@ -132,6 +162,12 @@ export class AdminCarsComponent {
     { key: 'upholstery', options: ['FABRIC', 'LEATHER', 'PART_LEATHER', 'ALCANTARA'] },
     { key: 'status', options: this.statuses },
   ];
+  protected readonly formFieldsByStep: Record<CarFormStep, CarField[]> = {
+    0: this.basicFields,
+    1: this.technicalFields,
+    2: [...this.ownershipFields, ...this.leaseFields],
+    3: [],
+  };
 
   protected readonly filteredCars = computed(() => {
     const query = this.query().trim().toLowerCase();
@@ -144,7 +180,6 @@ export class AdminCarsComponent {
         [
           car.brand,
           car.model,
-          car.title,
           car.licensePlate,
           car.referenceNumber,
           String(car.yearOfManufacture ?? ''),
@@ -245,11 +280,13 @@ export class AdminCarsComponent {
 
   protected startEditing(car: Car): void {
     this.editError.set(false);
+    this.editStep.set(0);
     this.editingCar.set({ ...car, status: this.currentStatus(car) });
   }
 
   protected startCreating(): void {
     this.createError.set(null);
+    this.createStep.set(0);
     this.creatingCar.set({
       brand: '',
       model: '',
@@ -258,7 +295,7 @@ export class AdminCarsComponent {
       yearOfManufacture: new Date().getFullYear(),
       mileage: 0,
       price: 0,
-      colour: '',
+      colour: this.colorOptions[0].hex,
       location: '',
       status: 'Pending_Confirmation',
       subtitle: '',
@@ -355,6 +392,38 @@ export class AdminCarsComponent {
 
   protected createFieldLabel(key: CarRequestKey): string {
     return this.humanize(String(key));
+  }
+
+  protected currentCreateFields(): CarField[] {
+    return this.formFieldsByStep[this.createStep()];
+  }
+
+  protected currentEditFields(): CarField[] {
+    return this.formFieldsByStep[this.editStep()];
+  }
+
+  protected setCreateStep(step: number): void {
+    this.createStep.set(this.asFormStep(step));
+  }
+
+  protected setEditStep(step: number): void {
+    this.editStep.set(this.asFormStep(step));
+  }
+
+  protected changeCreateStep(offset: number): void {
+    this.setCreateStep(this.createStep() + offset);
+  }
+
+  protected changeEditStep(offset: number): void {
+    this.setEditStep(this.editStep() + offset);
+  }
+
+  protected isLastStep(step: CarFormStep): boolean {
+    return step === this.formSteps.length - 1;
+  }
+
+  protected colorLabel(hex: string): string {
+    return this.colorOptions.find((option) => option.hex === hex)?.label ?? hex;
   }
 
   protected cancelEditing(): void {
@@ -484,6 +553,10 @@ export class AdminCarsComponent {
     this.newCarPicturePreviews().forEach((url) => URL.revokeObjectURL(url));
     this.newCarPicturePreviews.set([]);
     this.newCarPictures.set([]);
+  }
+
+  private asFormStep(step: number): CarFormStep {
+    return Math.min(this.formSteps.length - 1, Math.max(0, step)) as CarFormStep;
   }
 
   private errorMessage(error: HttpErrorResponse): string {

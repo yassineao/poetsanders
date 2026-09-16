@@ -6,7 +6,7 @@ const { parsed = {} } = config({ path: resolve('.env'), quiet: true });
 
 const envValue = (name) => process.env[name]?.trim() || parsed[name]?.trim() || '';
 const apiBaseUrl = (envValue('API_BASE_URL') || envValue('VITE_API_URL')).replace(/\/+$/, '');
-const dealershipUrl = envValue('DEALERSHIP_URL').replace(/\/+$/, '');
+const dealershipUrl = (envValue('DEALERSHIP_URL') || envValue('dealershipUrl')).replace(/\/+$/, '');
 const supabaseUrl = envValue('SUPABASE_URL').replace(/\/+$/, '');
 const supabaseKey = envValue('SUPABASE_KEY');
 const outputPath = resolve('src/environments/environment.generated.ts');

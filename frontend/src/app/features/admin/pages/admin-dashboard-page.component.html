@@ -38,6 +38,7 @@
               [users]="data.users"
               (userUpdated)="updateUser($event)"
               (userCreated)="addUser($event)"
+              (userDeleted)="removeUser($event)"
             />
           }
           @case ('appointments') {

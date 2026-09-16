@@ -177,6 +177,14 @@ public class AdminDashboardService {
     }
 
     @Transactional
+    public void deleteUser(UUID id) {
+        if (!userRepository.existsById(id)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found");
+        }
+        userRepository.deleteById(id);
+    }
+
+    @Transactional
     public AdminAppointmentResponse updateAppointment(
             UUID id,
             AdminAppointmentUpdateRequest request

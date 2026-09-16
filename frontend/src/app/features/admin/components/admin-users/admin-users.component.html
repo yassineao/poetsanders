@@ -15,6 +15,61 @@
     </button>
   </div>
 
+  @if (addableUser(); as user) {
+  <div
+    class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/75 p-4 backdrop-blur-sm"
+    role="dialog"
+    aria-modal="true"
+    (click)="cancelAdding()"
+  >
+    <div
+      class="w-full max-w-2xl rounded-2xl border border-white/10 bg-slate-900 p-6 shadow-2xl shadow-black/50"
+      (click)="$event.stopPropagation()"
+    >
+      <div class="mb-5 flex items-start justify-between gap-4">
+        <div>
+          <h3 class="text-xl font-bold text-white">Add user</h3>
+          <p class="mt-1 text-sm text-slate-400">{{ copy().usersDescription }}</p>
+        </div>
+        <button
+          type="button"
+          [disabled]="adding()"
+          class="text-2xl leading-none text-slate-400 hover:text-white disabled:opacity-60"
+          aria-label="Close"
+          (click)="cancelAdding()"
+        >
+          &times;
+        </button>
+      </div>
+      <div class="grid gap-3 md:grid-cols-2">
+        <input [(ngModel)]="user.name" required [placeholder]="copy().nameLabel"
+          class="h-10 rounded-lg border border-white/10 bg-slate-950 px-3 text-white outline-none focus:border-cyan-300/50" />
+        <input [(ngModel)]="user.email" type="email" required [placeholder]="copy().emailLabel"
+          class="h-10 rounded-lg border border-white/10 bg-slate-950 px-3 text-white outline-none focus:border-cyan-300/50" />
+        <input [(ngModel)]="user.phoneNumber" [placeholder]="copy().phoneLabel"
+          class="h-10 rounded-lg border border-white/10 bg-slate-950 px-3 text-white outline-none focus:border-cyan-300/50" />
+        <input [(ngModel)]="user.password" type="password" required autocomplete="new-password" placeholder="Password"
+          class="h-10 rounded-lg border border-white/10 bg-slate-950 px-3 text-white outline-none focus:border-cyan-300/50" />
+        <select [(ngModel)]="user.role"
+          class="h-10 rounded-lg border border-white/10 bg-slate-950 px-3 text-white outline-none focus:border-cyan-300/50 md:col-span-2">
+          <option value="USER">USER</option>
+          <option value="ADMIN">ADMIN</option>
+        </select>
+      </div>
+      <div class="mt-5 flex justify-end gap-2">
+        <button type="button" [disabled]="adding()" (click)="saveAddedUser()"
+          class="min-h-10 rounded-lg bg-cyan-300 px-4 font-semibold text-slate-950 disabled:cursor-wait disabled:opacity-60">
+          {{ adding() ? copy().savingLabel : copy().saveLabel }}
+        </button>
+        <button type="button" [disabled]="adding()" (click)="cancelAdding()"
+          class="min-h-10 rounded-lg border border-white/10 px-4 font-semibold text-slate-300 hover:bg-white/5 disabled:opacity-60">
+          {{ copy().cancelLabel }}
+        </button>
+      </div>
+    </div>
+  </div>
+  }
+
   @if (saveError()) {
   <p role="alert" class="m-6 rounded-lg border border-rose-300/20 bg-rose-300/10 p-4 text-sm text-rose-100">
     {{ copy().userUpdateErrorLabel }}
@@ -35,37 +90,6 @@
       </thead>
       <tbody class="divide-y divide-white/10">
 
-        @if (addableUser(); as user) {
-        <tr class="bg-cyan-300/[0.03]">
-          <td colspan="6" class="p-4">
-            <div class="grid gap-3 md:grid-cols-2 xl:grid-cols-5">
-              <input [(ngModel)]="user.name" required [placeholder]="copy().nameLabel"
-                class="h-10 rounded-lg border border-white/10 bg-slate-950 px-3 text-white outline-none focus:border-cyan-300/50" />
-              <input [(ngModel)]="user.email" type="email" required [placeholder]="copy().emailLabel"
-                class="h-10 rounded-lg border border-white/10 bg-slate-950 px-3 text-white outline-none focus:border-cyan-300/50" />
-              <input [(ngModel)]="user.phoneNumber" [placeholder]="copy().phoneLabel"
-                class="h-10 rounded-lg border border-white/10 bg-slate-950 px-3 text-white outline-none focus:border-cyan-300/50" />
-              <input [(ngModel)]="user.password" type="password" required autocomplete="new-password" placeholder="Password"
-                class="h-10 rounded-lg border border-white/10 bg-slate-950 px-3 text-white outline-none focus:border-cyan-300/50" />
-              <select [(ngModel)]="user.role"
-                class="h-10 rounded-lg border border-white/10 bg-slate-950 px-3 text-white outline-none focus:border-cyan-300/50">
-                <option value="USER">USER</option>
-                <option value="ADMIN">ADMIN</option>
-              </select>
-            </div>
-            <div class="mt-3 flex justify-end gap-2">
-              <button type="button" [disabled]="adding()" (click)="saveAddedUser()"
-                class="min-h-10 rounded-lg bg-cyan-300 px-4 font-semibold text-slate-950 disabled:cursor-wait disabled:opacity-60">
-                {{ adding() ? copy().savingLabel : copy().saveLabel }}
-              </button>
-              <button type="button" [disabled]="adding()" (click)="cancelAdding()"
-                class="min-h-10 rounded-lg border border-white/10 px-4 font-semibold text-slate-300 hover:bg-white/5 disabled:opacity-60">
-                {{ copy().cancelLabel }}
-              </button>
-            </div>
-          </td>
-        </tr>
-        }
         @for (user of paginatedUsers(); track user.id) {
         <tr class="transition hover:bg-white/[0.03]">
           @if (editingUserId() === user.id && editingUser(); as editableUser) {
@@ -95,9 +119,13 @@
                 class="min-h-10 rounded-lg bg-cyan-300 px-4 font-semibold text-slate-950 disabled:cursor-wait disabled:opacity-60">
                 {{ saving() ? copy().savingLabel : copy().saveLabel }}
               </button>
-              <button type="button" [disabled]="saving()" (click)="cancelEditing()"
+              <button type="button" [disabled]="saving() || isDeleting(user.id)" (click)="cancelEditing()"
                 class="min-h-10 rounded-lg border border-white/10 px-4 font-semibold text-slate-300 hover:bg-white/5 disabled:opacity-60">
                 {{ copy().cancelLabel }}
+              </button>
+              <button type="button" [disabled]="saving() || isDeleting(user.id)" (click)="deleteUser(user)"
+                class="min-h-10 rounded-lg border border-rose-300/25 bg-rose-300/10 px-4 font-semibold text-rose-100 hover:bg-rose-300/20 disabled:cursor-wait disabled:opacity-60">
+                {{ isDeleting(user.id) ? copy().deletingLabel : copy().deleteLabel }}
               </button>
             </div>
           </td>

@@ -301,6 +301,18 @@ export class AdminDashboardPageComponent {
     );
   }
 
+  protected removeUser(userId: string): void {
+    this.dashboard.update((dashboard) =>
+      dashboard
+        ? {
+            ...dashboard,
+            totalUsers: Math.max(0, dashboard.totalUsers - 1),
+            users: dashboard.users.filter((user) => user.id !== userId),
+          }
+        : dashboard,
+    );
+  }
+
   protected updateContactMessage(updatedMessage: AdminContactMessage): void {
     this.dashboard.update((dashboard) =>
       dashboard

@@ -19,6 +19,7 @@ export class AdminUsersComponent {
   readonly users = input.required<AdminUser[]>();
   readonly userUpdated = output<AdminUser>();
   readonly userCreated = output<AdminUser>();
+  readonly userDeleted = output<string>();
 
   private readonly admin = inject(AdminService);
   private readonly i18n = inject(I18nService);
@@ -32,6 +33,7 @@ export class AdminUsersComponent {
   protected readonly addableUser = signal<AdminUserCreate | null>(null);
   protected readonly adding = signal(false);
   protected readonly saving = signal(false);
+  protected readonly deletingIds = signal<string[]>([]);
   protected readonly saveError = signal(false);
 
   protected readonly filteredUsers = computed(() => {
@@ -160,6 +162,38 @@ protected cancelAdding(): void {
         },
         error: () => this.saveError.set(true),
       });
+  }
+
+  protected deleteUser(user: AdminUser): void {
+    if (this.deletingIds().includes(user.id)) {
+      return;
+    }
+
+    if (!window.confirm(`Delete user ${user.email}? This cannot be undone.`)) {
+      return;
+    }
+
+    this.deletingIds.update((ids) => [...ids, user.id]);
+    this.saveError.set(false);
+    this.admin
+      .deleteUser(user.id)
+      .pipe(
+        finalize(() => this.deletingIds.update((ids) => ids.filter((id) => id !== user.id))),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe({
+        next: () => {
+          this.userDeleted.emit(user.id);
+          if (this.editingUserId() === user.id) {
+            this.cancelEditing();
+          }
+        },
+        error: () => this.saveError.set(true),
+      });
+  }
+
+  protected isDeleting(id: string): boolean {
+    return this.deletingIds().includes(id);
   }
 
   protected formatDate(value: string): string {

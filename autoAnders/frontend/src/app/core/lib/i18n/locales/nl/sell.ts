@@ -54,6 +54,20 @@ const statusOptions = [
   { value: "Cancelled", label: "Geannuleerd" },
 ];
 
+const colorOptions = [
+  { value: "#111827", label: "Zwart" },
+  { value: "#f8fafc", label: "Wit" },
+  { value: "#6b7280", label: "Grijs" },
+  { value: "#cbd5e1", label: "Zilver" },
+  { value: "#dc2626", label: "Rood" },
+  { value: "#2563eb", label: "Blauw" },
+  { value: "#16a34a", label: "Groen" },
+  { value: "#facc15", label: "Geel" },
+  { value: "#f97316", label: "Oranje" },
+  { value: "#92400e", label: "Bruin" },
+  { value: "#d6c7a1", label: "Beige" },
+];
+
 export const nlSellCopy: Copy["sell"] = {
   eyebrow: "Auto verkopen",
   title: "Voertuiggegevens versturen",
@@ -66,9 +80,6 @@ export const nlSellCopy: Copy["sell"] = {
     // { name: "phone", label: "Telefoon", type: "tel" },
     { name: "brand", label: "Merk", type: "text", required: true },
     { name: "model", label: "Model", type: "text", required: true },
-    
-    { name: "title", label: "Titel", type: "text" },
-    { name: "subtitle", label: "Subtitel", type: "text" },
     { name: "yearOfManufacture", label: "Bouwjaar", type: "number" },
     { name: "mileage", label: "Kilometerstand", type: "number", required: true },
     { name: "power", label: "Vermogen", type: "text" },
@@ -92,7 +103,7 @@ export const nlSellCopy: Copy["sell"] = {
     { name: "numberOfKeys", label: "Aantal sleutels", type: "number" },
     { name: "licensePlate", label: "Kenteken", type: "text" },
     { name: "engineDisplacement", label: "Cilinderinhoud", type: "number" },
-    { name: "colour", label: "Kleur", type: "text" },
+    { name: "colour", label: "Kleur", type: "select", options: colorOptions, required: true },
     { name: "emptyWeight", label: "Leeggewicht", type: "number" },
     { name: "taxAdditionPercentage", label: "Bijtelling percentage", type: "number" },
     { name: "apkMotDate", label: "APK-datum", type: "text" },

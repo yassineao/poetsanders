@@ -9,13 +9,30 @@ import {
   inject,
   signal,
 } from '@angular/core';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import {
+  AbstractControl,
+  FormBuilder,
+  ReactiveFormsModule,
+  ValidationErrors,
+  ValidatorFn,
+  Validators,
+} from '@angular/forms';
 import { EMPTY, catchError, finalize } from 'rxjs';
 import { AuthService } from '../../../../core/auth/auth.service';
 import { I18nService } from '../../../../core/i18/i18n.service';
 import type { AuthUser } from '../../../../core/interfaces/AuthUser';
 
 const passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z\d\s]).{12,}$/;
+const passwordsMatchValidator: ValidatorFn = (
+  control: AbstractControl,
+): ValidationErrors | null => {
+  const password = control.get('password')?.value;
+  const passwordConfirmation = control.get('passwordConfirmation')?.value;
+
+  return password !== passwordConfirmation && (password || passwordConfirmation)
+    ? { passwordMismatch: true }
+    : null;
+};
 
 @Component({
   selector: 'app-profile-editor',
@@ -35,15 +52,21 @@ export class ProfileEditorComponent implements OnChanges {
   protected readonly saving = signal(false);
   protected readonly saved = signal(false);
   protected readonly errorMessage = signal('');
+  protected readonly passwordVisible = signal(false);
+  protected readonly passwordConfirmationVisible = signal(false);
 
-  protected readonly profileForm = this.formBuilder.nonNullable.group({
-    name: ['', [Validators.required, Validators.maxLength(255)]],
-    phoneNumber: ['', [Validators.required, Validators.minLength(8), Validators.maxLength(30)]],
-    password: [
-      '',
-      [Validators.minLength(12), Validators.maxLength(30), Validators.pattern(passwordPattern)],
-    ],
-  });
+  protected readonly profileForm = this.formBuilder.nonNullable.group(
+    {
+      name: ['', [Validators.required, Validators.maxLength(255)]],
+      phoneNumber: ['', [Validators.required, Validators.minLength(8), Validators.maxLength(30)]],
+      password: [
+        '',
+        [Validators.minLength(12), Validators.maxLength(30), Validators.pattern(passwordPattern)],
+      ],
+      passwordConfirmation: [''],
+    },
+    { validators: passwordsMatchValidator },
+  );
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['user']) {
@@ -54,6 +77,8 @@ export class ProfileEditorComponent implements OnChanges {
   protected startEditing(): void {
     this.saved.set(false);
     this.errorMessage.set('');
+    this.passwordVisible.set(false);
+    this.passwordConfirmationVisible.set(false);
     this.editing.set(true);
   }
 
@@ -109,6 +134,9 @@ export class ProfileEditorComponent implements OnChanges {
       name: this.user.user,
       phoneNumber: this.user.phoneNumber ?? '',
       password: '',
+      passwordConfirmation: '',
     });
+    this.passwordVisible.set(false);
+    this.passwordConfirmationVisible.set(false);
   }
 }

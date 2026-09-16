@@ -72,6 +72,7 @@ export const enAdminCopy: AdminCopy = {
   saveLabel: 'Save',
   cancelLabel: 'Cancel',
   savingLabel: 'Saving...',
+  deletingLabel: 'Deleting...',
   userUpdateErrorLabel: 'The user could not be updated. Please check the values and try again.',
   addCarLabel: 'Add car',
   carCreateErrorLabel: 'The car could not be created. Please check the values and try again.',

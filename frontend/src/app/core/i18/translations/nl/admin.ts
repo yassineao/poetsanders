@@ -72,6 +72,7 @@ export const nlAdminCopy: AdminCopy = {
   saveLabel: 'Opslaan',
   cancelLabel: 'Annuleren',
   savingLabel: 'Opslaan...',
+  deletingLabel: 'Verwijderen...',
   userUpdateErrorLabel: 'De gebruiker kon niet worden bijgewerkt.',
   addCarLabel: 'Auto toevoegen',
   carCreateErrorLabel: 'De auto kon niet worden aangemaakt.',

@@ -1,17 +1,285 @@
-<section class="mx-auto mt-8 max-w-5xl rounded-3xl border border-white/10 bg-zinc-900 p-6 text-white shadow-2xl shadow-black/40 sm:p-8">
+<section class="mx-auto mt-8 max-w-6xl rounded-3xl border border-white/10 bg-zinc-900 p-6 text-white shadow-2xl shadow-black/40 sm:p-8">
   <div class="flex flex-col gap-3 border-b border-white/10 pb-5 sm:flex-row sm:items-end sm:justify-between">
     <div>
       <p class="text-sm font-bold uppercase tracking-[0.2em] text-red-500">Garage</p>
       <h2 class="mt-2 text-2xl font-black">My cars</h2>
     </div>
-    <button
-      type="button"
-      (click)="loadCars()"
-      [disabled]="loading()"
-      class="rounded-xl border border-white/10 px-4 py-2 text-sm font-bold text-zinc-200 transition hover:border-red-500/50 hover:bg-white/5 disabled:cursor-not-allowed disabled:opacity-50">
-      Refresh
-    </button>
+    <div class="flex flex-wrap gap-2">
+      <button
+        type="button"
+        (click)="openAddCar()"
+        class="rounded-xl bg-red-600 px-4 py-2 text-sm font-bold text-white shadow-lg shadow-red-950/30 transition hover:bg-red-500">
+        Add car
+      </button>
+      <button
+        type="button"
+        (click)="loadCars()"
+        [disabled]="loading()"
+        class="rounded-xl border border-white/10 px-4 py-2 text-sm font-bold text-zinc-200 transition hover:border-red-500/50 hover:bg-white/5 disabled:cursor-not-allowed disabled:opacity-50">
+        Refresh
+      </button>
+    </div>
   </div>
+
+  @if (addPanelOpen()) {
+    @let values = addValues();
+
+    <form class="mt-6 overflow-hidden rounded-2xl border border-red-500/20 bg-zinc-950/80 shadow-2xl shadow-black/30" (ngSubmit)="createCar()">
+      <div class="border-b border-white/10 p-5 sm:p-6">
+        <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+          <div>
+            <p class="text-xs font-black uppercase tracking-[0.2em] text-red-400">New vehicle</p>
+            <h3 class="mt-2 text-2xl font-black">Add a car</h3>
+          </div>
+
+          <div class="grid grid-cols-2 gap-2 sm:flex">
+            @for (step of addSteps; track step; let index = $index) {
+              <button
+                type="button"
+                (click)="addStep.set(index)"
+                class="rounded-xl border px-3 py-2 text-xs font-black uppercase tracking-wide transition"
+                [class.border-red-500]="addStep() === index"
+                [class.bg-red-600]="addStep() === index"
+                [class.text-white]="addStep() === index"
+                [class.border-white/10]="addStep() !== index"
+                [class.text-zinc-400]="addStep() !== index">
+                {{ index + 1 }}. {{ step }}
+              </button>
+            }
+          </div>
+        </div>
+      </div>
+
+      <div class="p-5 sm:p-6">
+        @if (addStep() === 0) {
+          <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            @for (field of addBasicsTextFields; track field.key) {
+              <label class="text-sm font-medium text-zinc-300">
+                {{ field.label }}
+                <input
+                  [name]="'add-' + field.key"
+                  [ngModel]="values[field.key]"
+                  (ngModelChange)="setAddValue(field.key, $event)"
+                  [required]="field.required || false"
+                  class="mt-2 w-full rounded-xl border border-white/10 bg-black/40 px-4 py-3 text-white outline-none transition focus:border-red-500 focus:ring-4 focus:ring-red-500/10"
+                />
+              </label>
+            }
+
+            <fieldset class="sm:col-span-2 lg:col-span-3">
+              <legend class="text-sm font-medium text-zinc-300">Colour</legend>
+              <button
+                type="button"
+                (click)="addColorPickerOpen.set(!addColorPickerOpen())"
+                class="mt-2 flex w-full items-center gap-3 rounded-xl border border-white/10 bg-black/40 px-4 py-3 text-left text-sm font-bold text-zinc-200 transition hover:border-red-500/50 hover:bg-white/5">
+                <span class="h-6 w-6 rounded-full border border-white/30" [style.background]="values.colour"></span>
+                <span>{{ colorLabel(values.colour) }}</span>
+                <span class="ml-auto text-xs text-zinc-400">{{ values.colour }}</span>
+              </button>
+              @if (addColorPickerOpen()) {
+                <div class="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4">
+                  @for (color of colorOptions; track color.hex) {
+                    <button
+                      type="button"
+                      (click)="selectAddColor(color.hex)"
+                      class="flex items-center gap-3 rounded-xl border border-white/10 bg-black/40 px-3 py-2 text-left text-sm font-bold text-zinc-200 transition hover:border-red-500/50 hover:bg-white/5"
+                      [class.border-red-500]="values.colour === color.hex"
+                      [class.bg-red-950]="values.colour === color.hex"
+                    >
+                      <span class="h-6 w-6 rounded-full border border-white/30" [style.background]="color.hex"></span>
+                      <span>{{ color.label }}</span>
+                    </button>
+                  }
+                </div>
+              }
+            </fieldset>
+
+            @for (field of addBasicsNumberFields; track field.key) {
+              <label class="text-sm font-medium text-zinc-300">
+                {{ field.label }}
+                <input
+                  [name]="'add-' + field.key"
+                  type="number"
+                  [step]="field.step || null"
+                  [ngModel]="values[field.key]"
+                  (ngModelChange)="setAddValue(field.key, $event)"
+                  [required]="field.required || false"
+                  class="mt-2 w-full rounded-xl border border-white/10 bg-black/40 px-4 py-3 text-white outline-none transition focus:border-red-500 focus:ring-4 focus:ring-red-500/10"
+                />
+              </label>
+            }
+
+            @for (field of addBasicsDateFields; track field.key) {
+              <label class="text-sm font-medium text-zinc-300">
+                {{ field.label }}
+                <input
+                  [name]="'add-' + field.key"
+                  type="date"
+                  [ngModel]="values[field.key]"
+                  (ngModelChange)="setAddValue(field.key, $event)"
+                  class="mt-2 w-full rounded-xl border border-white/10 bg-black/40 px-4 py-3 text-white outline-none transition focus:border-red-500 focus:ring-4 focus:ring-red-500/10"
+                />
+              </label>
+            }
+
+            @for (field of selectFields; track field.key) {
+              <label class="text-sm font-medium text-zinc-300">
+                {{ field.label }}
+                <select
+                  [name]="'add-' + field.key"
+                  [ngModel]="values[field.key]"
+                  (ngModelChange)="setAddValue(field.key, $event)"
+                  class="mt-2 w-full rounded-xl border border-white/10 bg-black/40 px-4 py-3 text-white outline-none transition focus:border-red-500 focus:ring-4 focus:ring-red-500/10"
+                >
+                  <option [ngValue]="null">Select</option>
+                  @for (option of field.options; track option) {
+                    <option [ngValue]="option">{{ option.replaceAll("_", " ") }}</option>
+                  }
+                </select>
+              </label>
+            }
+
+          </div>
+        } @else if (addStep() === 1) {
+          <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            @for (field of addSpecTextFields; track field.key) {
+              <label class="text-sm font-medium text-zinc-300">
+                {{ field.label }}
+                <input
+                  [name]="'add-' + field.key"
+                  [ngModel]="values[field.key]"
+                  (ngModelChange)="setAddValue(field.key, $event)"
+                  class="mt-2 w-full rounded-xl border border-white/10 bg-black/40 px-4 py-3 text-white outline-none transition focus:border-red-500 focus:ring-4 focus:ring-red-500/10"
+                />
+              </label>
+            }
+
+            @for (field of addSpecDateFields; track field.key) {
+              <label class="text-sm font-medium text-zinc-300">
+                {{ field.label }}
+                <input
+                  [name]="'add-' + field.key"
+                  type="date"
+                  [ngModel]="values[field.key]"
+                  (ngModelChange)="setAddValue(field.key, $event)"
+                  class="mt-2 w-full rounded-xl border border-white/10 bg-black/40 px-4 py-3 text-white outline-none transition focus:border-red-500 focus:ring-4 focus:ring-red-500/10"
+                />
+              </label>
+            }
+
+            @for (field of addSpecNumberFields; track field.key) {
+              <label class="text-sm font-medium text-zinc-300">
+                {{ field.label }}
+                <input
+                  [name]="'add-' + field.key"
+                  type="number"
+                  [step]="field.step || null"
+                  [ngModel]="values[field.key]"
+                  (ngModelChange)="setAddValue(field.key, $event)"
+                  class="mt-2 w-full rounded-xl border border-white/10 bg-black/40 px-4 py-3 text-white outline-none transition focus:border-red-500 focus:ring-4 focus:ring-red-500/10"
+                />
+              </label>
+            }
+
+            @for (field of booleanFields; track field.key) {
+              <label class="flex min-h-14 items-center gap-3 rounded-xl border border-white/10 bg-black/40 px-4 py-3 text-sm font-medium text-zinc-300">
+                <input
+                  [name]="'add-' + field.key"
+                  type="checkbox"
+                  [ngModel]="values[field.key]"
+                  (ngModelChange)="setAddValue(field.key, $event)"
+                  class="h-5 w-5 accent-red-600"
+                />
+                {{ field.label }}
+              </label>
+            }
+          </div>
+        } @else if (addStep() === 2) {
+          <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            @for (field of addFinanceNumberFields; track field.key) {
+              <label class="text-sm font-medium text-zinc-300">
+                {{ field.label }}
+                <input
+                  [name]="'add-' + field.key"
+                  type="number"
+                  [step]="field.step || null"
+                  [ngModel]="values[field.key]"
+                  (ngModelChange)="setAddValue(field.key, $event)"
+                  class="mt-2 w-full rounded-xl border border-white/10 bg-black/40 px-4 py-3 text-white outline-none transition focus:border-red-500 focus:ring-4 focus:ring-red-500/10"
+                />
+              </label>
+            }
+          </div>
+        } @else {
+          <div>
+            <label class="flex min-h-40 cursor-pointer flex-col items-center justify-center rounded-2xl border border-dashed border-white/20 bg-black/30 px-6 py-8 text-center transition hover:border-red-500/50 hover:bg-red-950/10">
+              <span class="text-lg font-black text-white">Upload car pictures</span>
+              <span class="mt-2 max-w-xl text-sm leading-6 text-zinc-400">
+                Select multiple images at once. They will be uploaded together after the car is created.
+              </span>
+              <span class="mt-4 rounded-xl bg-white px-4 py-2 text-sm font-black text-black">Choose pictures</span>
+              <input type="file" accept="image/*" multiple (change)="addPicturesToNewCar($event)" class="sr-only" />
+            </label>
+
+            @if (addPicturePreviews().length) {
+              <div class="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+                @for (picture of addPicturePreviews(); track picture.url; let index = $index) {
+                  <div class="group relative overflow-hidden rounded-xl border border-white/10 bg-black">
+                    <img [src]="picture.url" [alt]="picture.name" class="aspect-[4/3] w-full object-cover" />
+                    <button
+                      type="button"
+                      (click)="removeNewCarPicture(index)"
+                      class="absolute right-2 top-2 grid h-8 w-8 place-items-center rounded-full bg-black/70 text-lg font-bold text-white transition hover:bg-red-600"
+                      aria-label="Remove picture">
+                      &times;
+                    </button>
+                    <p class="truncate bg-black/70 px-3 py-2 text-xs text-zinc-300">{{ picture.name }}</p>
+                  </div>
+                }
+              </div>
+            }
+          </div>
+        }
+      </div>
+
+      <div class="flex flex-col gap-3 border-t border-white/10 p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6">
+        <button
+          type="button"
+          (click)="cancelAddCar()"
+          [disabled]="creatingCar()"
+          class="rounded-xl border border-white/10 px-5 py-3 text-sm font-bold text-zinc-200 transition hover:border-white/25 hover:bg-white/5 disabled:cursor-not-allowed disabled:opacity-50">
+          Cancel
+        </button>
+
+        <div class="flex flex-col gap-3 sm:flex-row">
+          <button
+            type="button"
+            (click)="previousAddStep()"
+            [disabled]="addStep() === 0 || creatingCar()"
+            class="rounded-xl border border-white/10 px-5 py-3 text-sm font-bold text-zinc-200 transition hover:border-white/25 hover:bg-white/5 disabled:cursor-not-allowed disabled:opacity-50">
+            Back
+          </button>
+
+          @if (addStep() < addSteps.length - 1) {
+            <button
+              type="button"
+              (click)="nextAddStep()"
+              [disabled]="!canGoToNextAddStep() || creatingCar()"
+              class="rounded-xl bg-white px-5 py-3 text-sm font-black text-black transition hover:bg-zinc-200 disabled:cursor-not-allowed disabled:opacity-50">
+              Next
+            </button>
+          } @else {
+            <button
+              type="submit"
+              [disabled]="!addBasicsValid() || creatingCar()"
+              class="rounded-xl bg-red-600 px-5 py-3 text-sm font-black text-white shadow-lg shadow-red-950/30 transition hover:bg-red-500 disabled:cursor-not-allowed disabled:opacity-50">
+              {{ creatingCar() ? "Creating..." : "Create car" }}
+            </button>
+          }
+        </div>
+      </div>
+    </form>
+  }
 
   @if (loading()) {
     <p class="mt-5 rounded-2xl border border-white/10 bg-black/20 px-4 py-3 text-sm text-zinc-400">
@@ -136,6 +404,34 @@
                         />
                       </label>
                     }
+
+                    <fieldset class="sm:col-span-2">
+                      <legend class="text-sm font-medium text-zinc-300">Colour</legend>
+                      <button
+                        type="button"
+                        (click)="editColorPickerOpen.set(editColorPickerOpen() === car.id ? null : car.id)"
+                        class="mt-2 flex w-full items-center gap-3 rounded-xl border border-white/10 bg-zinc-950/80 px-4 py-3 text-left text-sm font-bold text-zinc-200 transition hover:border-red-500/50 hover:bg-white/5">
+                        <span class="h-6 w-6 rounded-full border border-white/30" [style.background]="values.colour"></span>
+                        <span>{{ colorLabel(values.colour) }}</span>
+                        <span class="ml-auto text-xs text-zinc-400">{{ values.colour }}</span>
+                      </button>
+                      @if (editColorPickerOpen() === car.id) {
+                        <div class="mt-2 grid grid-cols-2 gap-2">
+                          @for (color of colorOptions; track color.hex) {
+                            <button
+                              type="button"
+                              (click)="selectEditColor(values, color.hex)"
+                              class="flex items-center gap-3 rounded-xl border border-white/10 bg-zinc-950/80 px-3 py-2 text-left text-sm font-bold text-zinc-200 transition hover:border-red-500/50 hover:bg-white/5"
+                              [class.border-red-500]="values.colour === color.hex"
+                              [class.bg-red-950]="values.colour === color.hex"
+                            >
+                              <span class="h-6 w-6 rounded-full border border-white/30" [style.background]="color.hex"></span>
+                              <span>{{ color.label }}</span>
+                            </button>
+                          }
+                        </div>
+                      }
+                    </fieldset>
 
                     @for (field of dateFields; track field.key) {
                       <label class="text-sm font-medium text-zinc-300">

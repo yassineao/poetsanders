@@ -32,6 +32,33 @@
       }
 
       <form #form="ngForm" (ngSubmit)="submit(form)" class="mt-8 space-y-6">
+        @if (steps().length > 1) {
+          <div class="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
+            @for (step of steps(); track step.label; let stepIndex = $index) {
+              <button
+                type="button"
+                (click)="goToStep(stepIndex)"
+                [class.border-red-500]="currentPage() === stepIndex"
+                [class.bg-red-950]="currentPage() === stepIndex"
+                class="rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-left text-sm font-bold text-zinc-200 transition hover:border-red-500/50 hover:bg-white/5">
+                <span class="block text-xs uppercase tracking-[0.16em] text-zinc-500">
+                  {{ paginationLabels().pageLabel }} {{ stepIndex + 1 }}
+                </span>
+                <span class="mt-1 block">{{ step.label }}</span>
+              </button>
+            }
+          </div>
+        }
+
+        @if (currentStep(); as step) {
+          <div class="rounded-2xl border border-white/10 bg-black/20 px-5 py-4">
+            <p class="text-xs font-bold uppercase tracking-[0.18em] text-red-400">
+              {{ paginationLabels().pageLabel }} {{ currentPage() + 1 }} {{ paginationLabels().ofLabel }} {{ totalPages() }}
+            </p>
+            <h2 class="mt-1 text-xl font-black text-white">{{ step.label }}</h2>
+          </div>
+        }
+
         <div class="grid gap-4 rounded-2xl border border-white/10 bg-black/20 p-4 sm:grid-cols-2 sm:p-5">
           @for (field of visible_fields(); track field.name) {
             <div
@@ -93,7 +120,48 @@
                 }
               } @else {
                 {{ field.label }}
-                @if (field.options?.length) {
+                @if (field.name === "colour" && field.options?.length) {
+                  <input
+                    #fieldControl="ngModel"
+                    type="hidden"
+                    [name]="field.name"
+                    [ngModel]="fieldValue(field)"
+                    [required]="field.required ?? false"
+                  />
+                  <button
+                    type="button"
+                    (click)="openColorField.set(openColorField() === field.name ? null : field.name)"
+                    class="mt-2 flex w-full items-center gap-3 rounded-xl border border-white/10 bg-zinc-950/80 px-4 py-3.5 text-left text-sm font-bold text-zinc-200 transition hover:border-red-500/50 hover:bg-white/5">
+                    @if (fieldValue(field)) {
+                      <span class="h-6 w-6 rounded-full border border-white/30" [style.background]="fieldValue(field)"></span>
+                      <span>{{ optionLabel(field, fieldValue(field)) }}</span>
+                    } @else {
+                      <span class="h-6 w-6 rounded-full border border-dashed border-white/30"></span>
+                      <span>{{ field.placeholder ?? "Choose colour" }}</span>
+                    }
+                  </button>
+                  @if (openColorField() === field.name) {
+                    <div class="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-3">
+                      @for (option of field.options; track option.value) {
+                        <button
+                          type="button"
+                          (click)="selectColor(field, option.value)"
+                          class="flex items-center gap-3 rounded-xl border border-white/10 bg-zinc-950/80 px-3 py-2 text-left text-sm font-bold text-zinc-200 transition hover:border-red-500/50 hover:bg-white/5"
+                          [class.border-red-500]="fieldValue(field) === option.value"
+                          [class.bg-red-950]="fieldValue(field) === option.value"
+                        >
+                          <span class="h-6 w-6 rounded-full border border-white/30" [style.background]="option.value"></span>
+                          <span>{{ option.label }}</span>
+                        </button>
+                      }
+                    </div>
+                  }
+                  @if (fieldError(field, fieldControl, form); as error) {
+                    <span class="mt-2 block text-xs font-medium text-red-400" role="alert">
+                      {{ error }}
+                    </span>
+                  }
+                } @else if (field.options?.length) {
                   <select
                     #fieldControl="ngModel"
                     [name]="field.name"
@@ -139,7 +207,7 @@
           }
         </div>
         
-        @if (fields().length > fieldsPerPage) {
+        @if (totalPages() > 1) {
           <div class="flex flex-col gap-3 rounded-2xl border border-white/10 bg-black/20 p-3 sm:flex-row sm:items-center sm:justify-between">
             <p class="text-sm font-medium text-zinc-400">
               {{ paginationLabels().pageLabel }}

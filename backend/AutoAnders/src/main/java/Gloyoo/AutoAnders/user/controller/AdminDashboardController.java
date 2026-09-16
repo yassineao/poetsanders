@@ -66,6 +66,12 @@ public class AdminDashboardController {
         return ResponseEntity.status(201).body(adminDashboardService.createUser(request));
     }
 
+    @DeleteMapping("/users/{id}")
+    public ResponseEntity<Void> deleteUser(@PathVariable UUID id) {
+        adminDashboardService.deleteUser(id);
+        return ResponseEntity.noContent().build();
+    }
+
     @PatchMapping("/appointments/{id}")
     public ResponseEntity<AdminAppointmentResponse> updateAppointment(
             @PathVariable UUID id,

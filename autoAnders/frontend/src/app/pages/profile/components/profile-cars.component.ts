@@ -7,6 +7,7 @@ import type { Car, CarPicture, CarPictureRequest, CarRequest } from "../../../co
 
 type CarEditValues = CarRequest;
 type CarEditKey = keyof CarEditValues;
+type PicturePreview = { file: File; name: string; url: string };
 
 interface CarInputField {
   key: CarEditKey;
@@ -20,6 +21,11 @@ interface CarSelectField {
   key: CarEditKey;
   label: string;
   options: readonly string[];
+}
+
+interface CarColorOption {
+  label: string;
+  hex: string;
 }
 
 @Component({
@@ -38,19 +44,48 @@ export class ProfileCarsComponent {
   protected readonly deletingPictureIds = signal<string[]>([]);
   protected readonly editingCarId = signal<string | null>(null);
   protected readonly editValues = signal<Record<string, CarEditValues>>({});
+  protected readonly addPanelOpen = signal(false);
+  protected readonly addStep = signal(0);
+  protected readonly addValues = signal<CarEditValues>(this.emptyCarValues());
+  protected readonly addPicturePreviews = signal<PicturePreview[]>([]);
+  protected readonly addColorPickerOpen = signal(false);
+  protected readonly editColorPickerOpen = signal<string | null>(null);
+  protected readonly creatingCar = signal(false);
   protected readonly hasCars = computed(() => this.cars().length > 0);
+  protected readonly addSteps = ["Basics", "Specs", "Finance", "Pictures"];
+  protected readonly colorOptions: CarColorOption[] = [
+    { label: "Black", hex: "#111827" },
+    { label: "White", hex: "#f8fafc" },
+    { label: "Gray", hex: "#6b7280" },
+    { label: "Silver", hex: "#cbd5e1" },
+    { label: "Red", hex: "#dc2626" },
+    { label: "Blue", hex: "#2563eb" },
+    { label: "Green", hex: "#16a34a" },
+    { label: "Yellow", hex: "#facc15" },
+    { label: "Orange", hex: "#f97316" },
+    { label: "Brown", hex: "#92400e" },
+    { label: "Beige", hex: "#d6c7a1" },
+  ];
+  protected readonly addBasicsValid = computed(() => {
+    const values = this.addValues();
+    return Boolean(values.brand && values.model && values.mileage);
+  });
+  protected readonly canGoToNextAddStep = computed(() => {
+    if (this.addStep() === 0) {
+      return this.addBasicsValid();
+    }
+
+    return true;
+  });
 
   protected readonly textFields: CarInputField[] = [
     { key: "brand", label: "Brand", type: "text", required: true },
     { key: "model", label: "Model", type: "text", required: true },
-    { key: "title", label: "Title", type: "text" },
-    { key: "subtitle", label: "Subtitle", type: "text" },
     { key: "power", label: "Power", type: "text" },
     { key: "referenceNumber", label: "Reference number", type: "text" },
     { key: "motorVehicleTax", label: "Motor vehicle tax", type: "text" },
     { key: "chassisNumber", label: "Chassis number", type: "text" },
     { key: "licensePlate", label: "License plate", type: "text" },
-    { key: "colour", label: "Colour", type: "text" },
     { key: "apkMotDate", label: "APK/MOT date", type: "text" },
     { key: "location", label: "Location", type: "text" },
   ];
@@ -112,6 +147,59 @@ export class ProfileCarsComponent {
     { key: "serviceDocumentation", label: "Service documentation" },
   ];
 
+  protected readonly addBasicsTextFields: CarInputField[] = [
+    { key: "brand", label: "Brand", type: "text", required: true },
+    { key: "model", label: "Model", type: "text", required: true },
+    { key: "referenceNumber", label: "Reference number", type: "text" },
+    { key: "licensePlate", label: "License plate", type: "text" },
+    { key: "location", label: "Location", type: "text" },
+  ];
+
+  protected readonly addBasicsNumberFields: CarInputField[] = [
+    { key: "yearOfManufacture", label: "Year", type: "number" },
+    { key: "mileage", label: "Mileage", type: "number", required: true },
+    { key: "price", label: "Price", type: "number", step: "0.01" },
+  ];
+
+  protected readonly addBasicsDateFields: CarInputField[] = [
+    { key: "firstRegistrationDate", label: "First registration", type: "date" },
+  ];
+
+  protected readonly addSpecTextFields: CarInputField[] = [
+    { key: "power", label: "Power", type: "text" },
+    { key: "motorVehicleTax", label: "Motor vehicle tax", type: "text" },
+    { key: "apkMotDate", label: "APK/MOT date", type: "text" },
+    { key: "chassisNumber", label: "Chassis number", type: "text" },
+  ];
+
+  protected readonly addSpecDateFields: CarInputField[] = [
+    { key: "modelDateFrom", label: "Model date from", type: "date" },
+    { key: "modelDateTo", label: "Model date to", type: "date" },
+  ];
+
+  protected readonly addSpecNumberFields: CarInputField[] = [
+    { key: "numberOfDoors", label: "Doors", type: "number" },
+    { key: "numberOfKeys", label: "Keys", type: "number" },
+    { key: "engineDisplacement", label: "Engine displacement", type: "number" },
+    { key: "wheelbase", label: "Wheelbase", type: "number" },
+    { key: "numberOfCylinders", label: "Cylinders", type: "number" },
+    { key: "emptyWeight", label: "Empty weight", type: "number" },
+    { key: "maxTowingWeight", label: "Max towing weight", type: "number" },
+    { key: "maxTowingWeightUnbraked", label: "Max towing weight unbraked", type: "number" },
+    { key: "urbanFuelConsumption", label: "Urban fuel consumption", type: "number", step: "0.01" },
+    { key: "combinedFuelConsumption", label: "Combined fuel consumption", type: "number", step: "0.01" },
+    { key: "motorwayFuelConsumption", label: "Motorway fuel consumption", type: "number", step: "0.01" },
+    { key: "co2Emissions", label: "CO2 emissions", type: "number" },
+  ];
+
+  protected readonly addFinanceNumberFields: CarInputField[] = [
+    { key: "taxAdditionPercentage", label: "Tax addition percentage", type: "number", step: "0.01" },
+    { key: "financialLeasePricePerMonth", label: "Financial lease per month", type: "number", step: "0.01" },
+    { key: "leasePrice36Months", label: "Lease price 36 months", type: "number", step: "0.01" },
+    { key: "leasePrice48Months", label: "Lease price 48 months", type: "number", step: "0.01" },
+    { key: "leasePrice60Months", label: "Lease price 60 months", type: "number", step: "0.01" },
+  ];
+
   constructor() {
     this.loadCars();
   }
@@ -132,8 +220,128 @@ export class ProfileCarsComponent {
       .subscribe((cars) => this.cars.set(cars));
   }
 
+  protected openAddCar(): void {
+    this.addValues.set(this.emptyCarValues());
+    this.clearAddPicturePreviews();
+    this.addStep.set(0);
+    this.addPanelOpen.set(true);
+  }
+
+  protected cancelAddCar(): void {
+    if (this.creatingCar()) {
+      return;
+    }
+
+    this.addPanelOpen.set(false);
+    this.addStep.set(0);
+    this.addValues.set(this.emptyCarValues());
+    this.clearAddPicturePreviews();
+  }
+
+  protected nextAddStep(): void {
+    if (this.canGoToNextAddStep()) {
+      this.addStep.update((step) => Math.min(step + 1, this.addSteps.length - 1));
+    }
+  }
+
+  protected previousAddStep(): void {
+    this.addStep.update((step) => Math.max(step - 1, 0));
+  }
+
+  protected setAddValue(key: CarEditKey, value: unknown): void {
+    this.addValues.update((values) => ({
+      ...values,
+      [key]: value,
+    }));
+  }
+
+  protected selectAddColor(hex: string): void {
+    this.setAddValue("colour", hex);
+    this.addColorPickerOpen.set(false);
+  }
+
+  protected selectEditColor(values: CarEditValues, hex: string): void {
+    values.colour = hex;
+    this.editColorPickerOpen.set(null);
+  }
+
+  protected addPicturesToNewCar(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const files = Array.from(input.files ?? []).filter((file) => file.type.startsWith("image/"));
+    input.value = "";
+
+    if (!files.length) {
+      return;
+    }
+
+    this.addPicturePreviews.update((previews) => [
+      ...previews,
+      ...files.map((file) => ({
+        file,
+        name: file.name,
+        url: URL.createObjectURL(file),
+      })),
+    ]);
+  }
+
+  protected removeNewCarPicture(index: number): void {
+    this.addPicturePreviews.update((previews) => {
+      const next = [...previews];
+      const [removed] = next.splice(index, 1);
+      if (removed) {
+        URL.revokeObjectURL(removed.url);
+      }
+      return next;
+    });
+  }
+
+  protected createCar(): void {
+    if (this.creatingCar() || !this.addBasicsValid()) {
+      return;
+    }
+
+    const values = this.addValues();
+    const previews = this.addPicturePreviews();
+
+    this.creatingCar.set(true);
+    this.failed.set(false);
+
+    this.carsService.addCar(this.toCarRequest(values, null))
+      .pipe(
+        catchError((error) => {
+          console.error("Creating car failed:", error);
+          this.failed.set(true);
+          return of(null);
+        }),
+      )
+      .subscribe(async (createdCar) => {
+        if (!createdCar) {
+          this.creatingCar.set(false);
+          return;
+        }
+
+        if (!previews.length) {
+          this.finishCreateCar(createdCar);
+          return;
+        }
+
+        const pictureRequests = await this.toPictureRequests(previews.map((preview) => preview.file));
+        this.carsService.addCarPictures(createdCar.id, pictureRequests)
+          .pipe(finalize(() => this.creatingCar.set(false)))
+          .subscribe({
+            next: (pictures) => this.finishCreateCar({ ...createdCar, pictures }),
+            error: (error) => {
+              console.error("Uploading new car pictures failed:", error);
+              this.failed.set(true);
+              this.finishCreateCar(createdCar);
+            },
+          });
+      });
+  }
+
   protected startEdit(car: Car): void {
     this.editingCarId.set(car.id);
+    this.editColorPickerOpen.set(null);
     this.editValues.update((values) => ({
       ...values,
       [car.id]: this.toEditValues(car),
@@ -142,6 +350,7 @@ export class ProfileCarsComponent {
 
   protected cancelEdit(): void {
     this.editingCarId.set(null);
+    this.editColorPickerOpen.set(null);
   }
 
   protected valuesFor(car: Car): CarEditValues {
@@ -233,6 +442,10 @@ export class ProfileCarsComponent {
     return String(car.status || "No status").replaceAll("_", " ");
   }
 
+  protected colorLabel(hex: string): string {
+    return this.colorOptions.find((option) => option.hex === hex)?.label ?? hex;
+  }
+
   protected saveCar(car: Car, form: NgForm): void {
     form.form.markAllAsTouched();
     if (form.invalid || this.savingCarId()) {
@@ -240,7 +453,7 @@ export class ProfileCarsComponent {
     }
 
     const values = this.valuesFor(car);
-    const request = this.toCarRequest(values);
+    const request = this.toCarRequest(values, car.status);
     if (!window.confirm(`Save changes to ${car.brand} ${car.model}?`)) {
       return;
     }
@@ -321,7 +534,7 @@ export class ProfileCarsComponent {
       numberOfKeys: car.numberOfKeys ?? 0,
       licensePlate: car.licensePlate ?? "",
       engineDisplacement: car.engineDisplacement ?? 0,
-      colour: car.colour ?? "",
+      colour: this.normalizeColor(car.colour),
       emptyWeight: car.emptyWeight ?? 0,
       taxAdditionPercentage: car.taxAdditionPercentage ?? 0,
       apkMotDate: car.apkMotDate ?? "",
@@ -342,12 +555,80 @@ export class ProfileCarsComponent {
     };
   }
 
-  private toCarRequest(values: CarEditValues): CarRequest {
+  private emptyCarValues(): CarEditValues {
+    return {
+      brand: "",
+      model: "",
+      title: "",
+      subtitle: "",
+      yearOfManufacture: new Date().getFullYear(),
+      mileage: 0,
+      power: "",
+      referenceNumber: "",
+      price: 0,
+      firstRegistrationDate: "",
+      numberOfDoors: 0,
+      wheelbase: 0,
+      numberOfCylinders: 0,
+      motorVehicleTax: "",
+      modelDateFrom: "",
+      modelDateTo: "",
+      maxTowingWeight: 0,
+      maxTowingWeightUnbraked: 0,
+      urbanFuelConsumption: 0,
+      combinedFuelConsumption: 0,
+      motorwayFuelConsumption: 0,
+      co2Emissions: 0,
+      taxDeductible: false,
+      chassisNumber: "",
+      numberOfKeys: 0,
+      licensePlate: "",
+      engineDisplacement: 0,
+      colour: this.colorOptions[0].hex,
+      emptyWeight: 0,
+      taxAdditionPercentage: 0,
+      apkMotDate: "",
+      serviceDocumentation: false,
+      location: "",
+      financialLeasePricePerMonth: 0,
+      leasePrice60Months: 0,
+      leasePrice48Months: 0,
+      leasePrice36Months: 0,
+      bodyType: null,
+      gearbox: null,
+      fuel: null,
+      emissionClass: null,
+      energyLabel: null,
+      paintType: null,
+      upholstery: null,
+      status: null,
+    };
+  }
+
+  private finishCreateCar(car: Car): void {
+    this.cars.update((cars) => [car, ...cars]);
+    this.addPanelOpen.set(false);
+    this.addStep.set(0);
+    this.addColorPickerOpen.set(false);
+    this.addValues.set(this.emptyCarValues());
+    this.clearAddPicturePreviews();
+    this.creatingCar.set(false);
+  }
+
+  private clearAddPicturePreviews(): void {
+    for (const preview of this.addPicturePreviews()) {
+      URL.revokeObjectURL(preview.url);
+    }
+
+    this.addPicturePreviews.set([]);
+  }
+
+  private toCarRequest(values: CarEditValues, status: CarRequest["status"]): CarRequest {
     return {
       brand: values.brand,
       model: values.model,
-      title: values.title,
-      subtitle: values.subtitle,
+      title: "",
+      subtitle: "",
       yearOfManufacture: this.toNumber(values.yearOfManufacture),
       mileage: this.toNumber(values.mileage),
       power: values.power,
@@ -371,7 +652,7 @@ export class ProfileCarsComponent {
       numberOfKeys: this.toNumber(values.numberOfKeys),
       licensePlate: values.licensePlate,
       engineDisplacement: this.toNumber(values.engineDisplacement),
-      colour: values.colour,
+      colour: this.normalizeColor(values.colour),
       emptyWeight: this.toNumber(values.emptyWeight),
       taxAdditionPercentage: this.toNumber(values.taxAdditionPercentage),
       apkMotDate: values.apkMotDate,
@@ -388,7 +669,7 @@ export class ProfileCarsComponent {
       energyLabel: values.energyLabel,
       paintType: values.paintType,
       upholstery: values.upholstery,
-      status: values.status,
+      status,
     };
   }
 
@@ -397,6 +678,13 @@ export class ProfileCarsComponent {
       return 0;
     }
     return Number(value);
+  }
+
+  private normalizeColor(value: unknown): string {
+    const color = typeof value === "string" ? value : "";
+    return this.colorOptions.some((option) => option.hex === color)
+      ? color
+      : this.colorOptions[0].hex;
   }
 
   private toPictureRequests(files: File[]): Promise<CarPictureRequest[]> {

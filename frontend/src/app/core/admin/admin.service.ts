@@ -46,6 +46,12 @@ export class AdminService {
     });
   }
 
+  deleteUser(id: string): Observable<void> {
+    return this.http.delete<void>(`${this.apiBaseUrl}/admin/users/${id}`, {
+      withCredentials: true,
+    });
+  }
+
   updateAppointment(
     id: string,
     appointment: AdminAppointmentUpdate,

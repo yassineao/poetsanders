@@ -129,6 +129,7 @@ export interface AdminCopy {
   saveLabel: string;
   cancelLabel: string;
   savingLabel: string;
+  deletingLabel: string;
   userUpdateErrorLabel: string;
   addCarLabel: string;
   carCreateErrorLabel: string;

@@ -72,6 +72,7 @@ export const deAdminCopy: AdminCopy = {
   saveLabel: 'Speichern',
   cancelLabel: 'Abbrechen',
   savingLabel: 'Wird gespeichert...',
+  deletingLabel: 'Wird gelöscht...',
   userUpdateErrorLabel: 'Der Benutzer konnte nicht aktualisiert werden.',
   addCarLabel: 'Fahrzeug hinzufügen',
   carCreateErrorLabel: 'Das Fahrzeug konnte nicht erstellt werden.',

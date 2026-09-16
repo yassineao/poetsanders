@@ -44,6 +44,7 @@ export interface FormField {
   name: string;
   label: string;
   type: string;
+  step?: string;
   accept?: string;
   multiple?: boolean;
   options?: {

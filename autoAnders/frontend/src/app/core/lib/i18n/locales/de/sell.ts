@@ -54,6 +54,20 @@ const statusOptions = [
   { value: "Cancelled", label: "Storniert" },
 ];
 
+const colorOptions = [
+  { value: "#111827", label: "Schwarz" },
+  { value: "#f8fafc", label: "Weiss" },
+  { value: "#6b7280", label: "Grau" },
+  { value: "#cbd5e1", label: "Silber" },
+  { value: "#dc2626", label: "Rot" },
+  { value: "#2563eb", label: "Blau" },
+  { value: "#16a34a", label: "Gruen" },
+  { value: "#facc15", label: "Gelb" },
+  { value: "#f97316", label: "Orange" },
+  { value: "#92400e", label: "Braun" },
+  { value: "#d6c7a1", label: "Beige" },
+];
+
 export const deSellCopy: Copy["sell"] = {
   eyebrow: "Auto verkaufen",
   title: "Fahrzeugdaten senden",
@@ -66,8 +80,6 @@ export const deSellCopy: Copy["sell"] = {
     // { name: "phone", label: "Telefon", type: "tel" },
     { name: "brand", label: "Marke", type: "text", required: true },
     { name: "model", label: "Modell", type: "text", required: true },
-    { name: "title", label: "Titel", type: "text" },
-    { name: "subtitle", label: "Untertitel", type: "text" },
     { name: "yearOfManufacture", label: "Baujahr", type: "number" },
     { name: "mileage", label: "Kilometerstand", type: "number", required: true },
     { name: "power", label: "Leistung", type: "text" },
@@ -91,7 +103,7 @@ export const deSellCopy: Copy["sell"] = {
     { name: "numberOfKeys", label: "Anzahl Schluessel", type: "number" },
     { name: "licensePlate", label: "Kennzeichen", type: "text" },
     { name: "engineDisplacement", label: "Hubraum", type: "number" },
-    { name: "colour", label: "Farbe", type: "text" },
+    { name: "colour", label: "Farbe", type: "select", options: colorOptions, required: true },
     { name: "emptyWeight", label: "Leergewicht", type: "number" },
     { name: "taxAdditionPercentage", label: "Steuerzuschlag Prozent", type: "number" },
     { name: "apkMotDate", label: "APK/TUV Datum", type: "text" },

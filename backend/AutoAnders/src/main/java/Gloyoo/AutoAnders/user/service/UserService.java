@@ -160,6 +160,12 @@ public class UserService {
         users.delete(user);
     }
 
+    @Transactional
+    public void delete(UUID id) {
+        User user = findByIdOrThrow(id);
+        users.delete(user);
+    }
+
     private String normalizeEmail(String email) {
         return email.trim().toLowerCase(Locale.ROOT);
     }
