@@ -55,6 +55,8 @@ app:
   mail:
     enabled: ${MAIL_ENABLED:false}
     from: ${MAIL_FROM:${MAIL_USERNAME:}}
+  contact:
+    recipient: ${CONTACT_TO_EMAIL:}
   base-url: ${BASE_URL:https://poetsanders.vercel.app}
   api-base-url: ${API_BASE_URL:http://localhost:8080}
   cors:

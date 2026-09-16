@@ -24,6 +24,19 @@ export class CatalogueComponent {
   protected readonly selectedImages = signal<string[]>([]);
   protected readonly brand = signal("All");
   protected readonly selectedCar = signal<CatalogueCar | null>(null);
+  protected readonly colorOptions = [
+    { label: "Black", hex: "#111827" },
+    { label: "White", hex: "#f8fafc" },
+    { label: "Gray", hex: "#6b7280" },
+    { label: "Silver", hex: "#cbd5e1" },
+    { label: "Red", hex: "#dc2626" },
+    { label: "Blue", hex: "#2563eb" },
+    { label: "Green", hex: "#16a34a" },
+    { label: "Yellow", hex: "#facc15" },
+    { label: "Orange", hex: "#f97316" },
+    { label: "Brown", hex: "#92400e" },
+    { label: "Beige", hex: "#d6c7a1" },
+  ];
   protected readonly brands = computed(() => ["All", ...new Set(this.cars().map((car) => car.brand))]);
   protected readonly filteredCars = computed(() => {
     const query = this.search().trim().toLowerCase();
@@ -51,8 +64,40 @@ export class CatalogueComponent {
     return new Intl.NumberFormat("nl-NL", { style: "currency", currency: "EUR", maximumFractionDigits: 0 }).format(value);
   }
 
+  protected formatOptionalPrice(value: number | null | undefined): string {
+    return value && value > 0 ? this.formatPrice(value) : "-";
+  }
+
+  protected detailValue(value: boolean | number | string | null | undefined, suffix = ""): string {
+    if (typeof value === "boolean") {
+      return value ? "Yes" : "No";
+    }
+
+    if (value === null || value === undefined || value === "") {
+      return "-";
+    }
+
+    if (typeof value === "number") {
+      return value > 0 ? `${new Intl.NumberFormat("nl-NL").format(value)}${suffix}` : "-";
+    }
+
+    return `${value}${suffix}`;
+  }
+
   protected imagesFor(car: CatalogueCar): string[] {
     const images = car.images?.length ? car.images : [car.image];
     return images.filter(Boolean);
+  }
+
+  protected isColorHex(value: string | null | undefined): boolean {
+    return typeof value === "string" && /^#[0-9a-f]{6}$/i.test(value);
+  }
+
+  protected colorLabel(value: string | null | undefined): string {
+    if (!value) {
+      return "-";
+    }
+
+    return this.colorOptions.find((option) => option.hex === value)?.label ?? value;
   }
 }

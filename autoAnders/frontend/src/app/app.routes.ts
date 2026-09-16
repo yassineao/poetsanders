@@ -26,7 +26,7 @@ export const routes: Routes = [
       },
       { path: "sell", redirectTo: "Sell" },
       { path: "faq", component: FaqPageComponent },
-      { path: "form", component: ContactPageComponent },
+      { path: "form", component: ContactPageComponent, canActivate: [authGuard] },
       { path: "contact", redirectTo: "form" },
       { path: "auth", component: AuthPageComponent },
       { path: "login", redirectTo: "auth" },

@@ -9,6 +9,11 @@ export interface FormSubmission {
   form: NgForm;
 }
 
+interface FormStep {
+  label: string;
+  fields: FormField[];
+}
+
 @Component({
   selector: "app-form-page",
   imports: [FormsModule, RouterLink],
@@ -27,13 +32,44 @@ export class FormPageComponent {
   readonly registering = input(false);
   readonly registeringChange = output<boolean>();
   protected readonly attemptedSubmit = signal(false);
+  protected readonly openColorField = signal<string | null>(null);
   private readonly persistedValues = signal<Record<string, unknown>>({});
   private readonly fileUrls = signal<Record<string, string[]>>({});
   readonly currentPage = signal(0);
-  readonly fieldsPerPage = 10;
   readonly sent_Url = input("/");
 
   readonly fields = computed(() => this.content().fields ?? []);
+  readonly steps = computed<FormStep[]>(() => {
+    const fields = this.fields();
+    const fieldsWithSteps = fields.map((field) => ({
+      ...field,
+      step: field.step ?? this.defaultStepFor(field.name) ?? undefined,
+    }));
+    const groupedFields = fieldsWithSteps.filter((field) => field.step);
+
+    if (!groupedFields.length) {
+      return fieldsWithSteps.reduce<FormStep[]>((steps, field, index) => {
+        const stepIndex = Math.floor(index / 10);
+        steps[stepIndex] ??= {
+          label: String(stepIndex + 1),
+          fields: [],
+        };
+        steps[stepIndex].fields.push(field);
+        return steps;
+      }, []);
+    }
+
+    return fieldsWithSteps.reduce<FormStep[]>((steps, field) => {
+      const label = field.step ?? "Other";
+      const existingStep = steps.find((step) => step.label === label);
+      if (existingStep) {
+        existingStep.fields.push(field);
+      } else {
+        steps.push({ label, fields: [field] });
+      }
+      return steps;
+    }, []);
+  });
   readonly paginationLabels = computed(() => {
     const labels = this.content().pagination;
     if (labels) {
@@ -65,18 +101,13 @@ export class FormPageComponent {
     }
   });
 
-  readonly totalPages = computed(() =>
-    Math.max(1, Math.ceil(this.fields().length / this.fieldsPerPage)),
+  readonly totalPages = computed(() => Math.max(1, this.steps().length));
+
+  readonly currentStep = computed(() =>
+    this.steps()[Math.min(this.currentPage(), this.totalPages() - 1)],
   );
 
-  visible_fields = computed(
-    () => {
-      const start = this.currentPage() * this.fieldsPerPage;
-      const end = (this.currentPage() + 1) * this.fieldsPerPage;
-      return this.fields().slice(start , end); 
-
-    }
-  );
+  readonly visible_fields = computed(() => this.currentStep()?.fields ?? []);
 
   protected isFirstPage(): boolean {
     return this.currentPage() === 0;
@@ -168,6 +199,20 @@ export class FormPageComponent {
     }));
   }
 
+  protected goToStep(index: number): void {
+    this.persistCurrentFormValues();
+    this.currentPage.set(Math.min(this.totalPages() - 1, Math.max(0, index)));
+  }
+
+  protected selectColor(field: FormField, value: string): void {
+    this.persistFieldValue(field.name, value);
+    this.openColorField.set(null);
+  }
+
+  protected optionLabel(field: FormField, value: unknown): string {
+    return field.options?.find((option) => option.value === value)?.label ?? String(value || "");
+  }
+
   protected removeFile(field: FormField, index: number): void {
     const files = this.selectedFiles(field).filter((_, fileIndex) => fileIndex !== index);
 
@@ -211,6 +256,100 @@ export class FormPageComponent {
 
   private fileKey(file: File): string {
     return `${file.name}-${file.size}-${file.lastModified}`;
+  }
+
+  private defaultStepFor(fieldName: string): string | null {
+    const labels = this.defaultStepLabels();
+
+    if ([
+      "brand",
+      "model",
+      "yearOfManufacture",
+      "mileage",
+      "price",
+      "firstRegistrationDate",
+      "referenceNumber",
+      "licensePlate",
+      "colour",
+      "location",
+    ].includes(fieldName)) {
+      return labels.basics;
+    }
+
+    if ([
+      "power",
+      "numberOfDoors",
+      "wheelbase",
+      "numberOfCylinders",
+      "motorVehicleTax",
+      "modelDateFrom",
+      "modelDateTo",
+      "maxTowingWeight",
+      "maxTowingWeightUnbraked",
+      "urbanFuelConsumption",
+      "combinedFuelConsumption",
+      "motorwayFuelConsumption",
+      "co2Emissions",
+      "chassisNumber",
+      "numberOfKeys",
+      "engineDisplacement",
+      "emptyWeight",
+      "apkMotDate",
+    ].includes(fieldName)) {
+      return labels.technical;
+    }
+
+    if ([
+      "taxDeductible",
+      "serviceDocumentation",
+      "taxAdditionPercentage",
+      "financialLeasePricePerMonth",
+      "leasePrice60Months",
+      "leasePrice48Months",
+      "leasePrice36Months",
+      "bodyType",
+      "gearbox",
+      "fuel",
+      "emissionClass",
+      "energyLabel",
+      "paintType",
+      "upholstery",
+      "status",
+    ].includes(fieldName)) {
+      return labels.options;
+    }
+
+    if (fieldName === "pictures") {
+      return labels.pictures;
+    }
+
+    return null;
+  }
+
+  private defaultStepLabels(): { basics: string; technical: string; options: string; pictures: string } {
+    switch (this.locale()) {
+      case "de":
+        return {
+          basics: "Basisdaten",
+          technical: "Technische Daten",
+          options: "Finanzen & Optionen",
+          pictures: "Bilder",
+        };
+      case "nl":
+        return {
+          basics: "Basisgegevens",
+          technical: "Technische gegevens",
+          options: "Financieel & opties",
+          pictures: "Afbeeldingen",
+        };
+      default:
+        return {
+          basics: "Basics",
+          technical: "Technical details",
+          options: "Finance & options",
+          pictures: "Pictures",
+        };
+    }
   }
 
   protected fieldError(

@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, Input } from '@angular/core';
+import { RouterModule } from '@angular/router';
 import { ServicesFeatureCopy } from '../../../../core/interfaces/services';
 
 const defaultFeatures: ServicesFeatureCopy = {
@@ -12,7 +13,7 @@ const defaultFeatures: ServicesFeatureCopy = {
 @Component({
   selector: 'app-features-services',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RouterModule],
   templateUrl: './Features-services.component.html',
 })
 export class FeaturesServicesComponent {

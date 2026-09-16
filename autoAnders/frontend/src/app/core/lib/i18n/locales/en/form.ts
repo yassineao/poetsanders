@@ -42,7 +42,7 @@ export const enFormCopy: Copy["form"] = {
         submitLabel: "Send Message",
         popup: {
           successTitle: "Message sent",
-          successMessage: "Thank you. Your message has been sent. Check your mail.",
+          successMessage: "Thank you. Your message has been sent. Replies will appear in your messages.",
           errorTitle: "Message not sent",
           errorMessage: "Something went wrong. Please try again.",
           closeLabel: "OK",

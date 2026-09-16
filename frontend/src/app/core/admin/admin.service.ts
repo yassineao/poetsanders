@@ -8,6 +8,8 @@ import type {
   AdminAppointmentUpdate,
   AdminCarCreate,
   AdminCarUpdate,
+  AdminContactMessage,
+  AdminContactMessageStatus,
   AdminDashboard,
   AdminUser,
   AdminUserCreate,
@@ -40,6 +42,12 @@ export class AdminService {
 
   createUser(user: AdminUserCreate): Observable<AdminUser> {
     return this.http.post<AdminUser>(`${this.apiBaseUrl}/admin/users`, user, {
+      withCredentials: true,
+    });
+  }
+
+  deleteUser(id: string): Observable<void> {
+    return this.http.delete<void>(`${this.apiBaseUrl}/admin/users/${id}`, {
       withCredentials: true,
     });
   }
@@ -83,6 +91,24 @@ export class AdminService {
 
   deleteCar(id: string): Observable<void> {
     return this.http.delete<void>(`${this.apiBaseUrl}/admin/cars/${id}`, {
+      withCredentials: true,
+    });
+  }
+
+  updateContactMessage(
+    id: string,
+    status: AdminContactMessageStatus,
+    adminReply: string | null = null,
+  ): Observable<AdminContactMessage> {
+    return this.http.patch<AdminContactMessage>(
+      `${this.apiBaseUrl}/admin/contact-messages/${id}`,
+      { status, adminReply },
+      { withCredentials: true },
+    );
+  }
+
+  deleteContactMessage(id: string): Observable<void> {
+    return this.http.delete<void>(`${this.apiBaseUrl}/admin/contact-messages/${id}`, {
       withCredentials: true,
     });
   }

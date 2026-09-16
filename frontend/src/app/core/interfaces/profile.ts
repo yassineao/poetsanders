@@ -7,6 +7,10 @@ export interface ProfileCopy {
   phoneLabel: string;
   passwordLabel: string;
   passwordHint: string;
+  passwordConfirmationLabel: string;
+  passwordConfirmationError: string;
+  showPasswordLabel: string;
+  hidePasswordLabel: string;
   editLabel: string;
   cancelLabel: string;
   saveLabel: string;

@@ -21,4 +21,5 @@ export interface LoginCopy {
   supportHeading: string;
   supportMessage: string;
   supportLinkLabel: string;
+  RegisterLinkLabel: string;
 }

@@ -23,4 +23,5 @@ export const nlLoginCopy: LoginCopy = {
   supportHeading: 'Hulp nodig bij het inloggen?',
   supportMessage: 'Neem contact met ons op. We helpen je weer toegang tot je account te krijgen.',
   supportLinkLabel: 'Contact opnemen',
+  RegisterLinkLabel: 'Nog geen account? Registreer hier.',
 };

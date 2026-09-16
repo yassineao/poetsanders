@@ -189,6 +189,30 @@ public class AuthController {
         return "OK";
     }
 
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> delete(
+            @PathVariable UUID id,
+            Authentication authentication,
+            HttpServletRequest request
+    ) {
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("error", "Not authenticated"));
+        }
+
+        UUID authenticatedId = authenticatedUserId(authentication);
+        if (!authenticatedId.equals(id)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(Map.of("error", "You can only delete your own account"));
+        }
+
+        userService.delete(id);
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, expiredCookie(request, ACCESS_COOKIE).toString())
+                .header(HttpHeaders.SET_COOKIE, expiredCookie(request, REFRESH_COOKIE).toString())
+                .body(Map.of("message", "Account deleted"));
+    }
+
     @GetMapping("/profile-access")
     public ResponseEntity<Void> profileAccess(
             @RequestParam String token,

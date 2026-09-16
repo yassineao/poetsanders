@@ -25,6 +25,7 @@ export interface RegisterCopy {
   supportHeading: string;
   supportMessage: string;
   supportLinkLabel: string;
+  RegisterLinkLabel: string;
   registerAuth?: {
     message: string;
     buttonLabel: string;

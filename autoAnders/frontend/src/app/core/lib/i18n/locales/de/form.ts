@@ -53,7 +53,7 @@ export const deFormCopy: Copy["form"] = {
       submitLabel: "Nachricht senden",
       popup: {
         successTitle: "Nachricht gesendet",
-        successMessage: "Vielen Dank. Ihre Nachricht wurde gesendet. Pruefen Sie Ihre E-Mail.",
+        successMessage: "Vielen Dank. Ihre Nachricht wurde gesendet. Antworten erscheinen in Ihren Nachrichten.",
         errorTitle: "Nachricht nicht gesendet",
         errorMessage: "Etwas ist schiefgelaufen. Bitte versuchen Sie es erneut.",
         closeLabel: "OK",

@@ -38,6 +38,7 @@
               [users]="data.users"
               (userUpdated)="updateUser($event)"
               (userCreated)="addUser($event)"
+              (userDeleted)="removeUser($event)"
             />
           }
           @case ('appointments') {
@@ -62,6 +63,13 @@
               (carUpdated)="updateCar($event)"
               (carCreated)="addCar($event)"
               (carDeleted)="removeCar($event)"
+            />
+          }
+          @case ('contacts') {
+            <app-admin-contacts
+              [contactMessages]="data.contactMessages"
+              (contactUpdated)="updateContactMessage($event)"
+              (contactDeleted)="removeContactMessage($event)"
             />
           }
         }
