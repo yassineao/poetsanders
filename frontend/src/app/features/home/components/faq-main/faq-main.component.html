@@ -1,5 +1,5 @@
 <section
-  class="relative overflow-hidden border-y border-white/10 bg-slate-900/70 px-4 py-16 sm:px-6 lg:px-8 lg:py-20"
+  class="relative overflow-hidden border-y border-white/10 bg-slate-900/70 px-4 py-10 sm:px-6 lg:px-8 lg:py-20 sm:py-16"
 >
   <div
     class="pointer-events-none absolute -left-24 top-0 h-72 w-72 rounded-full bg-cyan-400/10 blur-3xl"
@@ -15,7 +15,7 @@
 
       <a
         routerLink="/faq"
-        class="mt-7 inline-flex min-h-11 items-center gap-2 rounded-xl border border-cyan-300/20 bg-cyan-300/10 px-5 text-sm font-bold text-cyan-200 transition hover:border-cyan-300/35 hover:bg-cyan-300/15 hover:text-cyan-100"
+        class="mobile-action mt-7 inline-flex min-h-11 items-center gap-2 rounded-xl border border-cyan-300/20 bg-cyan-300/10 px-5 text-sm font-bold text-cyan-200 transition hover:border-cyan-300/35 hover:bg-cyan-300/15 hover:text-cyan-100"
       >
         {{ faq.eyebrow }}
         <svg
@@ -42,7 +42,7 @@
         <h3>
           <button
             type="button"
-            class="flex w-full items-center gap-4 px-5 py-5 text-left outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-cyan-300"
+            class="flex w-full items-center gap-3 px-4 py-4 sm:gap-4 sm:px-5 sm:py-5 text-left outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-cyan-300"
             [attr.aria-expanded]="openItem() === index"
             [attr.aria-controls]="'home-faq-answer-' + index"
             (click)="toggleItem(index)"
@@ -76,7 +76,7 @@
         >
           <div class="overflow-hidden">
             <p
-              class="border-t border-white/10 px-5 py-4 pl-[4.25rem] text-sm leading-6 text-slate-400"
+              class="border-t border-white/10 px-4 py-4 sm:px-5 sm:pl-[4.25rem] text-sm leading-6 text-slate-400"
             >
               {{ item.answer }}
             </p>

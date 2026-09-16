@@ -23,7 +23,7 @@
 
     <button
       type="button"
-      class="h-11 rounded-lg border border-cyan-300/25 bg-cyan-300/10 px-5 text-sm font-bold text-cyan-100 transition hover:bg-cyan-300/20"
+      class="mobile-action h-11 rounded-lg border border-cyan-300/25 bg-cyan-300/10 px-5 text-sm font-bold text-cyan-100 transition hover:bg-cyan-300/20"
       (click)="startEditing()"
     >
       {{ copy().editLabel }}
@@ -141,18 +141,18 @@
         {{ errorMessage() }}
       </p>
 
-      <div class="flex flex-wrap gap-3">
+      <div class="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
         <button
           type="submit"
           [disabled]="saving()"
-          class="h-11 rounded-lg bg-cyan-200 px-5 text-sm font-bold text-slate-950 transition hover:bg-cyan-100 disabled:cursor-wait disabled:opacity-70"
+          class="mobile-action h-11 rounded-lg bg-cyan-200 px-5 text-sm font-bold text-slate-950 transition hover:bg-cyan-100 disabled:cursor-wait disabled:opacity-70"
         >
           {{ saving() ? copy().savingLabel : copy().saveLabel }}
         </button>
         <button
           type="button"
           [disabled]="saving()"
-          class="h-11 rounded-lg border border-white/10 px-5 text-sm font-bold text-slate-200 transition hover:bg-white/5 disabled:opacity-70"
+          class="mobile-action h-11 rounded-lg border border-white/10 px-5 text-sm font-bold text-slate-200 transition hover:bg-white/5 disabled:opacity-70"
           (click)="cancelEditing()"
         >
           {{ copy().cancelLabel }}

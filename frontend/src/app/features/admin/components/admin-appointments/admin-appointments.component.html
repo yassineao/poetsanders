@@ -1,5 +1,5 @@
 <section id="appointments" class="mt-10 scroll-mt-8 overflow-hidden rounded-2xl border border-white/10 bg-slate-900/70">
-  <div class="flex flex-col gap-5 border-b border-white/10 p-6 lg:flex-row lg:items-end lg:justify-between">
+  <div class="flex flex-col gap-5 border-b border-white/10 p-4 lg:flex-row lg:items-end lg:justify-between sm:p-6">
 
     <div>
       <h2 class="text-2xl font-bold text-white">{{ copy().appointmentsHeading }}</h2>
@@ -33,31 +33,31 @@
   </p>
 
   <div class="overflow-x-auto">
-    <table class="w-full min-w-[1160px] text-left text-sm">
-      <thead class="bg-slate-950/60 text-xs uppercase tracking-wide text-slate-500">
-        <tr>
-          <th class="px-6 py-4">{{ copy().customerLabel }}</th>
-          <th class="px-6 py-4">{{ copy().phoneLabel }}</th>
-          <th class="px-6 py-4">{{ copy().treatmentLabel }}</th>
-          <th class="px-6 py-4">{{ copy().dateLabel }}</th>
-          <th class="px-6 py-4">{{ copy().statusLabel }}</th>
-          <th class="px-6 py-4">{{ copy().actionsLabel }}</th>
+    <table role="table" class="responsive-table w-full min-w-[1160px] text-left text-sm">
+      <thead role="rowgroup" class="bg-slate-950/60 text-xs uppercase tracking-wide text-slate-500">
+        <tr role="row">
+          <th scope="col" role="columnheader" class="px-6 py-4">{{ copy().customerLabel }}</th>
+          <th scope="col" role="columnheader" class="px-6 py-4">{{ copy().phoneLabel }}</th>
+          <th scope="col" role="columnheader" class="px-6 py-4">{{ copy().treatmentLabel }}</th>
+          <th scope="col" role="columnheader" class="px-6 py-4">{{ copy().dateLabel }}</th>
+          <th scope="col" role="columnheader" class="px-6 py-4">{{ copy().statusLabel }}</th>
+          <th scope="col" role="columnheader" class="px-6 py-4">{{ copy().actionsLabel }}</th>
         </tr>
       </thead>
-      <tbody class="divide-y divide-white/10">
-        <tr *ngFor="let appointment of paginatedAppointments()" class="transition hover:bg-white/[0.03]">
-          <td class="px-6 py-4">
+      <tbody role="rowgroup" class="divide-y divide-white/10">
+        <tr role="row" *ngFor="let appointment of paginatedAppointments()" class="transition hover:bg-white/[0.03]">
+          <td role="cell" [attr.data-label]="copy().customerLabel" class="table-cell-wide px-6 py-4">
             <p class="font-semibold text-white">{{ appointment.customerName || '-' }}</p>
             <p class="mt-1 text-xs text-slate-400">{{ appointment.customerEmail }}</p>
           </td>
-          <td class="px-6 py-4 text-slate-300">
+          <td role="cell" [attr.data-label]="copy().phoneLabel" class="px-6 py-4 text-slate-300">
             {{ appointment.customerPhoneNumber || '-' }}
           </td>
-          <td class="px-6 py-4 font-semibold text-cyan-100">
+          <td role="cell" [attr.data-label]="copy().treatmentLabel" class="table-cell-wide px-6 py-4 font-semibold text-cyan-100">
             {{ treatmentName(appointment.washType) }}
           </td>
-          <td class="px-6 py-4 text-slate-300">{{ formatDate(appointment.localDateTime) }}</td>
-          <td class="px-6 py-4">
+          <td role="cell" [attr.data-label]="copy().dateLabel" class="table-cell-wide px-6 py-4 text-slate-300">{{ formatDate(appointment.localDateTime) }}</td>
+          <td role="cell" [attr.data-label]="copy().statusLabel" class="px-6 py-4">
             <span class="rounded-full border px-2.5 py-1 text-xs font-bold" [ngClass]="
                 appointment.accepted
                   ? 'border-emerald-300/25 bg-emerald-300/10 text-emerald-200'
@@ -66,7 +66,7 @@
               {{ appointment.accepted ? copy().acceptedLabel : copy().pendingLabel }}
             </span>
           </td>
-          <td class="px-6 py-4">
+          <td role="cell" [attr.data-label]="copy().actionsLabel" class="px-6 py-4">
             <div class="flex gap-2">
               <button *ngIf="!appointment.accepted" type="button" [disabled]="isAccepting(appointment.id)"
                 (click)="appointmentAccepted.emit(appointment)"
@@ -88,17 +88,17 @@
     </table>
   </div>
 
-  <p *ngIf="!filteredAppointments().length" class="p-6 text-sm text-slate-400">
+  <p *ngIf="!filteredAppointments().length" class="p-4 text-sm text-slate-400 sm:p-6">
     {{ copy().noAppointmentsLabel }}
   </p>
 
   <div *ngIf="filteredAppointments().length"
-    class="flex items-center justify-between gap-4 border-t border-white/10 px-6 py-4">
+    class="grid grid-cols-2 items-center gap-3 border-t border-white/10 px-4 py-4 sm:flex sm:justify-between sm:gap-4 sm:px-6">
     <button type="button" [disabled]="page() === 1" (click)="changePage(-1)"
       class="rounded-lg border border-white/10 px-4 py-2 text-sm font-semibold text-slate-200 transition hover:bg-white/5 disabled:cursor-not-allowed disabled:opacity-40">
       {{ copy().previousLabel }}
     </button>
-    <span class="text-sm text-slate-400">
+    <span class="col-span-2 row-start-1 text-center text-sm text-slate-400">
       {{ copy().pageLabel }} {{ page() }} {{ copy().ofLabel }} {{ pageCount() }}
     </span>
     <button type="button" [disabled]="page() === pageCount()" (click)="changePage(1)"
@@ -109,14 +109,14 @@
 </section>
 
 @if (creatingAppointment()) {
-<div class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4" (click)="cancelCreating()">
+<div class="fixed inset-0 z-[60] flex items-center justify-center bg-black/80 p-4" (click)="cancelCreating()">
   <section role="dialog" aria-modal="true"
-    class="max-h-[92vh] w-full max-w-2xl overflow-y-auto rounded-lg border border-white/10 bg-slate-950 p-6 text-white"
+    class="admin-dialog w-full max-w-2xl overflow-y-auto rounded-lg border border-white/10 bg-slate-950 p-4 text-white sm:p-6"
     (click)="$event.stopPropagation()">
     <div class="flex items-center justify-between gap-4">
       <h2 class="text-xl font-bold">Add appointment</h2>
       <button type="button" [attr.aria-label]="copy().closeLabel" (click)="cancelCreating()"
-        class="grid h-10 w-10 place-items-center rounded-lg border border-white/10 text-2xl">&times;</button>
+        class="grid h-11 w-11 shrink-0 place-items-center rounded-lg border border-white/10 text-2xl">&times;</button>
     </div>
 
     <div class="mt-6 grid grid-cols-2 gap-2 rounded-lg border border-white/10 bg-slate-900 p-1">
@@ -208,7 +208,7 @@
       class="mt-4 rounded-lg border border-rose-300/20 bg-rose-300/10 p-4 text-sm text-rose-100">
       {{ createAppointmentError() }}
     </p>
-    <div class="mt-6 flex justify-end gap-2">
+    <div class="mt-6 flex flex-wrap justify-end gap-2">
       <button type="button" [disabled]="savingUser() || savingAppointment()" (click)="cancelCreating()"
         class="min-h-10 rounded-lg border border-white/10 px-4 text-slate-300">{{ copy().cancelLabel }}</button>
       <button type="button" [disabled]="savingUser() || savingAppointment()" (click)="saveNewAppointment()"
@@ -221,14 +221,14 @@
 }
 
 @if (editingAppointment(); as appointment) {
-<div class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4" (click)="cancelEditing()">
+<div class="fixed inset-0 z-[60] flex items-center justify-center bg-black/80 p-4" (click)="cancelEditing()">
   <section role="dialog" aria-modal="true"
-    class="w-full max-w-xl rounded-lg border border-white/10 bg-slate-950 p-6 text-white"
+    class="admin-dialog w-full max-w-xl rounded-lg border border-white/10 bg-slate-950 p-4 text-white sm:p-6"
     (click)="$event.stopPropagation()">
     <div class="flex items-center justify-between gap-4">
       <h2 class="text-xl font-bold">{{ copy().editLabel }}: {{ appointment.customerName }}</h2>
       <button type="button" [attr.aria-label]="copy().closeLabel" (click)="cancelEditing()"
-        class="grid h-10 w-10 place-items-center rounded-lg border border-white/10 text-2xl">&times;</button>
+        class="grid h-11 w-11 shrink-0 place-items-center rounded-lg border border-white/10 text-2xl">&times;</button>
     </div>
 
     @if (editError()) {
@@ -269,7 +269,7 @@
         </select>
       </label>
     </div>
-    <div class="mt-6 flex justify-end gap-2">
+    <div class="mt-6 flex flex-wrap justify-end gap-2">
       <button type="button" [disabled]="savingEdit()" (click)="cancelEditing()"
         class="min-h-10 rounded-lg border border-white/10 px-4 text-slate-300">{{ copy().cancelLabel }}</button>
       <button type="button" [disabled]="savingEdit()" (click)="saveAppointment()"

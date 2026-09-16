@@ -1,4 +1,4 @@
-<section id="testimonials" class="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
+<section id="testimonials" class="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8 sm:py-16">
   <div class="grid gap-8 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.6fr)] lg:items-end">
     <div>
       <p class="text-xs font-semibold uppercase tracking-[0.24em] text-cyan-200">{{ testimonials.eyebrow }}</p>
@@ -32,7 +32,7 @@
         <span class="text-sm font-medium text-white">{{ testimonials.ratingLabel }}</span>
       </div>
 
-      <a class="mt-4 inline-flex items-center justify-center rounded-md border border-white/15 bg-white/10 px-4 py-3 text-sm font-semibold text-white transition hover:border-cyan-200/40 hover:bg-white/15 focus:outline-none focus:ring-2 focus:ring-cyan-200 focus:ring-offset-2 focus:ring-offset-slate-950"
+      <a class="mobile-action mt-4 inline-flex items-center justify-center rounded-md border border-white/15 bg-white/10 px-4 py-3 text-sm font-semibold text-white transition hover:border-cyan-200/40 hover:bg-white/15 focus:outline-none focus:ring-2 focus:ring-cyan-200 focus:ring-offset-2 focus:ring-offset-slate-950"
         [href]="maps.MAPS_URL" target="_blank" rel="noreferrer">
         {{ testimonials.sourceLabel }}
       </a>
@@ -40,14 +40,14 @@
 
     <div class="grid gap-4 md:grid-cols-3">
       <article *ngFor="let testimonial of testimonials.testimonials"
-        class="flex min-h-[19rem] flex-col justify-between rounded-lg border border-white/10 bg-slate-900/85 p-6 shadow-xl shadow-slate-950/20 transition duration-300 hover:-translate-y-1 hover:border-cyan-200/40">
+        class="flex sm:min-h-[19rem] flex-col justify-between rounded-lg border border-white/10 bg-slate-900/85 p-4 shadow-xl shadow-slate-950/20 transition duration-300 hover:-translate-y-1 hover:border-cyan-200/40 sm:p-6">
         <div>
           <div class="mb-6 flex items-center justify-between gap-4">
             <span
               class="rounded bg-cyan-200/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-cyan-100">
               {{ testimonial.service }}
             </span>
-            <span class="text-4xl font-semibold leading-none text-cyan-200/35">"</span>
+            <span class="text-3xl font-semibold leading-none text-cyan-200/35 sm:text-4xl">"</span>
           </div>
           <blockquote class="text-base leading-7 text-slate-200">
             {{ testimonial.quote }}

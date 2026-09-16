@@ -1,12 +1,12 @@
 <section
-  class="relative mt-12 overflow-hidden rounded-3xl border border-emerald-300/20 bg-slate-900/80 shadow-2xl shadow-slate-950/40"
+  class="relative mt-8 overflow-hidden rounded-3xl border border-emerald-300/20 bg-slate-900/80 shadow-2xl shadow-slate-950/40 sm:mt-12"
   aria-live="polite"
 >
   <div class="pointer-events-none absolute -right-20 -top-24 h-72 w-72 rounded-full bg-cyan-300/10 blur-3xl"></div>
   <div class="pointer-events-none absolute -bottom-28 -left-20 h-64 w-64 rounded-full bg-emerald-300/10 blur-3xl"></div>
 
   <div class="relative grid lg:grid-cols-[0.75fr_1.25fr]">
-    <div class="border-b border-white/10 bg-gradient-to-br from-emerald-300/10 via-cyan-300/5 to-transparent p-7 sm:p-10 lg:border-b-0 lg:border-r">
+    <div class="border-b border-white/10 bg-gradient-to-br from-emerald-300/10 via-cyan-300/5 to-transparent p-5 sm:p-10 lg:border-b-0 lg:border-r">
       <span class="grid h-16 w-16 place-items-center rounded-2xl bg-emerald-300 text-slate-950 shadow-lg shadow-emerald-950/30">
         <svg class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
           <path stroke-linecap="round" stroke-linejoin="round" d="m5 12 4 4L19 6"></path>
@@ -36,7 +36,7 @@
       </div>
     </div>
 
-    <div class="p-7 sm:p-10">
+    <div class="p-5 sm:p-10">
       <div class="grid gap-4 sm:grid-cols-2">
         <div *ngIf="!confirmation.registrationOnly" class="rounded-2xl border border-white/10 bg-slate-950/40 p-5 sm:col-span-2">
           <p class="text-xs font-bold uppercase tracking-[0.18em] text-slate-500">{{ copy().confirmationAppointmentLabel }}</p>

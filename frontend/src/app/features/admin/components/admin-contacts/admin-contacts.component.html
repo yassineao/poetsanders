@@ -1,5 +1,5 @@
 <section class="mt-10 overflow-hidden rounded-lg border border-white/10 bg-slate-900/70">
-  <div class="flex flex-col gap-5 border-b border-white/10 p-6 sm:flex-row sm:items-end sm:justify-between">
+  <div class="flex flex-col gap-5 border-b border-white/10 p-4 sm:flex-row sm:items-end sm:justify-between sm:p-6">
     <div>
       <h2 class="text-2xl font-bold text-white">{{ copy().contactsHeading }}</h2>
       <p class="mt-2 text-sm text-slate-400">{{ copy().contactsDescription }}</p>
@@ -21,28 +21,28 @@
   }
 
   <div class="overflow-x-auto">
-    <table class="w-full min-w-[1180px] text-left text-sm">
-      <thead class="bg-slate-950/60 text-xs uppercase text-slate-500">
-        <tr>
-          <th class="px-6 py-4">{{ copy().topicLabel }}</th>
-          <th class="px-6 py-4">{{ copy().customerLabel }}</th>
-          <th class="px-6 py-4">{{ copy().messageLabel }}</th>
-          <th class="px-6 py-4">{{ copy().statusLabel }}</th>
-          <th class="px-6 py-4">{{ copy().deliveredLabel }}</th>
-          <th class="px-6 py-4">{{ copy().dateLabel }}</th>
-          <th class="px-6 py-4">{{ copy().actionsLabel }}</th>
+    <table role="table" class="responsive-table w-full min-w-[1180px] text-left text-sm">
+      <thead role="rowgroup" class="bg-slate-950/60 text-xs uppercase text-slate-500">
+        <tr role="row">
+          <th scope="col" role="columnheader" class="px-6 py-4">{{ copy().topicLabel }}</th>
+          <th scope="col" role="columnheader" class="px-6 py-4">{{ copy().customerLabel }}</th>
+          <th scope="col" role="columnheader" class="px-6 py-4">{{ copy().messageLabel }}</th>
+          <th scope="col" role="columnheader" class="px-6 py-4">{{ copy().statusLabel }}</th>
+          <th scope="col" role="columnheader" class="px-6 py-4">{{ copy().deliveredLabel }}</th>
+          <th scope="col" role="columnheader" class="px-6 py-4">{{ copy().dateLabel }}</th>
+          <th scope="col" role="columnheader" class="px-6 py-4">{{ copy().actionsLabel }}</th>
         </tr>
       </thead>
-      <tbody class="divide-y divide-white/10">
+      <tbody role="rowgroup" class="divide-y divide-white/10">
         @for (message of paginatedMessages(); track message.id) {
-          <tr class="align-top transition hover:bg-white/[0.03]">
-            <td class="px-6 py-4 font-semibold text-white">{{ message.companyName }}</td>
-            <td class="px-6 py-4 text-slate-300">
+          <tr role="row" class="align-top transition hover:bg-white/[0.03]">
+            <td role="cell" [attr.data-label]="copy().topicLabel" class="table-cell-wide px-6 py-4 font-semibold text-white">{{ message.companyName }}</td>
+            <td role="cell" [attr.data-label]="copy().customerLabel" class="table-cell-wide px-6 py-4 text-slate-300">
               <p class="font-semibold text-white">{{ message.customerName || '-' }}</p>
               <a [href]="'mailto:' + message.email" class="mt-1 block text-cyan-200 hover:text-cyan-100">{{ message.email }}</a>
               <p class="mt-1 text-slate-400">{{ message.phoneNumber || '-' }}</p>
             </td>
-            <td class="max-w-md px-6 py-4 text-slate-300">
+            <td role="cell" [attr.data-label]="copy().messageLabel" class="table-cell-wide max-w-md px-6 py-4 text-slate-300">
               <p class="whitespace-pre-wrap leading-6">{{ message.message }}</p>
               @if (message.emailError) {
                 <p class="mt-3 rounded-lg border border-amber-300/20 bg-amber-300/10 p-3 text-xs text-amber-100">
@@ -61,16 +61,16 @@
                 <p class="mt-2 text-xs text-slate-500">Replied {{ formatDate(message.repliedAt) }}</p>
               }
             </td>
-            <td class="px-6 py-4">
+            <td role="cell" [attr.data-label]="copy().statusLabel" class="px-6 py-4">
               <span
                 class="rounded-full px-2.5 py-1 text-xs font-bold"
                 [ngClass]="message.status === 'NEW' ? 'bg-cyan-300/10 text-cyan-200' : message.status === 'READ' ? 'bg-emerald-300/10 text-emerald-200' : 'bg-white/[0.06] text-slate-300'">
                 {{ message.status }}
               </span>
             </td>
-            <td class="px-6 py-4 text-slate-300">{{ message.emailDelivered ? 'Yes' : 'No' }}</td>
-            <td class="px-6 py-4 text-slate-400">{{ formatDate(message.createdAt) }}</td>
-            <td class="px-6 py-4">
+            <td role="cell" [attr.data-label]="copy().deliveredLabel" class="px-6 py-4 text-slate-300">{{ message.emailDelivered ? 'Yes' : 'No' }}</td>
+            <td role="cell" [attr.data-label]="copy().dateLabel" class="px-6 py-4 text-slate-400">{{ formatDate(message.createdAt) }}</td>
+            <td role="cell" [attr.data-label]="copy().actionsLabel" class="px-6 py-4">
               <div class="flex flex-wrap gap-2">
                 <button
                   type="button"
@@ -116,16 +116,16 @@
   </div>
 
   @if (!filteredMessages().length) {
-    <p class="p-6 text-sm text-slate-400">{{ copy().noContactsLabel }}</p>
+    <p class="p-4 text-sm text-slate-400 sm:p-6">{{ copy().noContactsLabel }}</p>
   }
 
   @if (filteredMessages().length) {
-    <div class="flex items-center justify-between gap-4 border-t border-white/10 px-6 py-4">
+    <div class="grid grid-cols-2 items-center gap-3 border-t border-white/10 px-4 py-4 sm:flex sm:justify-between sm:gap-4 sm:px-6">
       <button type="button" [disabled]="page() === 1" (click)="changePage(-1)"
         class="rounded-lg border border-white/10 px-4 py-2 text-sm font-semibold text-slate-200 transition hover:bg-white/5 disabled:cursor-not-allowed disabled:opacity-40">
         {{ copy().previousLabel }}
       </button>
-      <span class="text-sm text-slate-400">{{ copy().pageLabel }} {{ page() }} {{ copy().ofLabel }} {{ pageCount() }}</span>
+      <span class="col-span-2 row-start-1 text-center text-sm text-slate-400">{{ copy().pageLabel }} {{ page() }} {{ copy().ofLabel }} {{ pageCount() }}</span>
       <button type="button" [disabled]="page() === pageCount()" (click)="changePage(1)"
         class="rounded-lg border border-white/10 px-4 py-2 text-sm font-semibold text-slate-200 transition hover:bg-white/5 disabled:cursor-not-allowed disabled:opacity-40">
         {{ copy().nextLabel }}

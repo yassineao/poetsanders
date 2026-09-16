@@ -1,13 +1,13 @@
-<section class="bg-slate-950 px-4 py-16 text-slate-100 sm:px-6 lg:px-8 lg:py-24">
+<section class="bg-slate-950 px-4 py-10 text-slate-100 sm:px-6 lg:px-8 lg:py-24 sm:py-16">
   <div class="mx-auto max-w-7xl">
     <div class="max-w-3xl">
       <p class="text-sm font-semibold uppercase tracking-[0.22em] text-cyan-200">
         {{ copy().eyebrow }}
       </p>
-      <h1 class="mt-4 text-4xl font-bold tracking-tight text-white sm:text-5xl">
+      <h1 class="mt-4 text-3xl font-bold tracking-tight text-white sm:text-5xl">
         {{ copy().heading }}
       </h1>
-      <p class="mt-5 text-lg leading-8 text-slate-300">{{ copy().description }}</p>
+      <p class="mt-4 text-base leading-7 sm:mt-5 sm:text-lg sm:leading-8 text-slate-300">{{ copy().description }}</p>
     </div>
 
     <app-booking-confirmation
@@ -18,7 +18,7 @@
 
     <form
       *ngIf="!submitted()"
-      class="mt-12 grid gap-8 lg:grid-cols-[0.9fr_1.1fr]"
+      class="mt-8 grid gap-8 lg:grid-cols-[0.9fr_1.1fr] sm:mt-12"
       [formGroup]="bookingForm"
       (ngSubmit)="submit()"
     >

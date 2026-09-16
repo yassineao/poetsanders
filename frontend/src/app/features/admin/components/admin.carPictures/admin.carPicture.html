@@ -1,6 +1,6 @@
 @if (car(); as selectedCar) {
   <div
-    class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4"
+    class="fixed inset-0 z-[60] flex items-center justify-center bg-black/80 p-4"
     role="presentation"
     (click)="closePictures()"
   >
@@ -8,7 +8,7 @@
       role="dialog"
       aria-modal="true"
       [attr.aria-label]="copy().picturesLabel"
-      class="max-h-[92vh] w-full max-w-6xl overflow-y-auto rounded-lg border border-white/10 bg-slate-950 text-slate-100 shadow-2xl"
+      class="admin-dialog w-full max-w-6xl overflow-y-auto rounded-lg border border-white/10 bg-slate-950 text-slate-100 shadow-2xl"
       (click)="$event.stopPropagation()"
     >
       <header class="sticky top-0 z-10 flex flex-col gap-4 border-b border-white/10 bg-slate-950 px-5 py-4 sm:px-6 lg:flex-row lg:items-start lg:justify-between">

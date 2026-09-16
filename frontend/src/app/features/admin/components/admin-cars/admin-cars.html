@@ -1,5 +1,5 @@
 <section class="mt-10 overflow-hidden rounded-lg border border-white/10 bg-slate-900/70">
-  <div class="flex flex-col gap-5 border-b border-white/10 p-6 lg:flex-row lg:items-end lg:justify-between">
+  <div class="flex flex-col gap-5 border-b border-white/10 p-4 lg:flex-row lg:items-end lg:justify-between sm:p-6">
     <div>
       <h2 class="text-2xl font-bold text-white">{{ copy().carsManagementHeading }}</h2>
       <p class="mt-2 text-sm text-slate-400">{{ copy().carsManagementDescription }}</p>
@@ -41,28 +41,28 @@
   }
 
   <div class="overflow-x-auto">
-    <table class="w-full min-w-[860px] text-left text-sm">
-      <thead class="bg-slate-950/60 text-xs uppercase text-slate-500">
-        <tr>
-          <th class="px-6 py-4">{{ copy().carLabel }}</th>
-          <th class="px-6 py-4">{{ copy().licensePlateLabel }}</th>
-          <th class="px-6 py-4">{{ copy().yearLabel }}</th>
-          <th class="px-6 py-4">{{ copy().priceLabel }}</th>
-          <th class="px-6 py-4">{{ copy().statusLabel }}</th>
-          <th class="px-6 py-4">{{ copy().actionsLabel }}</th>
+    <table role="table" class="responsive-table w-full min-w-[860px] text-left text-sm">
+      <thead role="rowgroup" class="bg-slate-950/60 text-xs uppercase text-slate-500">
+        <tr role="row">
+          <th scope="col" role="columnheader" class="px-6 py-4">{{ copy().carLabel }}</th>
+          <th scope="col" role="columnheader" class="px-6 py-4">{{ copy().licensePlateLabel }}</th>
+          <th scope="col" role="columnheader" class="px-6 py-4">{{ copy().yearLabel }}</th>
+          <th scope="col" role="columnheader" class="px-6 py-4">{{ copy().priceLabel }}</th>
+          <th scope="col" role="columnheader" class="px-6 py-4">{{ copy().statusLabel }}</th>
+          <th scope="col" role="columnheader" class="px-6 py-4">{{ copy().actionsLabel }}</th>
         </tr>
       </thead>
-      <tbody class="divide-y divide-white/10">
+      <tbody role="rowgroup" class="divide-y divide-white/10">
         @for (car of paginatedCars(); track car.id) {
-          <tr class="transition hover:bg-white/[0.03]">
-            <td class="px-6 py-4">
+          <tr role="row" class="transition hover:bg-white/[0.03]">
+            <td role="cell" [attr.data-label]="copy().carLabel" class="table-cell-wide px-6 py-4">
               <p class="font-semibold text-white">{{ car.brand }} {{ car.model }}</p>
               <p class="mt-1 text-xs text-slate-400">{{ car.referenceNumber || car.licensePlate || '-' }}</p>
             </td>
-            <td class="px-6 py-4 font-medium text-slate-300">{{ car.licensePlate || '-' }}</td>
-            <td class="px-6 py-4 text-slate-300">{{ car.yearOfManufacture || '-' }}</td>
-            <td class="px-6 py-4 font-semibold text-cyan-100">{{ formatPrice(car.price) }}</td>
-            <td class="px-6 py-4">
+            <td role="cell" [attr.data-label]="copy().licensePlateLabel" class="px-6 py-4 font-medium text-slate-300">{{ car.licensePlate || '-' }}</td>
+            <td role="cell" [attr.data-label]="copy().yearLabel" class="px-6 py-4 text-slate-300">{{ car.yearOfManufacture || '-' }}</td>
+            <td role="cell" [attr.data-label]="copy().priceLabel" class="px-6 py-4 font-semibold text-cyan-100">{{ formatPrice(car.price) }}</td>
+            <td role="cell" [attr.data-label]="copy().statusLabel" class="table-cell-wide px-6 py-4">
               <div class="flex items-center gap-3">
                 <select
                   [ngModel]="currentStatus(car)"
@@ -79,7 +79,7 @@
                 }
               </div>
             </td>
-            <td class="px-6 py-4">
+            <td role="cell" [attr.data-label]="copy().actionsLabel" class="px-6 py-4">
               <div class="flex items-center gap-2">
                 <button
                   type="button"
@@ -110,11 +110,11 @@
   </div>
 
   @if (!filteredCars().length) {
-    <p class="p-6 text-sm text-slate-400">{{ copy().noCarsLabel }}</p>
+    <p class="p-4 text-sm text-slate-400 sm:p-6">{{ copy().noCarsLabel }}</p>
   }
 
   @if (filteredCars().length) {
-    <div class="flex items-center justify-between gap-4 border-t border-white/10 px-6 py-4">
+    <div class="grid grid-cols-2 items-center gap-3 border-t border-white/10 px-4 py-4 sm:flex sm:justify-between sm:gap-4 sm:px-6">
       <button
         type="button"
         [disabled]="page() === 1"
@@ -123,7 +123,7 @@
       >
         {{ copy().previousLabel }}
       </button>
-      <span class="text-sm text-slate-400">
+      <span class="col-span-2 row-start-1 text-center text-sm text-slate-400">
         {{ copy().pageLabel }} {{ page() }} {{ copy().ofLabel }} {{ pageCount() }}
       </span>
       <button
@@ -139,11 +139,11 @@
 </section>
 
 @if (creatingCar(); as car) {
-  <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4" (click)="cancelCreating()">
-    <section role="dialog" aria-modal="true" class="max-h-[92vh] w-full max-w-4xl overflow-y-auto rounded-lg border border-white/10 bg-slate-950 p-6 text-white" (click)="$event.stopPropagation()">
+  <div class="fixed inset-0 z-[60] flex items-center justify-center bg-black/80 p-4" (click)="cancelCreating()">
+    <section role="dialog" aria-modal="true" class="admin-dialog w-full max-w-4xl overflow-y-auto rounded-lg border border-white/10 bg-slate-950 p-4 text-white sm:p-6" (click)="$event.stopPropagation()">
       <div class="flex items-center justify-between gap-4">
         <h2 class="text-xl font-bold">{{ copy().addCarLabel }}</h2>
-        <button type="button" [attr.aria-label]="copy().closeLabel" (click)="cancelCreating()" class="grid h-10 w-10 place-items-center rounded-lg border border-white/10 text-2xl">&times;</button>
+        <button type="button" [attr.aria-label]="copy().closeLabel" (click)="cancelCreating()" class="grid h-11 w-11 shrink-0 place-items-center rounded-lg border border-white/10 text-2xl">&times;</button>
       </div>
 
       <div class="mt-6 grid gap-2 sm:grid-cols-4">
@@ -178,7 +178,7 @@
         @if (createStep() === 0) {
           <fieldset class="sm:col-span-2 lg:col-span-3">
             <legend class="text-sm font-semibold text-slate-300">{{ createFieldLabel('colour') }}</legend>
-            <div class="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4">
+            <div class="mt-2 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
               @for (color of colorOptions; track color.hex) {
                 <label
                   class="flex cursor-pointer items-center gap-3 rounded-lg border border-white/10 bg-slate-900 px-3 py-2 text-sm font-semibold text-slate-200 transition hover:bg-white/5"
@@ -242,7 +242,7 @@
 
       <div class="mt-6 flex flex-col gap-3 border-t border-white/10 pt-5 sm:flex-row sm:items-center sm:justify-between">
         <span class="text-sm text-slate-400">Step {{ createStep() + 1 }} of {{ formSteps.length }}</span>
-        <div class="flex justify-end gap-2">
+        <div class="flex flex-wrap justify-end gap-2">
           <button type="button" [disabled]="createStep() === 0 || creating()" (click)="changeCreateStep(-1)" class="min-h-10 rounded-lg border border-white/10 px-4 text-slate-300 disabled:cursor-not-allowed disabled:opacity-40">{{ copy().previousLabel }}</button>
           @if (!isLastStep(createStep())) {
             <button type="button" [disabled]="creating()" (click)="changeCreateStep(1)" class="min-h-10 rounded-lg bg-cyan-300 px-4 font-semibold text-slate-950 disabled:opacity-60">{{ copy().nextLabel }}</button>
@@ -257,11 +257,11 @@
 }
 
 @if (editingCar(); as car) {
-  <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4" (click)="cancelEditing()">
-    <section role="dialog" aria-modal="true" class="max-h-[92vh] w-full max-w-4xl overflow-y-auto rounded-lg border border-white/10 bg-slate-950 p-6 text-white" (click)="$event.stopPropagation()">
+  <div class="fixed inset-0 z-[60] flex items-center justify-center bg-black/80 p-4" (click)="cancelEditing()">
+    <section role="dialog" aria-modal="true" class="admin-dialog w-full max-w-4xl overflow-y-auto rounded-lg border border-white/10 bg-slate-950 p-4 text-white sm:p-6" (click)="$event.stopPropagation()">
       <div class="flex items-center justify-between gap-4">
         <h2 class="text-xl font-bold">{{ copy().editLabel }}: {{ car.brand }} {{ car.model }}</h2>
-        <button type="button" [attr.aria-label]="copy().closeLabel" (click)="cancelEditing()" class="grid h-10 w-10 place-items-center rounded-lg border border-white/10 text-2xl">&times;</button>
+        <button type="button" [attr.aria-label]="copy().closeLabel" (click)="cancelEditing()" class="grid h-11 w-11 shrink-0 place-items-center rounded-lg border border-white/10 text-2xl">&times;</button>
       </div>
 
       @if (editError()) {
@@ -300,7 +300,7 @@
         @if (editStep() === 0) {
           <fieldset class="sm:col-span-2 lg:col-span-3">
             <legend class="text-sm font-semibold text-slate-300">{{ createFieldLabel('colour') }}</legend>
-            <div class="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4">
+            <div class="mt-2 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
               @for (color of colorOptions; track color.hex) {
                 <label
                   class="flex cursor-pointer items-center gap-3 rounded-lg border border-white/10 bg-slate-900 px-3 py-2 text-sm font-semibold text-slate-200 transition hover:bg-white/5"
@@ -341,7 +341,7 @@
 
       <div class="mt-6 flex flex-col gap-3 border-t border-white/10 pt-5 sm:flex-row sm:items-center sm:justify-between">
         <span class="text-sm text-slate-400">Step {{ editStep() + 1 }} of {{ formSteps.length }}</span>
-        <div class="flex justify-end gap-2">
+        <div class="flex flex-wrap justify-end gap-2">
           <button type="button" [disabled]="editStep() === 0 || savingEdit()" (click)="changeEditStep(-1)" class="min-h-10 rounded-lg border border-white/10 px-4 text-slate-300 disabled:cursor-not-allowed disabled:opacity-40">{{ copy().previousLabel }}</button>
           @if (!isLastStep(editStep())) {
             <button type="button" [disabled]="savingEdit()" (click)="changeEditStep(1)" class="min-h-10 rounded-lg bg-cyan-300 px-4 font-semibold text-slate-950 disabled:opacity-60">{{ copy().nextLabel }}</button>
@@ -360,7 +360,7 @@
 
 @if (selectedCar(); as car) {
   <div
-    class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4"
+    class="fixed inset-0 z-[60] flex items-center justify-center bg-black/80 p-4"
     role="presentation"
     (click)="closeDetails()"
   >
@@ -368,7 +368,7 @@
       role="dialog"
       aria-modal="true"
       [attr.aria-label]="copy().characteristicsLabel"
-      class="max-h-[92vh] w-full max-w-5xl overflow-y-auto rounded-lg border border-white/10 bg-slate-950 text-slate-100 shadow-2xl"
+      class="admin-dialog w-full max-w-5xl overflow-y-auto rounded-lg border border-white/10 bg-slate-950 text-slate-100 shadow-2xl"
       (click)="$event.stopPropagation()"
     >
       <header class="sticky top-0 z-10 flex items-start justify-between gap-4 border-b border-white/10 bg-slate-950 px-5 py-4 sm:px-6">
@@ -425,7 +425,7 @@
       role="alertdialog"
       aria-modal="true"
       [attr.aria-label]="copy().carCreateErrorLabel"
-      class="w-full max-w-md rounded-lg border border-rose-300/25 bg-slate-950 p-6 text-white shadow-2xl"
+      class="w-full max-w-md rounded-lg border border-rose-300/25 bg-slate-950 p-4 text-white shadow-2xl sm:p-6"
       (click)="$event.stopPropagation()"
     >
       <div class="flex items-start gap-4">

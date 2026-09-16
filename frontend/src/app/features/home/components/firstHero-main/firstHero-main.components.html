@@ -1,29 +1,29 @@
-<section class="mx-auto max-w-7xl py-14 sm:py-18 lg:py-22">
+<section class="mx-auto max-w-7xl py-8 sm:py-18 lg:py-22">
   <div class="grid items-center gap-10 lg:grid-cols-[minmax(0,1fr)_460px]">
     <div class="max-w-3xl text-center lg:text-left">
 <!--      <div class="inline-flex items-center gap-2 rounded-full border border-cyan-200/25 bg-white/10 px-3 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-cyan-100 shadow-lg shadow-black/10 backdrop-blur">-->
 <!--        <span class="h-2 w-2 rounded-full bg-cyan-200"></span>-->
 <!--        {{ hero.eyebrow }}-->
 <!--      </div>-->
-      <h1 class="mt-5 max-w-4xl text-4xl font-semibold leading-tight tracking-tight text-white sm:text-6xl">
+      <h1 class="mt-2 max-w-4xl text-3xl font-semibold leading-tight tracking-tight text-white sm:text-6xl">
         {{ hero.heading }}
       </h1>
-      <p class="mt-6 max-w-2xl text-lg leading-8 text-slate-100 lg:text-xl">{{ hero.subheading }}</p>
+      <p class="mt-4 max-w-2xl text-base leading-7 sm:mt-6 sm:text-lg sm:leading-8 text-slate-100 lg:text-xl">{{ hero.subheading }}</p>
       <p class="mt-4 max-w-2xl text-sm leading-7 text-slate-300 sm:text-base">{{ hero.description }}</p>
 
-      <div class="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center lg:justify-start">
-        <a [href]="hero.primaryLink" class="inline-flex items-center justify-center rounded-md bg-white px-6 py-3 text-sm font-semibold text-slate-950 shadow-lg shadow-black/20 transition hover:bg-cyan-100 focus:outline-none focus:ring-2 focus:ring-cyan-200 focus:ring-offset-2 focus:ring-offset-slate-950">{{ hero.ctaPrimary }}</a>
-        <a [href]="hero.secondaryLink" class="inline-flex items-center justify-center rounded-md border border-white/25 bg-white/10 px-6 py-3 text-sm font-semibold text-white backdrop-blur transition hover:bg-white/15 focus:outline-none focus:ring-2 focus:ring-cyan-200 focus:ring-offset-2 focus:ring-offset-slate-950">{{ hero.ctaSecondary }}</a>
+      <div class="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-center lg:justify-start">
+        <a [href]="hero.primaryLink" class="mobile-action inline-flex items-center justify-center rounded-md bg-white px-6 py-3 text-sm font-semibold text-slate-950 shadow-lg shadow-black/20 transition hover:bg-cyan-100 focus:outline-none focus:ring-2 focus:ring-cyan-200 focus:ring-offset-2 focus:ring-offset-slate-950">{{ hero.ctaPrimary }}</a>
+        <a [href]="hero.secondaryLink" class="mobile-action inline-flex items-center justify-center rounded-md border border-white/25 bg-white/10 px-6 py-3 text-sm font-semibold text-white backdrop-blur transition hover:bg-white/15 focus:outline-none focus:ring-2 focus:ring-cyan-200 focus:ring-offset-2 focus:ring-offset-slate-950">{{ hero.ctaSecondary }}</a>
       </div>
 
-      <div class="mt-6 grid gap-3 text-left sm:grid-cols-3">
+      <div class="mt-6 grid gap-2 text-left sm:grid-cols-3">
         <a
           *ngFor="let item of hero.contactItems"
-          class="rounded-md border border-white/10 bg-slate-950/55 px-4 py-3 shadow-sm backdrop-blur transition hover:border-cyan-200/35 hover:bg-white/10"
+          class="flex items-center justify-between gap-4 rounded-xl border border-white/10 bg-slate-950/55 sm:block px-4 py-3 shadow-sm backdrop-blur transition hover:border-cyan-200/35 hover:bg-white/10"
           [href]="item.href || '#content'"
         >
-          <span class="block text-xs font-semibold uppercase tracking-[0.16em] text-cyan-200">{{ item.label }}</span>
-          <span class="mt-2 block text-sm font-medium leading-6 text-white">{{ item.value }}</span>
+          <span class="block shrink-0 text-xs font-semibold uppercase tracking-[0.16em] text-cyan-200">{{ item.label }}</span>
+          <span class="block text-right text-sm font-medium leading-6 text-white sm:mt-2 sm:text-left">{{ item.value }}</span>
         </a>
       </div>
 

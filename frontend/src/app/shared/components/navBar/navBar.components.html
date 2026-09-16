@@ -1,5 +1,6 @@
 <header
   class="fixed inset-x-0 top-0 z-50 border-b border-white/10 bg-slate-950/90 shadow-xl shadow-black/20 backdrop-blur-xl"
+  (keydown.escape)="closeMobileMenu()"
 >
   <div
     class="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-cyan-300/70 to-transparent"
@@ -9,7 +10,7 @@
     <nav aria-label="Primary navigation" class="flex h-16 items-center gap-2 xl:h-20">
       <a
         routerLink="/"
-        class="group flex min-w-0 shrink-0 items-center gap-2 rounded-xl outline-none focus-visible:ring-2 focus-visible:ring-cyan-300"
+        class="group flex min-h-11 min-w-0 shrink-0 items-center gap-2 rounded-xl outline-none focus-visible:ring-2 focus-visible:ring-cyan-300"
         aria-label="Poets Anders home"
         (click)="closeMobileMenu()"
       >
@@ -369,7 +370,7 @@
         [href]="dealershipUrl"
         target="_blank"
         rel="noopener noreferrer"
-        class="ml-auto inline-flex h-10 items-center whitespace-nowrap rounded-lg border border-cyan-300/30 bg-cyan-300/10 px-2 text-xs font-bold text-cyan-100 outline-none transition hover:border-cyan-200/60 hover:bg-cyan-300/20 hover:text-white focus-visible:ring-2 focus-visible:ring-cyan-300 xl:hidden"
+        class="ml-auto hidden h-11 items-center whitespace-nowrap rounded-lg border border-cyan-300/30 bg-cyan-300/10 px-2 text-xs font-bold text-cyan-100 outline-none transition hover:border-cyan-200/60 hover:bg-cyan-300/20 hover:text-white focus-visible:ring-2 focus-visible:ring-cyan-300 sm:inline-flex xl:hidden"
         [attr.aria-label]="copy().navbar.dealership"
       >
         {{ copy().navbar.dealership }}
@@ -377,7 +378,7 @@
 
       <button
         type="button"
-        class="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-white/10 bg-white/[0.05] text-slate-200 outline-none transition hover:border-cyan-300/30 hover:bg-white/10 hover:text-white focus-visible:ring-2 focus-visible:ring-cyan-300 xl:hidden"
+        class="ml-auto inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-white/10 bg-white/[0.05] text-slate-200 outline-none transition hover:border-cyan-300/30 hover:bg-white/10 hover:text-white focus-visible:ring-2 focus-visible:ring-cyan-300 sm:ml-auto xl:hidden"
         [attr.aria-expanded]="mobileMenuOpen()"
         aria-controls="mobile-navigation"
         [attr.aria-label]="copy().navbar.menuToggle"
@@ -413,15 +414,23 @@
 
   <div
     id="mobile-navigation"
-    class="grid border-white/10 bg-slate-950/95 transition-all duration-300 xl:hidden"
+    [attr.inert]="mobileMenuOpen() ? null : ''"
+    [attr.aria-hidden]="!mobileMenuOpen()"
+    class="grid min-h-0 border-white/10 bg-slate-950/95 transition-all duration-300 xl:hidden"
     [ngClass]="
       mobileMenuOpen()
         ? 'grid-rows-[1fr] border-t opacity-100'
         : 'grid-rows-[0fr] border-t-0 opacity-0'
     "
   >
-    <div class="max-h-[calc(100vh-4rem)] overflow-y-auto overscroll-contain">
-      <div class="mx-auto max-w-7xl space-y-5 px-4 py-5 sm:px-6">
+    <div class="max-h-[calc(100dvh-4rem)] min-h-0 overflow-y-auto overscroll-contain [scrollbar-width:thin]">
+      <div class="mx-auto max-w-7xl space-y-5 px-4 py-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] sm:px-6">
+        <a
+          routerLink="/book"
+          class="flex min-h-12 items-center justify-center rounded-xl bg-cyan-300 px-4 py-3 text-sm font-bold text-slate-950"
+          (click)="closeMobileMenu()"
+        >{{ copy().navbar.ctaPrimary }}</a>
+
         <div class="grid gap-2 sm:grid-cols-2">
           <a
             routerLink="/"
@@ -499,6 +508,38 @@
           </a>
         </div>
 
+        <div class="grid gap-2 border-t border-white/10 pt-4 sm:grid-cols-2">
+          <a *ngIf="!isAuthenticated()" routerLink="/login" (click)="closeMobileMenu()"
+            class="flex min-h-12 items-center rounded-xl border border-white/10 px-4 py-3 text-sm font-semibold text-slate-200">
+            {{ copy().navbar.loginLabel }}
+          </a>
+          <a *ngIf="isAuthenticated()" routerLink="/profile" (click)="closeMobileMenu()"
+            class="flex min-h-12 min-w-0 items-center gap-3 rounded-xl border border-white/10 px-4 py-3 text-sm font-semibold text-slate-200">
+            <span class="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-cyan-300/10 uppercase text-cyan-200">{{ userName().charAt(0) }}</span>
+            <span class="min-w-0 break-words">{{ copy().profile.heading }}</span>
+          </a>
+          <a *ngIf="isAdmin()" routerLink="/admin" (click)="closeMobileMenu()"
+            class="flex min-h-12 items-center rounded-xl border border-cyan-300/20 bg-cyan-300/10 px-4 py-3 text-sm font-semibold text-cyan-200">
+            {{ copy().navbar.adminLabel }}
+          </a>
+          <a *ngIf="dealershipUrl" [href]="dealershipUrl" target="_blank" rel="noopener noreferrer"
+            class="flex min-h-12 items-center rounded-xl border border-white/10 px-4 py-3 text-sm font-semibold text-slate-200">
+            {{ copy().navbar.dealership }}
+          </a>
+        </div>
+
+        <fieldset class="border-t border-white/10 pt-4">
+          <legend class="px-1 text-xs font-semibold text-slate-400">{{ copy().navbar.langLabel }}</legend>
+          <div class="grid grid-cols-3 gap-2">
+            <button *ngFor="let locale of languages" type="button"
+              class="min-h-11 rounded-lg border border-white/10 px-2 text-sm font-semibold text-slate-200"
+              [ngClass]="locale === selectedLanguage() ? 'border-cyan-300/40 bg-cyan-300/10 text-cyan-200' : ''"
+              [attr.aria-pressed]="locale === selectedLanguage()" (click)="setLanguage(locale)">
+              {{ copy().navbar.langNames[locale] }}
+            </button>
+          </div>
+        </fieldset>
+
         <div>
           <p class="mb-2 text-[11px] font-bold uppercase tracking-[0.2em] text-slate-500">
             {{ copy().services.treatments.eyebrow }}
@@ -533,78 +574,6 @@
           </div>
         </div>
 
-        <div>
-          <p class="mb-2 text-[11px] font-bold uppercase tracking-[0.2em] text-slate-500">
-            {{ copy().navbar.langLabel }}
-          </p>
-          <div class="grid grid-cols-3 gap-2">
-            <button
-              *ngFor="let locale of languages"
-              type="button"
-              class="min-h-11 rounded-xl border px-2 text-sm font-semibold outline-none transition focus-visible:ring-2 focus-visible:ring-cyan-300"
-              [ngClass]="
-                locale === selectedLanguage()
-                  ? 'border-cyan-300 bg-cyan-300 text-slate-950'
-                  : 'border-white/10 bg-white/[0.03] text-slate-300 hover:bg-white/[0.07] hover:text-white'
-              "
-              (click)="setLanguage(locale)"
-            >
-              {{ locale | uppercase }}
-            </button>
-          </div>
-        </div>
-
-        <div class="grid gap-2 sm:grid-cols-2">
-          <a
-            *ngIf="isAdmin()"
-            routerLink="/admin"
-            class="inline-flex min-h-12 items-center justify-center rounded-xl border border-cyan-300/20 bg-cyan-300/10 px-4 text-sm font-bold text-cyan-100 transition hover:bg-cyan-300/20"
-            (click)="closeMobileMenu()"
-          >
-            {{ copy().navbar.adminLabel }}
-          </a>
-          <a
-            *ngIf="!isAuthenticated()"
-            routerLink="/login"
-            class="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/[0.04] px-4 text-sm font-semibold text-white transition hover:bg-white/[0.08]"
-            (click)="closeMobileMenu()"
-          >
-            {{ copy().navbar.loginLabel }}
-          </a>
-          <a
-            *ngIf="isAuthenticated()"
-            routerLink="/profile"
-            class="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/[0.04] px-4 text-sm font-semibold text-white transition hover:bg-white/[0.08]"
-            (click)="closeMobileMenu()"
-          >
-            <span
-              class="grid h-6 w-6 place-items-center rounded-full bg-cyan-300/15 text-xs font-bold uppercase text-cyan-200"
-              >{{ userName().charAt(0) }}</span
-            >
-            <span class="truncate">{{ userName() }}</span>
-          </a>
-          <a
-            routerLink="/book"
-            class="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-cyan-300 px-5 text-sm font-bold text-slate-950 shadow-lg shadow-cyan-950/30 transition hover:bg-cyan-200"
-            (click)="closeMobileMenu()"
-          >
-            <svg
-              class="h-4 w-4"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              stroke-width="2"
-              aria-hidden="true"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="M8 2v3M16 2v3M3.5 9h17M5 4.5h14a2 2 0 0 1 2 2V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6.5a2 2 0 0 1 2-2Z"
-              ></path>
-            </svg>
-            {{ copy().navbar.ctaPrimary }}
-          </a>
-        </div>
       </div>
     </div>
   </div>

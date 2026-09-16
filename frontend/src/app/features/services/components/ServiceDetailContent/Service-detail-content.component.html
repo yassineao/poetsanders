@@ -1,6 +1,6 @@
 <section class="border-t border-white/10 bg-slate-900/50">
-  <div class="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8 lg:py-24">
-    <div class="grid gap-12 lg:grid-cols-[1.35fr_0.65fr]">
+  <div class="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8 lg:py-24 sm:py-16">
+    <div class="grid gap-8 lg:grid-cols-[1.35fr_0.65fr] sm:gap-12">
       <div class="space-y-12">
         <article *ngFor="let section of details.sections">
           <h2 class="text-2xl font-semibold tracking-tight text-white sm:text-3xl">{{ section.heading }}</h2>
@@ -17,7 +17,7 @@
       </div>
 
       <div class="space-y-6 lg:sticky lg:top-28 lg:self-start">
-        <article class="rounded-lg border border-white/10 bg-slate-950/80 p-6 shadow-xl shadow-slate-950/20">
+        <article class="rounded-lg border border-white/10 bg-slate-950/80 p-4 shadow-xl shadow-slate-950/20 sm:p-6">
           <h2 class="text-2xl font-semibold text-white">{{ details.odorsHeading }}</h2>
           <p class="mt-3 text-sm leading-6 text-slate-300">{{ details.odorsDescription }}</p>
           <ul class="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-1">
@@ -30,9 +30,9 @@
           </ul>
         </article>
 
-        <article class="rounded-lg bg-cyan-200 p-6 text-slate-950 shadow-xl shadow-cyan-950/20">
+        <article class="rounded-lg bg-cyan-200 p-4 text-slate-950 shadow-xl shadow-cyan-950/20 sm:p-6">
           <p class="text-sm font-semibold uppercase tracking-[0.18em]">{{ details.priceLabel }}</p>
-          <p class="mt-2 text-4xl font-bold">{{ details.price }}</p>
+          <p class="mt-2 text-3xl font-bold sm:text-4xl">{{ details.price }}</p>
           <h2 class="mt-6 text-xl font-semibold">{{ details.ctaHeading }}</h2>
           <a
             [routerLink]="copy.bookLink"
