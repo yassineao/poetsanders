@@ -1,3 +1,4 @@
+import { translateUi } from '../../../../core/i18/ui-translations';
 import { CommonModule } from '@angular/common';
 import {
   Component,
@@ -44,6 +45,10 @@ const treatmentSlugByWashType: Record<WashType, string> = {
   templateUrl: './admin-appointments.component.html',
 })
 export class AdminAppointmentsComponent {
+  protected t(value: string): string {
+    return translateUi(value, this.i18n.getCurrentLanguage());
+  }
+
   readonly appointments = input.required<AdminAppointment[]>();
   readonly users = input.required<AdminUser[]>();
   readonly acceptingIds = input<string[]>([]);
@@ -243,7 +248,7 @@ export class AdminAppointmentsComponent {
       return;
     }
 
-    if (!window.confirm(`Save changes to appointment for ${appointment.customerName}?`)) {
+    if (!window.confirm(this.t("Save changes to appointment for {name}?").replace('{name}', appointment.customerName))) {
       return;
     }
 
@@ -274,7 +279,7 @@ export class AdminAppointmentsComponent {
       return;
     }
 
-    if (!window.confirm(`Delete appointment for ${appointment.customerName}? This cannot be undone.`)) {
+    if (!window.confirm(this.t("Delete appointment for {name}? This cannot be undone.").replace('{name}', appointment.customerName))) {
       return;
     }
 

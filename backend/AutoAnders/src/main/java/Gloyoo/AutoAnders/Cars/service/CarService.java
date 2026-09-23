@@ -38,7 +38,11 @@ public class CarService {
         this.statusChangeEmailService = statusChangeEmailService;
     }
 
-    public Car addCar(@NotNull CarRequest carRequest, @NotNull UUID userId) {
+    public Car addCar(
+            @NotNull CarRequest carRequest,
+            @NotNull UUID userId,
+            String role
+    ) {
         String licensePlate = normalizeOptional(carRequest.licensePlate());
         if (licensePlate != null && carRepository.existsByLicensePlate(licensePlate)) {
             throw new IllegalArgumentException("Car already exists with this license plate");
@@ -91,7 +95,9 @@ public class CarService {
                 .energyLabel(carRequest.energyLabel())
                 .paintType(carRequest.paintType())
                 .upholstery(carRequest.upholstery())
-                .status(carRequest.status())
+                // Customer sell submissions must be reviewed before appearing publicly.
+                // Admins can still choose the initial status through an admin-authorized request.
+                .status("ADMIN".equals(role) ? carRequest.status() : Status.Pending_Confirmation)
                 .user(user)
                 .pictures(new ArrayList<>())
                 .build();

@@ -48,6 +48,8 @@ Poets Anders is the customer-facing detailing and booking side of the project.
 
 - Responsive business website for the detailing company.
 - Service/treatment overview and individual treatment detail pages.
+- Treatment cards are clickable and link directly to their detail pages; the home-page cards are compact on phones and show before/after imagery for total, interior, exterior, and headlight treatments.
+- Treatment detail heroes include an interactive before/after slider for those four visual treatments, with price information near the page heading. Ozone treatment intentionally uses a single regular photo because its result is not meaningfully represented as a visual before/after.
 - FAQ, testimonials, location, contact, and business information.
 - Runtime language switching for English, Dutch, and German.
 - Shared navbar and footer.
@@ -87,9 +89,10 @@ Admins can:
 
 - View dashboard statistics.
 - Search and paginate users.
-- Create new users.
+- Create, edit, and delete users.
 - Edit user name, email, phone number, and role.
 - Search, filter, paginate, accept, and edit appointments.
+- Delete cars from the admin dashboard.
 
 ### Auto Anders
 
@@ -101,6 +104,7 @@ Admins can:
 
 - Search, filter, paginate, create, edit, and update cars.
 - Change car availability status.
+- Delete cars from the admin dashboard.
 - Add cars as the logged-in admin.
 - Upload multiple pictures for a car.
 - Preview selected pictures before upload.
@@ -116,6 +120,7 @@ Cars support detailed commercial and technical data:
 - Urban, motorway, and combined fuel consumption.
 - Financial lease prices for multiple terms.
 - Status values: `Available`, `Pending_Confirmation`, `Booked`, and `Cancelled`.
+- Public sales listings include only cars with `Available` status. Cars submitted by non-admin users start as `Pending_Confirmation` and must be reviewed before they appear for sale.
 - Multiple pictures stored in Supabase Storage and linked through PostgreSQL metadata.
 
 ## Technology Stack
@@ -589,7 +594,9 @@ erDiagram
 | `GET` | `/admin/dashboard` | Load totals, users, and appointments |
 | `POST` | `/admin/users` | Create user |
 | `PATCH` | `/admin/users/{id}` | Edit user |
+| `DELETE` | `/admin/users/{id}` | Delete user |
 | `PATCH` | `/admin/appointments/{id}` | Edit appointment |
+| `DELETE` | `/admin/cars/{id}` | Delete car from admin dashboard |
 | `POST` | `/admin/cars` | Create admin-owned car |
 | `PATCH` | `/admin/cars/{id}` | Edit car |
 
@@ -764,6 +771,7 @@ flowchart LR
 3. Add the backend `WashType` if needed.
 4. Update frontend booking mappings.
 5. Verify booking, appointment display, and service detail routing.
+6. For a visual before/after treatment, add its comparison image under `frontend/public/treatments/` and map its slug in the home treatment cards and service detail hero. Ozone intentionally uses a single image.
 
 ### Adding a Car Field
 

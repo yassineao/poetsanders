@@ -20,13 +20,16 @@ public record AdminContactMessageResponse(
         Instant updatedAt
 ) {
     public static AdminContactMessageResponse from(ContactMessage message) {
+        var user = message.getUser();
         return new AdminContactMessageResponse(
                 message.getId(),
                 message.getCompanyName(),
-                message.getUser().getId(),
-                message.getUser().getName(),
-                message.getUser().getEmail(),
-                message.getPhoneNumber() != null ? message.getPhoneNumber() : message.getUser().getPhoneNumber(),
+                user != null ? user.getId() : null,
+                user != null ? user.getName() : "Legacy contact",
+                user != null ? user.getEmail() : "",
+                message.getPhoneNumber() != null
+                        ? message.getPhoneNumber()
+                        : user != null ? user.getPhoneNumber() : null,
                 message.getMessage(),
                 message.getStatus(),
                 message.isEmailDelivered(),

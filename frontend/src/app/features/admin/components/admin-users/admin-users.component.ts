@@ -1,3 +1,4 @@
+import { translateUi } from '../../../../core/i18/ui-translations';
 import { CommonModule } from '@angular/common';
 import { Component, DestroyRef, computed, inject, input, output, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -16,6 +17,10 @@ const pageSize = 10;
   templateUrl: './admin-users.component.html',
 })
 export class AdminUsersComponent {
+  protected t(value: string): string {
+    return translateUi(value, this.i18n.getCurrentLanguage());
+  }
+
   readonly users = input.required<AdminUser[]>();
   readonly userUpdated = output<AdminUser>();
   readonly userCreated = output<AdminUser>();
@@ -169,7 +174,7 @@ protected cancelAdding(): void {
       return;
     }
 
-    if (!window.confirm(`Delete user ${user.email}? This cannot be undone.`)) {
+    if (!window.confirm(this.t("Delete user {name}? This cannot be undone.").replace('{name}', user.email))) {
       return;
     }
 

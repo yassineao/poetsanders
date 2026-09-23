@@ -1,23 +1,39 @@
 <section class="mx-auto mt-8 max-w-6xl rounded-3xl border border-white/10 bg-zinc-900 p-6 text-white shadow-2xl shadow-black/40 sm:p-8">
   <div class="flex flex-col gap-3 border-b border-white/10 pb-5 sm:flex-row sm:items-end sm:justify-between">
     <div>
-      <p class="text-sm font-bold uppercase tracking-[0.2em] text-red-500">Garage</p>
-      <h2 class="mt-2 text-2xl font-black">My cars</h2>
+      <p class="text-sm font-bold uppercase tracking-[0.2em] text-red-500">{{ t('Garage') }}</p>
+      <h2 class="mt-2 text-2xl font-black">{{ t('My cars') }}</h2>
+      <p class="mt-2 max-w-2xl text-sm leading-6 text-zinc-400">{{ t('View the cars linked to your account and manage their information and pictures.') }}</p>
     </div>
-    <div class="flex flex-wrap gap-2">
+    <div class="grid grid-cols-2 gap-2 sm:flex">
       <button
         type="button"
         (click)="openAddCar()"
-        class="rounded-xl bg-red-600 px-4 py-2 text-sm font-bold text-white shadow-lg shadow-red-950/30 transition hover:bg-red-500">
-        Add car
+        class="min-h-11 rounded-xl bg-red-600 px-4 py-2 text-sm font-bold text-white shadow-lg shadow-red-950/30 transition hover:bg-red-500">
+        {{ t('Add car') }}
       </button>
       <button
         type="button"
         (click)="loadCars()"
         [disabled]="loading()"
-        class="rounded-xl border border-white/10 px-4 py-2 text-sm font-bold text-zinc-200 transition hover:border-red-500/50 hover:bg-white/5 disabled:cursor-not-allowed disabled:opacity-50">
-        Refresh
+        class="min-h-11 rounded-xl border border-white/10 px-4 py-2 text-sm font-bold text-zinc-200 transition hover:border-red-500/50 hover:bg-white/5 disabled:cursor-not-allowed disabled:opacity-50">
+        {{ t('Refresh') }}
       </button>
+    </div>
+  </div>
+
+  <div class="mt-5 grid grid-cols-3 gap-2 sm:gap-3">
+    <div class="rounded-2xl border border-white/10 bg-black/20 p-3 sm:p-4">
+      <p class="text-2xl font-black text-white">{{ cars().length }}</p>
+      <p class="mt-1 text-xs font-bold uppercase tracking-wide text-zinc-500">{{ t('Total cars') }}</p>
+    </div>
+    <div class="rounded-2xl border border-amber-400/15 bg-amber-400/5 p-3 sm:p-4">
+      <p class="text-2xl font-black text-amber-300">{{ pendingCars() }}</p>
+      <p class="mt-1 text-xs font-bold uppercase tracking-wide text-zinc-500">{{ t('Pending') }}</p>
+    </div>
+    <div class="rounded-2xl border border-emerald-400/15 bg-emerald-400/5 p-3 sm:p-4">
+      <p class="text-2xl font-black text-emerald-300">{{ availableCars() }}</p>
+      <p class="mt-1 text-xs font-bold uppercase tracking-wide text-zinc-500">{{ t('Available') }}</p>
     </div>
   </div>
 
@@ -28,8 +44,8 @@
       <div class="border-b border-white/10 p-5 sm:p-6">
         <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div>
-            <p class="text-xs font-black uppercase tracking-[0.2em] text-red-400">New vehicle</p>
-            <h3 class="mt-2 text-2xl font-black">Add a car</h3>
+            <p class="text-xs font-black uppercase tracking-[0.2em] text-red-400">{{ t('New vehicle') }}</p>
+            <h3 class="mt-2 text-2xl font-black">{{ t('Add a car') }}</h3>
           </div>
 
           <div class="grid grid-cols-2 gap-2 sm:flex">
@@ -43,7 +59,7 @@
                 [class.text-white]="addStep() === index"
                 [class.border-white/10]="addStep() !== index"
                 [class.text-zinc-400]="addStep() !== index">
-                {{ index + 1 }}. {{ step }}
+                {{ index + 1 }}. {{ t(step) }}
               </button>
             }
           </div>
@@ -55,7 +71,7 @@
           <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             @for (field of addBasicsTextFields; track field.key) {
               <label class="text-sm font-medium text-zinc-300">
-                {{ field.label }}
+                {{ t(field.label) }}
                 <input
                   [name]="'add-' + field.key"
                   [ngModel]="values[field.key]"
@@ -67,13 +83,13 @@
             }
 
             <fieldset class="sm:col-span-2 lg:col-span-3">
-              <legend class="text-sm font-medium text-zinc-300">Colour</legend>
+              <legend class="text-sm font-medium text-zinc-300">{{ t('Colour') }}</legend>
               <button
                 type="button"
                 (click)="addColorPickerOpen.set(!addColorPickerOpen())"
                 class="mt-2 flex w-full items-center gap-3 rounded-xl border border-white/10 bg-black/40 px-4 py-3 text-left text-sm font-bold text-zinc-200 transition hover:border-red-500/50 hover:bg-white/5">
                 <span class="h-6 w-6 rounded-full border border-white/30" [style.background]="values.colour"></span>
-                <span>{{ colorLabel(values.colour) }}</span>
+                <span>{{ t(colorLabel(values.colour)) }}</span>
                 <span class="ml-auto text-xs text-zinc-400">{{ values.colour }}</span>
               </button>
               @if (addColorPickerOpen()) {
@@ -87,7 +103,7 @@
                       [class.bg-red-950]="values.colour === color.hex"
                     >
                       <span class="h-6 w-6 rounded-full border border-white/30" [style.background]="color.hex"></span>
-                      <span>{{ color.label }}</span>
+                      <span>{{ t(color.label) }}</span>
                     </button>
                   }
                 </div>
@@ -96,7 +112,7 @@
 
             @for (field of addBasicsNumberFields; track field.key) {
               <label class="text-sm font-medium text-zinc-300">
-                {{ field.label }}
+                {{ t(field.label) }}
                 <input
                   [name]="'add-' + field.key"
                   type="number"
@@ -111,7 +127,7 @@
 
             @for (field of addBasicsDateFields; track field.key) {
               <label class="text-sm font-medium text-zinc-300">
-                {{ field.label }}
+                {{ t(field.label) }}
                 <input
                   [name]="'add-' + field.key"
                   type="date"
@@ -124,16 +140,16 @@
 
             @for (field of selectFields; track field.key) {
               <label class="text-sm font-medium text-zinc-300">
-                {{ field.label }}
+                {{ t(field.label) }}
                 <select
                   [name]="'add-' + field.key"
                   [ngModel]="values[field.key]"
                   (ngModelChange)="setAddValue(field.key, $event)"
                   class="mt-2 w-full rounded-xl border border-white/10 bg-black/40 px-4 py-3 text-white outline-none transition focus:border-red-500 focus:ring-4 focus:ring-red-500/10"
                 >
-                  <option [ngValue]="null">Select</option>
+                  <option [ngValue]="null">{{ t('Select') }}</option>
                   @for (option of field.options; track option) {
-                    <option [ngValue]="option">{{ option.replaceAll("_", " ") }}</option>
+                    <option [ngValue]="option">{{ t(option.replaceAll("_", " ")) }}</option>
                   }
                 </select>
               </label>
@@ -144,7 +160,7 @@
           <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             @for (field of addSpecTextFields; track field.key) {
               <label class="text-sm font-medium text-zinc-300">
-                {{ field.label }}
+                {{ t(field.label) }}
                 <input
                   [name]="'add-' + field.key"
                   [ngModel]="values[field.key]"
@@ -156,7 +172,7 @@
 
             @for (field of addSpecDateFields; track field.key) {
               <label class="text-sm font-medium text-zinc-300">
-                {{ field.label }}
+                {{ t(field.label) }}
                 <input
                   [name]="'add-' + field.key"
                   type="date"
@@ -169,7 +185,7 @@
 
             @for (field of addSpecNumberFields; track field.key) {
               <label class="text-sm font-medium text-zinc-300">
-                {{ field.label }}
+                {{ t(field.label) }}
                 <input
                   [name]="'add-' + field.key"
                   type="number"
@@ -190,7 +206,7 @@
                   (ngModelChange)="setAddValue(field.key, $event)"
                   class="h-5 w-5 accent-red-600"
                 />
-                {{ field.label }}
+                {{ t(field.label) }}
               </label>
             }
           </div>
@@ -198,7 +214,7 @@
           <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             @for (field of addFinanceNumberFields; track field.key) {
               <label class="text-sm font-medium text-zinc-300">
-                {{ field.label }}
+                {{ t(field.label) }}
                 <input
                   [name]="'add-' + field.key"
                   type="number"
@@ -213,11 +229,11 @@
         } @else {
           <div>
             <label class="flex min-h-40 cursor-pointer flex-col items-center justify-center rounded-2xl border border-dashed border-white/20 bg-black/30 px-6 py-8 text-center transition hover:border-red-500/50 hover:bg-red-950/10">
-              <span class="text-lg font-black text-white">Upload car pictures</span>
+              <span class="text-lg font-black text-white">{{ t('Upload car pictures') }}</span>
               <span class="mt-2 max-w-xl text-sm leading-6 text-zinc-400">
-                Select multiple images at once. They will be uploaded together after the car is created.
+                {{ t('Select multiple images at once. They will be uploaded together after the car is created.') }}
               </span>
-              <span class="mt-4 rounded-xl bg-white px-4 py-2 text-sm font-black text-black">Choose pictures</span>
+              <span class="mt-4 rounded-xl bg-white px-4 py-2 text-sm font-black text-black">{{ t('Choose pictures') }}</span>
               <input type="file" accept="image/*" multiple (change)="addPicturesToNewCar($event)" class="sr-only" />
             </label>
 
@@ -230,7 +246,7 @@
                       type="button"
                       (click)="removeNewCarPicture(index)"
                       class="absolute right-2 top-2 grid h-8 w-8 place-items-center rounded-full bg-black/70 text-lg font-bold text-white transition hover:bg-red-600"
-                      aria-label="Remove picture">
+                      [attr.aria-label]="t('Remove picture')">
                       &times;
                     </button>
                     <p class="truncate bg-black/70 px-3 py-2 text-xs text-zinc-300">{{ picture.name }}</p>
@@ -248,7 +264,7 @@
           (click)="cancelAddCar()"
           [disabled]="creatingCar()"
           class="rounded-xl border border-white/10 px-5 py-3 text-sm font-bold text-zinc-200 transition hover:border-white/25 hover:bg-white/5 disabled:cursor-not-allowed disabled:opacity-50">
-          Cancel
+          {{ t('Cancel') }}
         </button>
 
         <div class="flex flex-col gap-3 sm:flex-row">
@@ -257,7 +273,7 @@
             (click)="previousAddStep()"
             [disabled]="addStep() === 0 || creatingCar()"
             class="rounded-xl border border-white/10 px-5 py-3 text-sm font-bold text-zinc-200 transition hover:border-white/25 hover:bg-white/5 disabled:cursor-not-allowed disabled:opacity-50">
-            Back
+            {{ t('Back') }}
           </button>
 
           @if (addStep() < addSteps.length - 1) {
@@ -266,14 +282,14 @@
               (click)="nextAddStep()"
               [disabled]="!canGoToNextAddStep() || creatingCar()"
               class="rounded-xl bg-white px-5 py-3 text-sm font-black text-black transition hover:bg-zinc-200 disabled:cursor-not-allowed disabled:opacity-50">
-              Next
+              {{ t('Next') }}
             </button>
           } @else {
             <button
               type="submit"
               [disabled]="!addBasicsValid() || creatingCar()"
               class="rounded-xl bg-red-600 px-5 py-3 text-sm font-black text-white shadow-lg shadow-red-950/30 transition hover:bg-red-500 disabled:cursor-not-allowed disabled:opacity-50">
-              {{ creatingCar() ? "Creating..." : "Create car" }}
+              {{ creatingCar() ? t("Creating...") : t("Create car") }}
             </button>
           }
         </div>
@@ -283,15 +299,15 @@
 
   @if (loading()) {
     <p class="mt-5 rounded-2xl border border-white/10 bg-black/20 px-4 py-3 text-sm text-zinc-400">
-      Loading cars...
+      {{ t('Loading cars...') }}
     </p>
   } @else if (failed()) {
     <p class="mt-5 rounded-2xl border border-red-500/30 bg-red-950/30 px-4 py-3 text-sm text-red-200">
-      Could not load or save your cars. Please try again.
+      {{ t('Could not load or save your cars. Please try again.') }}
     </p>
   } @else if (!hasCars()) {
     <p class="mt-5 rounded-2xl border border-white/10 bg-black/20 px-4 py-3 text-sm text-zinc-400">
-      You have not added any cars yet.
+      {{ t('You have not added any cars yet.') }}
     </p>
   }
 
@@ -308,48 +324,73 @@
               [alt]="car.brand + ' ' + car.model"
               class="h-56 w-full object-cover lg:h-full" />
 
-            <div class="p-5">
+            <div class="p-4 sm:p-5">
               <form #carForm="ngForm" (ngSubmit)="saveCar(car, carForm)" class="space-y-5">
                 <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                   <div>
                     <h3 class="text-xl font-black">{{ car.brand }} {{ car.model }}</h3>
-                    <p class="mt-1 text-sm text-zinc-400">{{ car.licensePlate || "No license plate" }}</p>
+                    <p class="mt-1 text-sm text-zinc-400">{{ car.licensePlate || t("No license plate") }}</p>
                     <p class="mt-2 inline-flex rounded-full bg-white/10 px-3 py-1 text-xs font-bold text-zinc-200">
-                      {{ statusLabel(car) }}
+                      {{ t(statusLabel(car)) }}
                     </p>
                   </div>
-                  <div class="flex flex-wrap gap-2">
+                  <div class="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap">
                     @if (!editing) {
                       <button
                         type="button"
                         (click)="startEdit(car)"
-                        class="rounded-xl border border-white/10 px-4 py-2 text-sm font-bold text-zinc-200 transition hover:border-red-500/50 hover:bg-white/5">
-                        Edit
+                        class="min-h-11 rounded-xl border border-white/10 px-4 py-2 text-sm font-bold text-zinc-200 transition hover:border-red-500/50 hover:bg-white/5">
+                        {{ t('Edit') }}
                       </button>
                     } @else {
                       <button
                         type="button"
                         (click)="cancelEdit()"
-                        class="rounded-xl border border-white/10 px-4 py-2 text-sm font-bold text-zinc-200 transition hover:border-white/25 hover:bg-white/5">
-                        Cancel
+                        class="min-h-11 rounded-xl border border-white/10 px-4 py-2 text-sm font-bold text-zinc-200 transition hover:border-white/25 hover:bg-white/5">
+                        {{ t('Cancel') }}
                       </button>
                     }
                     <button
                       type="button"
                       (click)="deleteCar(car)"
                       [disabled]="savingCarId() === car.id"
-                      class="rounded-xl bg-white px-4 py-2 text-sm font-bold text-black transition hover:bg-zinc-200 disabled:cursor-not-allowed disabled:opacity-50">
-                      Delete
+                      class="min-h-11 rounded-xl bg-white px-4 py-2 text-sm font-bold text-black transition hover:bg-zinc-200 disabled:cursor-not-allowed disabled:opacity-50">
+                      {{ t('Delete') }}
                     </button>
                   </div>
                 </div>
 
+                @if (!editing) {
+                  <div class="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-5">
+                    <div class="rounded-xl border border-white/5 bg-white/[0.04] p-3">
+                      <p class="text-[0.65rem] font-bold uppercase tracking-wide text-zinc-500">{{ t('Year') }}</p>
+                      <p class="mt-1 font-bold">{{ car.yearOfManufacture || '-' }}</p>
+                    </div>
+                    <div class="rounded-xl border border-white/5 bg-white/[0.04] p-3">
+                      <p class="text-[0.65rem] font-bold uppercase tracking-wide text-zinc-500">{{ t('Mileage') }}</p>
+                      <p class="mt-1 font-bold">{{ formatNumber(car.mileage) }} km</p>
+                    </div>
+                    <div class="rounded-xl border border-white/5 bg-white/[0.04] p-3">
+                      <p class="text-[0.65rem] font-bold uppercase tracking-wide text-zinc-500">{{ t('Price') }}</p>
+                      <p class="mt-1 font-bold">{{ formatPrice(car.price) }}</p>
+                    </div>
+                    <div class="rounded-xl border border-white/5 bg-white/[0.04] p-3">
+                      <p class="text-[0.65rem] font-bold uppercase tracking-wide text-zinc-500">{{ t('Fuel') }}</p>
+                      <p class="mt-1 font-bold">{{ t(car.fuel.toString() || '-') }}</p>
+                    </div>
+                    <div class="col-span-2 rounded-xl border border-white/5 bg-white/[0.04] p-3 sm:col-span-1">
+                      <p class="text-[0.65rem] font-bold uppercase tracking-wide text-zinc-500">{{ t('Pictures') }}</p>
+                      <p class="mt-1 font-bold">{{ car.pictures.length || 0 }}</p>
+                    </div>
+                  </div>
+                }
+
                 @if (editing) {
                   <div>
                     <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                      <p class="text-sm font-bold uppercase tracking-[0.18em] text-zinc-500">Pictures</p>
+                      <p class="text-sm font-bold uppercase tracking-[0.18em] text-zinc-500">{{ t('Pictures') }}</p>
                       <label class="inline-flex cursor-pointer items-center justify-center rounded-xl bg-white px-4 py-2 text-sm font-bold text-black transition hover:bg-zinc-200">
-                        {{ uploadingPicturesCarId() === car.id ? "Uploading..." : "Add pictures" }}
+                        {{ uploadingPicturesCarId() === car.id ? t("Uploading...") : t("Add pictures") }}
                         <input
                           type="file"
                           accept="image/*"
@@ -374,11 +415,11 @@
                               [disabled]="isDeletingPicture(picture.id)"
                               (click)="deletePicture(car, picture)"
                               class="absolute right-2 top-2 grid h-8 w-8 place-items-center rounded-full bg-black/70 text-lg font-bold text-white transition hover:bg-red-600 disabled:cursor-wait disabled:opacity-60"
-                              aria-label="Delete picture">
+                              [attr.aria-label]="t('Delete picture')">
                               &times;
                             </button>
                             <p class="truncate bg-black/70 px-3 py-2 text-xs text-zinc-300">
-                              {{ picture.title || "Car picture" }}
+                              {{ picture.title || t("Car picture") }}
                             </p>
                           </div>
                         }
@@ -395,7 +436,7 @@
                   <div class="grid gap-4 sm:grid-cols-2">
                     @for (field of textFields; track field.key) {
                       <label class="text-sm font-medium text-zinc-300">
-                        {{ field.label }}
+                        {{ t(field.label) }}
                         <input
                           [name]="field.key"
                           [(ngModel)]="values[field.key]"
@@ -406,13 +447,13 @@
                     }
 
                     <fieldset class="sm:col-span-2">
-                      <legend class="text-sm font-medium text-zinc-300">Colour</legend>
+                      <legend class="text-sm font-medium text-zinc-300">{{ t('Colour') }}</legend>
                       <button
                         type="button"
                         (click)="editColorPickerOpen.set(editColorPickerOpen() === car.id ? null : car.id)"
                         class="mt-2 flex w-full items-center gap-3 rounded-xl border border-white/10 bg-zinc-950/80 px-4 py-3 text-left text-sm font-bold text-zinc-200 transition hover:border-red-500/50 hover:bg-white/5">
                         <span class="h-6 w-6 rounded-full border border-white/30" [style.background]="values.colour"></span>
-                        <span>{{ colorLabel(values.colour) }}</span>
+                        <span>{{ t(colorLabel(values.colour)) }}</span>
                         <span class="ml-auto text-xs text-zinc-400">{{ values.colour }}</span>
                       </button>
                       @if (editColorPickerOpen() === car.id) {
@@ -426,7 +467,7 @@
                               [class.bg-red-950]="values.colour === color.hex"
                             >
                               <span class="h-6 w-6 rounded-full border border-white/30" [style.background]="color.hex"></span>
-                              <span>{{ color.label }}</span>
+                              <span>{{ t(color.label) }}</span>
                             </button>
                           }
                         </div>
@@ -435,7 +476,7 @@
 
                     @for (field of dateFields; track field.key) {
                       <label class="text-sm font-medium text-zinc-300">
-                        {{ field.label }}
+                        {{ t(field.label) }}
                         <input
                           [name]="field.key"
                           type="date"
@@ -447,7 +488,7 @@
 
                     @for (field of numberFields; track field.key) {
                       <label class="text-sm font-medium text-zinc-300">
-                        {{ field.label }}
+                        {{ t(field.label) }}
                         <input
                           [name]="field.key"
                           type="number"
@@ -461,22 +502,22 @@
 
                     @for (field of selectFields; track field.key) {
                       <label class="text-sm font-medium text-zinc-300">
-                        {{ field.label }}
+                        {{ t(field.label) }}
                         <select
                           [name]="field.key"
                           [(ngModel)]="values[field.key]"
                           class="mt-2 w-full rounded-xl border border-white/10 bg-zinc-950/80 px-4 py-3 text-white outline-none"
                         >
-                          <option [ngValue]="null">Select</option>
+                          <option [ngValue]="null">{{ t('Select') }}</option>
                           @for (option of field.options; track option) {
-                            <option [ngValue]="option">{{ option.replaceAll("_", " ") }}</option>
+                            <option [ngValue]="option">{{ t(option.replaceAll("_", " ")) }}</option>
                           }
                         </select>
                       </label>
                     }
 
                     <label class="text-sm font-medium text-zinc-300">
-                      Status
+                      {{ t('Status') }}
                       <input
                         name="status"
                         [ngModel]="statusLabel(car)"
@@ -493,7 +534,7 @@
                           [(ngModel)]="values[field.key]"
                           class="h-5 w-5"
                         />
-                        {{ field.label }}
+                        {{ t(field.label) }}
                       </label>
                     }
                   </div>
@@ -502,7 +543,7 @@
                     type="submit"
                     [disabled]="carForm.invalid || savingCarId() === car.id"
                     class="w-full rounded-xl bg-red-600 px-5 py-4 font-bold shadow-lg shadow-red-950/30 transition hover:bg-red-500 disabled:cursor-not-allowed disabled:opacity-50">
-                    {{ savingCarId() === car.id ? "Saving..." : "Save car" }}
+                    {{ savingCarId() === car.id ? t("Saving...") : t("Save car") }}
                   </button>
                 }
               </form>

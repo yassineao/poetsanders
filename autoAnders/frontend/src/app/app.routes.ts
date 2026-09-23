@@ -30,7 +30,7 @@ export const routes: Routes = [
       { path: "contact", redirectTo: "form" },
       { path: "auth", component: AuthPageComponent },
       { path: "login", redirectTo: "auth" },
-      { path: "profile", component: ProfileForm },
+      { path: "profile", component: ProfileForm, canActivate: [authGuard] },
       { path: "advantages", component: AdvantagesPageComponent },
       { path: "about", component: LegalPageComponent, data: { page: "about" } },
       { path: "privacy", component: LegalPageComponent, data: { page: "privacy" } },

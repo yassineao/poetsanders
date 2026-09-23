@@ -65,7 +65,7 @@ export const nlPagesCopy: Copy["pages"] = {
       intro:
         "Op deze pagina leggen we uit hoe persoonsgegevens op deze website en tijdens klantcommunicatie en dienstverlening worden verzameld, gebruikt, opgeslagen, gedeeld en beschermd.",
       heroMeta: [
-        "Laatst bijgewerkt: [DATE]",
+        // Publication date must be supplied by the business.
         "Conform GDPR Art. 13 & 14",
         "Versie 1.0",
       ],
@@ -284,8 +284,8 @@ export const nlPagesCopy: Copy["pages"] = {
             "Privacy & GDPR: privacy@autoanders.com\nFunctionaris voor gegevensbescherming: dpo@autoanders.com (indien van toepassing)\nPost: AutoAnders, [Volledig adres], t.a.v. Privacy Team\nReactietermijn: Binnen 30 kalenderdagen (GDPR-termijn)",
         },
       ],
-      note:
-        "Vervang voor publicatie alle placeholders zoals [DATE], bedrijfsnaam, adres, btw-nummer, privacy-e-mailadres en DPO-gegevens. Controleer ook of de vermelde tools, verwerkers, bewaartermijnen en rechtsgronden overeenkomen met de diensten die daadwerkelijk door het live bedrijf worden gebruikt.",
+      // Editorial reminder (not displayed):
+      // "Vervang voor publicatie alle placeholders zoals [DATE], bedrijfsnaam, adres, btw-nummer, privacy-e-mailadres en DPO-gegevens. Controleer ook of de vermelde tools, verwerkers, bewaartermijnen en rechtsgronden overeenkomen met de diensten die daadwerkelijk door het live bedrijf worden gebruikt."
     },
     impressum: {
       metadata: {
@@ -305,7 +305,7 @@ export const nlPagesCopy: Copy["pages"] = {
       intro:
         "Deze pagina bevat de verplichte aanbieder- en wettelijke informatie voor de AutoAnders-website.",
       heroMeta: [
-        "Laatst bijgewerkt: [DATUM]",
+        // Publication date must be supplied by the business.
         "Rechtsgebied: Europese Unie",
         "Van toepassing op alle EU-bezoekers",
       ],
@@ -383,8 +383,8 @@ export const nlPagesCopy: Copy["pages"] = {
           ],
         },
       ],
-      note:
-        "Vervang alle placeholders vóór publicatie.",
+      // Editorial reminder (not displayed):
+      // "Vervang alle placeholders vóór publicatie."
     },
     terms: {
       metadata: {
@@ -405,7 +405,7 @@ export const nlPagesCopy: Copy["pages"] = {
       intro:
         "Deze pagina beschrijft de voorwaarden voor AutoAnders diensten rond voertuiginformatie, auto's kopen, verkopen, inruilen, financiering, betalingen, aansprakelijkheid en geschillenbeslechting.",
       heroMeta: [
-        "Laatst bijgewerkt: [DATUM]",
+        // Publication date must be supplied by the business.
         "Conform Richtlijn 2011/83/EU",
         "Versie 1.0",
       ],
@@ -722,7 +722,7 @@ export const nlPagesCopy: Copy["pages"] = {
       intro:
         "Op deze pagina leggen we uit hoe cookies en vergelijkbare technologieen op deze website worden gebruikt, welke categorieen bestaan en hoe toestemming kan worden beheerd.",
       heroMeta: [
-        "Laatst bijgewerkt: [DATE]",
+        // Publication date must be supplied by the business.
         "Conform CNIL- en EDPB-richtlijnen",
         "Versie 1.0",
       ],
@@ -882,7 +882,7 @@ export const nlPagesCopy: Copy["pages"] = {
           ],
         },
       ],
-      note:
-        "Vervang voor publicatie [DATE] indien nodig en controleer of de vermelde cookies en diensten van derden overeenkomen met de tools die daadwerkelijk op de live website worden gebruikt.",
+      // Editorial reminder (not displayed):
+      // "Vervang voor publicatie [DATE] indien nodig en controleer of de vermelde cookies en diensten van derden overeenkomen met de tools die daadwerkelijk op de live website worden gebruikt."
     },
   };

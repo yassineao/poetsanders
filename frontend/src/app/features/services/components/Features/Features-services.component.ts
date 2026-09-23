@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input } from '@angular/core';
+import { Component, Input, inject } from '@angular/core';
+import { I18nService } from '../../../../core/i18/i18n.service';
 import { RouterModule } from '@angular/router';
 import { ServicesFeatureCopy } from '../../../../core/interfaces/services';
 
@@ -17,5 +18,6 @@ const defaultFeatures: ServicesFeatureCopy = {
   templateUrl: './Features-services.component.html',
 })
 export class FeaturesServicesComponent {
+  protected readonly i18n = inject(I18nService);
   @Input({ required: true }) features: ServicesFeatureCopy = defaultFeatures;
 }

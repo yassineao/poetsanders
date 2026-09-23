@@ -23,7 +23,7 @@
         </div>
         <div class="flex flex-wrap items-center gap-2">
           <label class="inline-flex min-h-10 cursor-pointer items-center rounded-lg border border-cyan-300/25 bg-cyan-300/10 px-4 text-sm font-semibold text-cyan-100 transition hover:bg-cyan-300/20">
-            Add pictures
+            {{ t('Add pictures') }}
             <input type="file" accept="image/*" multiple class="sr-only" (change)="addPictures($event)" />
           </label>
           <button
@@ -32,7 +32,7 @@
             class="min-h-10 rounded-lg bg-cyan-300 px-4 text-sm font-bold text-slate-950 transition hover:bg-cyan-200 disabled:cursor-not-allowed disabled:opacity-50"
             (click)="saveChanges()"
           >
-            {{ saving() ? 'Saving...' : 'Save' }}
+            {{ saving() ? t('Saving...') : t('Save') }}
           </button>
           <button
             type="button"
@@ -46,7 +46,7 @@
       </header>
 
       @if (loading()) {
-        <p class="p-5 text-sm text-slate-400 sm:p-6">Loading pictures...</p>
+        <p class="p-5 text-sm text-slate-400 sm:p-6">{{ t('Loading pictures...') }}</p>
       }
 
       @if (errorMessage()) {
@@ -62,7 +62,7 @@
               <button
                 type="button"
                 class="absolute right-2 top-2 z-10 grid h-9 w-9 place-items-center rounded-lg border border-white/10 bg-slate-950/85 text-xl text-slate-200 shadow-lg transition hover:bg-rose-500/20 hover:text-rose-100"
-                aria-label="Delete picture"
+                [attr.aria-label]="t('Delete picture')"
                 [disabled]="saving()"
                 (click)="removePicture(picture)"
               >
@@ -82,7 +82,7 @@
                   class="grid max-h-[70vh] max-w-full place-items-center bg-slate-900 text-sm text-slate-500"
                   [ngStyle]="pictureStyles(picture)"
                 >
-                  Image unavailable
+                  {{ t('Image unavailable') }}
                 </div>
               }
               @if (picture.title || picture.description) {
@@ -102,7 +102,7 @@
               <button
                 type="button"
                 class="absolute right-2 top-2 z-10 grid h-9 w-9 place-items-center rounded-lg border border-white/10 bg-slate-950/85 text-xl text-slate-200 shadow-lg transition hover:bg-rose-500/20 hover:text-rose-100"
-                aria-label="Remove pending picture"
+                [attr.aria-label]="t('Remove pending picture')"
                 [disabled]="saving()"
                 (click)="removePendingPicture(picture)"
               >
@@ -118,13 +118,13 @@
               />
               <figcaption class="border-t border-cyan-300/20 p-4">
                 <p class="font-semibold text-white">{{ picture.file.name }}</p>
-                <p class="mt-1 text-sm text-cyan-200">New picture</p>
+                <p class="mt-1 text-sm text-cyan-200">{{ t('New picture') }}</p>
               </figcaption>
             </figure>
           }
         </div>
       } @else {
-        <p class="p-5 text-sm text-slate-400 sm:p-6">No pictures uploaded for this car yet.</p>
+        <p class="p-5 text-sm text-slate-400 sm:p-6">{{ t('No pictures uploaded for this car yet.') }}</p>
       }
     </section>
   </div>

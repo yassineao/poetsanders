@@ -37,7 +37,9 @@ public class ContactMessage {
     private UUID id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
+    // Nullable only for legacy contact rows created before V13 introduced user_id.
+    // Every new contact request still supplies an authenticated user.
+    @JoinColumn(name = "user_id")
     private User user;
 
     @Column(name = "company_name", nullable = false, length = 120)

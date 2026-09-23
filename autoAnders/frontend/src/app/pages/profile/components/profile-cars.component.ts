@@ -1,5 +1,7 @@
+import type { Locale } from '../../../core/interfaces/locale';
+import { translateUi } from '../../../core/lib/i18n/ui-translations';
 import { CommonModule } from "@angular/common";
-import { Component, computed, inject, signal } from "@angular/core";
+import { Component, computed, inject, signal , input } from "@angular/core";
 import { FormsModule, NgForm } from "@angular/forms";
 import { catchError, finalize, forkJoin, of } from "rxjs";
 import { CarsService } from "../../../core/cars/cars.service";
@@ -34,6 +36,11 @@ interface CarColorOption {
   templateUrl: "./profile-cars.component.html",
 })
 export class ProfileCarsComponent {
+  protected t(value: string): string {
+    return translateUi(value, this.locale());
+  }
+
+  readonly locale = input.required<Locale>();
   private readonly carsService = inject(CarsService);
 
   protected readonly cars = signal<Car[]>([]);
@@ -52,6 +59,8 @@ export class ProfileCarsComponent {
   protected readonly editColorPickerOpen = signal<string | null>(null);
   protected readonly creatingCar = signal(false);
   protected readonly hasCars = computed(() => this.cars().length > 0);
+  protected readonly pendingCars = computed(() => this.cars().filter(car => String(car.status) === "Pending_Confirmation").length);
+  protected readonly availableCars = computed(() => this.cars().filter(car => String(car.status) === "Available").length);
   protected readonly addSteps = ["Basics", "Specs", "Finance", "Pictures"];
   protected readonly colorOptions: CarColorOption[] = [
     { label: "Black", hex: "#111827" },
@@ -217,7 +226,7 @@ export class ProfileCarsComponent {
         }),
         finalize(() => this.loading.set(false)),
       )
-      .subscribe((cars) => this.cars.set(cars));
+      .subscribe((cars) => this.cars.set(cars.map(car => ({ ...car, pictures: car.pictures ?? [] }))));
   }
 
   protected openAddCar(): void {
@@ -377,7 +386,7 @@ export class ProfileCarsComponent {
       return;
     }
 
-    if (!window.confirm(`Delete ${picture.title || "this picture"}? This cannot be undone.`)) {
+    if (!window.confirm(this.t("Delete {name}? This cannot be undone.").replace('{name}', picture.title || this.t("this picture")))) {
       return;
     }
 
@@ -439,11 +448,24 @@ export class ProfileCarsComponent {
   }
 
   protected statusLabel(car: Car): string {
-    return String(car.status || "No status").replaceAll("_", " ");
+    return this.t(String(car.status || "No status"));
   }
 
   protected colorLabel(hex: string): string {
     return this.colorOptions.find((option) => option.hex === hex)?.label ?? hex;
+  }
+
+  protected formatNumber(value: number | null | undefined): string {
+    return new Intl.NumberFormat(this.locale()).format(value ?? 0);
+  }
+
+  protected formatPrice(value: number | null | undefined): string {
+    if (!value) return "-";
+    return new Intl.NumberFormat(this.locale(), {
+      style: "currency",
+      currency: "EUR",
+      maximumFractionDigits: 0,
+    }).format(value);
   }
 
   protected saveCar(car: Car, form: NgForm): void {
@@ -454,7 +476,7 @@ export class ProfileCarsComponent {
 
     const values = this.valuesFor(car);
     const request = this.toCarRequest(values, car.status);
-    if (!window.confirm(`Save changes to ${car.brand} ${car.model}?`)) {
+    if (!window.confirm(this.t("Save changes to {name}?").replace('{name}', car.brand + ' ' + car.model))) {
       return;
     }
 
@@ -482,7 +504,7 @@ export class ProfileCarsComponent {
       return;
     }
 
-    if (!window.confirm(`Delete ${car.brand} ${car.model}? This cannot be undone.`)) {
+    if (!window.confirm(this.t("Delete {name}? This cannot be undone.").replace('{name}', car.brand + ' ' + car.model))) {
       return;
     }
 
@@ -584,7 +606,7 @@ export class ProfileCarsComponent {
       numberOfKeys: 0,
       licensePlate: "",
       engineDisplacement: 0,
-      colour: this.colorOptions[0].hex,
+      colour: "#111827",
       emptyWeight: 0,
       taxAdditionPercentage: 0,
       apkMotDate: "",
@@ -606,7 +628,7 @@ export class ProfileCarsComponent {
   }
 
   private finishCreateCar(car: Car): void {
-    this.cars.update((cars) => [car, ...cars]);
+    this.cars.update((cars) => [{ ...car, pictures: car.pictures ?? [] }, ...cars]);
     this.addPanelOpen.set(false);
     this.addStep.set(0);
     this.addColorPickerOpen.set(false);

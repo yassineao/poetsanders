@@ -6,7 +6,7 @@ const bodyTypeOptions = [
   { value: "SEDAN", label: "Sedan" },
   { value: "HATCHBACK", label: "Hatchback" },
   { value: "STATION_WAGON", label: "Stationwagen" },
-  { value: "COUPE", label: "Coupe" },
+  { value: "COUPE", label: "Coupé" },
   { value: "CABRIOLET", label: "Cabriolet" },
   { value: "VAN", label: "Bestelwagen" },
 ];
@@ -43,7 +43,7 @@ const paintTypeOptions = [
 const upholsteryOptions = [
   { value: "FABRIC", label: "Stof" },
   { value: "LEATHER", label: "Leer" },
-  { value: "PART_LEATHER", label: "Half leder" },
+  { value: "PART_LEATHER", label: "Halfleer" },
   { value: "ALCANTARA", label: "Alcantara" },
 ];
 
@@ -105,7 +105,7 @@ export const nlSellCopy: Copy["sell"] = {
     { name: "engineDisplacement", label: "Cilinderinhoud", type: "number" },
     { name: "colour", label: "Kleur", type: "select", options: colorOptions, required: true },
     { name: "emptyWeight", label: "Leeggewicht", type: "number" },
-    { name: "taxAdditionPercentage", label: "Bijtelling percentage", type: "number" },
+    { name: "taxAdditionPercentage", label: "Bijtellingspercentage", type: "number" },
     { name: "apkMotDate", label: "APK-datum", type: "text" },
     { name: "serviceDocumentation", label: "Onderhoudsdocumentatie", type: "checkbox" },
     { name: "location", label: "Locatie", type: "text" },
@@ -128,7 +128,7 @@ export const nlSellCopy: Copy["sell"] = {
       type: "file",
       accept: "image/*",
       multiple: true,
-      placeholder: "Kies voertuigfotos",
+      placeholder: "Kies voertuigfoto’s",
     },
   ],
   // textarea: { name: "message", label: "Bericht", rows: 5 },

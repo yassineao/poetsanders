@@ -1,3 +1,4 @@
+import { translateUi } from '../../../core/i18/ui-translations';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, DestroyRef, PLATFORM_ID, computed, inject, signal } from '@angular/core';
@@ -43,6 +44,9 @@ import { AdminUsersComponent } from '../components/admin-users/admin-users.compo
   templateUrl: './admin-dashboard-page.component.html',
 })
 export class AdminDashboardPageComponent {
+  private t(value: string): string {
+    return translateUi(value, this.i18n.getCurrentLanguage());
+  }
   private readonly admin = inject(AdminService);
   private readonly carsService = inject(CarsService);
   private readonly i18n = inject(I18nService);
@@ -103,7 +107,7 @@ export class AdminDashboardPageComponent {
       this.dashboard.set(dashboard);
     });
 
-  this.carsService
+  this.admin
     .getCars()
     .pipe(
       catchError((error: HttpErrorResponse) => {
@@ -131,7 +135,7 @@ export class AdminDashboardPageComponent {
       return;
     }
 
-    if (!window.confirm(`Accept appointment for ${appointment.customerName}?`)) {
+    if (!window.confirm(this.t("Accept appointment for {name}?").replace('{name}', appointment.customerName))) {
       return;
     }
 
@@ -215,7 +219,7 @@ export class AdminDashboardPageComponent {
       return;
     }
 
-    if (!window.confirm(`Change status for ${change.car.brand} ${change.car.model}?`)) {
+    if (!window.confirm(this.t("Change status for {name}?").replace('{name}', change.car.brand + ' ' + change.car.model))) {
       return;
     }
 

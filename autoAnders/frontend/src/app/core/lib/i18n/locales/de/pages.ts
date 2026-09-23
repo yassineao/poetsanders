@@ -65,7 +65,7 @@ export const dePagesCopy: Copy["pages"] = {
       intro:
         "Auf dieser Seite wird erklaert, wie personenbezogene Daten auf dieser Website sowie waehrend der Kundenkommunikation und Leistungserbringung erhoben, verwendet, gespeichert, weitergegeben und geschuetzt werden.",
       heroMeta: [
-        "Zuletzt aktualisiert: [DATE]",
+        // Publication date must be supplied by the business.
         "Konform mit GDPR Art. 13 & 14",
         "Version 1.0",
       ],
@@ -284,8 +284,8 @@ export const dePagesCopy: Copy["pages"] = {
             "Privacy & GDPR: privacy@autoanders.com\nDatenschutzbeauftragter: dpo@autoanders.com (falls vorhanden)\nPost: AutoAnders, [Vollstaendige Anschrift], z. Hd. Privacy Team\nAntwortfrist: Innerhalb von 30 Kalendertagen (GDPR-Frist)",
         },
       ],
-      note:
-        "Vor der Veroeffentlichung ersetzen Sie bitte alle Platzhalter wie [DATE], Firmenname, Anschrift, USt-Nummer, Privacy-E-Mail und DPO-Angaben. Pruefen Sie zudem, dass die aufgefuehrten Tools, Auftragsverarbeiter, Aufbewahrungsfristen und Rechtsgrundlagen mit den tatsaechlich eingesetzten Services des Live-Betriebs uebereinstimmen.",
+      // Editorial reminder (not displayed):
+      // "Vor der Veroeffentlichung ersetzen Sie bitte alle Platzhalter wie [DATE], Firmenname, Anschrift, USt-Nummer, Privacy-E-Mail und DPO-Angaben. Pruefen Sie zudem, dass die aufgefuehrten Tools, Auftragsverarbeiter, Aufbewahrungsfristen und Rechtsgrundlagen mit den tatsaechlich eingesetzten Services des Live-Betriebs uebereinstimmen."
     },
     impressum: {
       metadata: {
@@ -306,7 +306,7 @@ export const dePagesCopy: Copy["pages"] = {
       intro:
         "Diese Seite enthält die gesetzlich vorgeschriebenen Anbieter- und Offenlegungsangaben für die AutoAnders-Website.",
       heroMeta: [
-        "Zuletzt aktualisiert: [DATUM]",
+        // Publication date must be supplied by the business.
         "Gerichtsstand: Europäische Union",
         "Gilt für alle EU-Besucher",
       ],
@@ -384,12 +384,12 @@ export const dePagesCopy: Copy["pages"] = {
           ],
         },
       ],
-      note:
-        "Vor Veröffentlichung alle Platzhalter ersetzen (Name, Adresse, VAT, Hosting etc.).",
+      // Editorial reminder (not displayed):
+      // "Vor Veröffentlichung alle Platzhalter ersetzen (Name, Adresse, VAT, Hosting etc.)."
     },
     terms: {
       metadata: {
-        title: "TEST TITLE",
+        title: "Allgemeine Geschäftsbedingungen | AutoAnders",
         description:
           "Allgemeine Geschäftsbedingungen fuer AutoAnders Leistungen rund um Autokauf, Autoverkauf, Inzahlungnahme, Finanzierung und Fahrzeuganfragen.",
         locale: "de_DE",
@@ -406,7 +406,7 @@ export const dePagesCopy: Copy["pages"] = {
       intro:
         "Diese Seite beschreibt die Bedingungen für AutoAnders Leistungen rund um Fahrzeuganfragen, Autokauf, Autoverkauf, Inzahlungnahme, Finanzierung, Zahlung, Haftung und Streitbeilegung.",
       heroMeta: [
-        "Zuletzt aktualisiert: [DATUM]",
+        // Publication date must be supplied by the business.
         "Richtlinie 2011/83/EU konform",
         "Version 1.0",
       ],
@@ -659,7 +659,7 @@ export const dePagesCopy: Copy["pages"] = {
       intro:
         "Auf dieser Seite wird erklaert, wie Cookies und aehnliche Technologien auf dieser Website verwendet werden, welche Kategorien es gibt und wie Einwilligungen verwaltet werden koennen.",
       heroMeta: [
-        "Zuletzt aktualisiert: [DATE]",
+        // Publication date must be supplied by the business.
         "Konform mit CNIL- und EDPB-Leitlinien",
         "Version 1.0",
       ],
@@ -819,7 +819,7 @@ export const dePagesCopy: Copy["pages"] = {
           ],
         },
       ],
-      note:
-        "Vor der Veroeffentlichung ersetzen Sie bitte [DATE], falls erforderlich, und stellen Sie sicher, dass die aufgefuehrten Cookies und Drittanbieter-Dienste den tatsaechlich auf der Live-Website eingesetzten Tools entsprechen.",
+      // Editorial reminder (not displayed):
+      // "Vor der Veroeffentlichung ersetzen Sie bitte [DATE], falls erforderlich, und stellen Sie sicher, dass die aufgefuehrten Cookies und Drittanbieter-Dienste den tatsaechlich auf der Live-Website eingesetzten Tools entsprechen."
     },
   };

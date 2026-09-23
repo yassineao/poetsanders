@@ -28,6 +28,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.List;
 import java.util.UUID;
 import java.util.Map;
 
@@ -103,6 +104,11 @@ public class AdminDashboardController {
     ) {
         adminDashboardService.deleteCar(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/cars")
+    public ResponseEntity<List<Car>> getCars() {
+        return ResponseEntity.ok(adminDashboardService.getCars());
     }
 
     @PatchMapping("/cars/{id}")

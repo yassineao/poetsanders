@@ -1,3 +1,4 @@
+import { translateUi } from '../../../../core/i18/ui-translations';
 import { CommonModule } from '@angular/common';
 import { Component, DestroyRef, computed, inject, input, output, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -18,6 +19,10 @@ const pageSize = 10;
   templateUrl: './admin-contacts.component.html',
 })
 export class AdminContactsComponent {
+  protected t(value: string): string {
+    return translateUi(value, this.i18n.getCurrentLanguage());
+  }
+
   readonly contactMessages = input.required<AdminContactMessage[]>();
   readonly contactUpdated = output<AdminContactMessage>();
   readonly contactDeleted = output<string>();
@@ -135,7 +140,7 @@ export class AdminContactsComponent {
       return;
     }
 
-    if (!window.confirm(`Delete contact message from ${message.email}?`)) {
+    if (!window.confirm(this.t("Delete contact message from {name}?").replace('{name}', message.email))) {
       return;
     }
 

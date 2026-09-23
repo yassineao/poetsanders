@@ -1,3 +1,4 @@
+import { translateUi } from '../../../core/lib/i18n/ui-translations';
 import { CommonModule } from "@angular/common";
 import { Component, computed, input, signal } from "@angular/core";
 import { FormsModule } from "@angular/forms";
@@ -11,6 +12,10 @@ import type { Locale } from "../../../core/interfaces/locale";
   templateUrl: "./catalogue.component.html",
 })
 export class CatalogueComponent {
+  protected t(value: string): string {
+    return translateUi(value, this.locale());
+  }
+
   readonly cars = input.required<CatalogueCar[]>();
   readonly locale = input.required<Locale>();
   readonly title = input.required<string>();
@@ -20,9 +25,16 @@ export class CatalogueComponent {
   readonly loaded = input(true);
 
   protected readonly search = signal("");
+  protected readonly filtersOpen = signal(false);
   protected readonly selectedImage = signal<string | null>(null);
   protected readonly selectedImages = signal<string[]>([]);
   protected readonly brand = signal("All");
+  protected readonly transmission = signal("All");
+  protected readonly fuel = signal("All");
+  protected readonly vehicle = signal("All");
+  protected readonly doorCount = signal("All");
+  protected readonly maxMileage = signal<number | null>(null);
+  protected readonly maxPrice = signal<number | null>(null);
   protected readonly selectedCar = signal<CatalogueCar | null>(null);
   protected readonly colorOptions = [
     { label: "Black", hex: "#111827" },
@@ -38,6 +50,20 @@ export class CatalogueComponent {
     { label: "Beige", hex: "#d6c7a1" },
   ];
   protected readonly brands = computed(() => ["All", ...new Set(this.cars().map((car) => car.brand))]);
+  protected readonly transmissions = computed(() => this.uniqueValues(car => car.transmission));
+  protected readonly fuels = computed(() => this.uniqueValues(car => car.fuel));
+  protected readonly vehicles = computed(() => this.uniqueValues(car => car.vehicle));
+  protected readonly doorCounts = computed(() => [
+    "All",
+    ...new Set(this.cars().map(car => car.numberOfDoors).filter(value => value > 0).map(String)),
+  ]);
+  protected readonly activeFilterCount = computed(() => [
+    this.brand(),
+    this.transmission(),
+    this.fuel(),
+    this.vehicle(),
+    this.doorCount(),
+  ].filter(value => value !== "All").length + Number(this.maxMileage() !== null) + Number(this.maxPrice() !== null));
   protected readonly filteredCars = computed(() => {
     const query = this.search().trim().toLowerCase();
     return this.cars().filter((car) => {
@@ -54,14 +80,41 @@ export class CatalogueComponent {
         ...tags,
       ]
         .filter(value => value !== null && value !== undefined)
+        .map(value => this.t(String(value)))
         .join(' ')
         .toLowerCase();
-      return (!query || text.includes(query)) && (this.brand() === "All" || car.brand === this.brand());
+      return (!query || text.includes(query))
+        && (this.brand() === "All" || car.brand === this.brand())
+        && (this.transmission() === "All" || car.transmission === this.transmission())
+        && (this.fuel() === "All" || car.fuel === this.fuel())
+        && (this.vehicle() === "All" || car.vehicle === this.vehicle())
+        && (this.doorCount() === "All" || car.numberOfDoors === Number(this.doorCount()))
+        && (this.maxMileage() === null || car.mileage <= this.maxMileage()!)
+        && (this.maxPrice() === null || car.price <= this.maxPrice()!);
     });
   });
 
+  protected resetFilters(): void {
+    this.search.set("");
+    this.brand.set("All");
+    this.transmission.set("All");
+    this.fuel.set("All");
+    this.vehicle.set("All");
+    this.doorCount.set("All");
+    this.maxMileage.set(null);
+    this.maxPrice.set(null);
+  }
+
+  private uniqueValues(selector: (car: CatalogueCar) => string): string[] {
+    return ["All", ...new Set(this.cars().map(selector).filter(Boolean))];
+  }
+
+  protected formatNumber(value: number): string {
+    return new Intl.NumberFormat(this.locale()).format(value);
+  }
+
   protected formatPrice(value: number): string {
-    return new Intl.NumberFormat("nl-NL", { style: "currency", currency: "EUR", maximumFractionDigits: 0 }).format(value);
+    return new Intl.NumberFormat(this.locale(), { style: "currency", currency: "EUR", maximumFractionDigits: 0 }).format(value);
   }
 
   protected formatOptionalPrice(value: number | null | undefined): string {
@@ -70,7 +123,7 @@ export class CatalogueComponent {
 
   protected detailValue(value: boolean | number | string | null | undefined, suffix = ""): string {
     if (typeof value === "boolean") {
-      return value ? "Yes" : "No";
+      return this.t(value ? "Yes" : "No");
     }
 
     if (value === null || value === undefined || value === "") {
@@ -78,10 +131,10 @@ export class CatalogueComponent {
     }
 
     if (typeof value === "number") {
-      return value > 0 ? `${new Intl.NumberFormat("nl-NL").format(value)}${suffix}` : "-";
+      return value > 0 ? `${new Intl.NumberFormat(this.locale()).format(value)}${suffix}` : "-";
     }
 
-    return `${value}${suffix}`;
+    return `${this.t(value)}${suffix}`;
   }
 
   protected imagesFor(car: CatalogueCar): string[] {

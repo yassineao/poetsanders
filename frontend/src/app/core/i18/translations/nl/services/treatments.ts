@@ -7,6 +7,9 @@ export const nlServicesTreatmentsCopy: ServicesTreatmentsCopy = {
     'Kies uit complete autoverzorging, een gerichte interieur- of exterieurbehandeling, koplampherstel of een ozonbehandeling tegen hardnekkige geuren.',
   includedLabel: 'Inbegrepen diensten',
   detailLinkLabel: 'Meer informatie',
+  beforeLabel: 'Voor',
+  afterLabel: 'Na',
+  comparisonLabel: 'Sleep om voor en na te vergelijken',
   benefitsLabel: 'Uw voordelen',
   processLabel: 'Zo verloopt de behandeling',
   backLabel: 'Terug naar alle diensten',
@@ -16,11 +19,11 @@ export const nlServicesTreatmentsCopy: ServicesTreatmentsCopy = {
   items: [
     {
       slug: 'total-treatment',
-      title: 'Total Treatment',
+      title: 'Totaalbehandeling',
       description:
         'Een complete opfrisbeurt van binnen en buiten voor auto\'s die de volledige Poets Anders afwerking nodig hebben.',
       longDescription:
-        'De Total Treatment combineert een grondige interieurreiniging met zorgvuldige exterieurverzorging. Alle belangrijke oppervlakken worden systematisch behandeld, zodat het interieur fris aanvoelt en de buitenkant weer een verzorgde, gelijkmatige afwerking krijgt.',
+        'De Totaalbehandeling combineert een grondige interieurreiniging met zorgvuldige exterieurverzorging. Alle belangrijke oppervlakken worden systematisch behandeld, zodat het interieur fris aanvoelt en de buitenkant weer een verzorgde, gelijkmatige afwerking krijgt.',
       image: '/beautiful-car-washing-service.jpg',
       services: ['Interieurbehandeling', 'Exterieurbehandeling'],
       benefits: ['Complete verzorging in één afspraak', 'Afgestemde behandeling van binnen en buiten', 'Ideaal voor intensief gebruikte auto\'s'],
@@ -30,7 +33,7 @@ export const nlServicesTreatmentsCopy: ServicesTreatmentsCopy = {
           {
             heading: 'Laat uw auto van binnen en buiten weer stralen',
             paragraphs: [
-              'Glans de lak van uw auto niet meer zoals vroeger en is het interieur vuil of dof geworden? De Total Treatment van Poets Anders combineert professionele interieur- en exterieurverzorging, zodat de complete auto er weer fris en verzorgd uitziet.',
+              'Glans de lak van uw auto niet meer zoals vroeger en is het interieur vuil of dof geworden? De Totaalbehandeling van Poets Anders combineert professionele interieur- en exterieurverzorging, zodat de complete auto er weer fris en verzorgd uitziet.',
               'In het interieur reinigen we geschikte bekleding en behandelen we kunststof oppervlakken voor een nette, opgefriste cabine. De behandeling wordt afgestemd op de materialen en de staat van het interieur.',
             ],
           },
@@ -42,7 +45,7 @@ export const nlServicesTreatmentsCopy: ServicesTreatmentsCopy = {
             ],
           },
         ],
-        odorsHeading: 'Wat doen we tijdens de Total Treatment?',
+        odorsHeading: 'Wat doen we tijdens de Totaalbehandeling?',
         odorsDescription: 'De complete behandeling combineert de volgende interieur- en exterieurdiensten:',
         odors: [
           'Interieurbehandeling',
