@@ -152,12 +152,33 @@
   display: block;
 }
 
+/* Loop the hero comparison from the dirty (left) half to the clean (right) half. */
+.home-hero-before {
+  clip-path: inset(0 50.5% 0 0);
+  animation: home-hero-before-wipe 9s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+@keyframes home-hero-before-wipe {
+  0%, 12%, 100% { clip-path: inset(0 50.5% 0 0); }
+  48%, 64% { clip-path: inset(0 100% 0 0); }
+}
+
 @media (min-width: 1024px) {
   .desktop-only {
     display: block;
   }
 
   .mobile-only {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .home-hero-before {
+    animation: none;
+  }
+
+  .home-hero-before {
     display: none;
   }
 }

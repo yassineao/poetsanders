@@ -4,6 +4,8 @@ import type { HomeHeroCopy } from '../../../../core/interfaces/home';
 
 type HeroContent = HomeHeroCopy & {
   description: string;
+  beforeLabel?: string;
+  afterLabel?: string;
   highlightTitle?: string;
   highlightBody?: string;
   serviceNames?: string[];
@@ -27,6 +29,8 @@ const defaultHero: HeroContent = {
     items: [],
   },
   description: '',
+  beforeLabel: 'Before',
+  afterLabel: 'After',
   highlightTitle: '',
   highlightBody: '',
   serviceNames: [],

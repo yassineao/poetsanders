@@ -28,6 +28,10 @@
     </div>
   </section>
 
+  <app-catalogue [cars]="cars()" [locale]="locale()" [title]="home().catalogue.title"
+                 [subtitle]="home().catalogue.subtitle" [labels]="home().catalogue.labels" [showMoreButton]="true"
+                 [loaded]="carsLoaded()" />
+
   <section id="services" class="px-4 py-16 sm:px-6 lg:px-8">
     <div class="mx-auto max-w-7xl">
       <p class="text-sm font-semibold uppercase tracking-widest text-red-500">{{ home().services.eyebrow }}</p>
@@ -49,9 +53,7 @@
     </div>
   </section>
 
-  <app-catalogue [cars]="cars()" [locale]="locale()" [title]="home().catalogue.title"
-    [subtitle]="home().catalogue.subtitle" [labels]="home().catalogue.labels" [showMoreButton]="true"
-    [loaded]="carsLoaded()" />
+
 
   <section id="advantages" class="px-4 py-16 sm:px-6 lg:px-8">
     <div class="mx-auto max-w-7xl text-center">
