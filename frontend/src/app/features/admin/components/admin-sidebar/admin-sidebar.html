@@ -1,6 +1,6 @@
 <div class="sticky top-16 z-40 border-b border-white/10 bg-slate-950 px-4 py-3 md:hidden">
   <div class="flex items-center justify-between gap-4">
-    <a routerLink="/" class="text-sm font-bold text-white">Poets Anders Admin</a>
+    <a routerLink="/" class="text-sm font-bold text-white">Poets Anders {{ i18n.copy().navbar.adminLabel }}</a>
     <button
       type="button"
       class="grid h-11 w-11 shrink-0 place-items-center rounded-lg border border-white/10 text-slate-200 transition hover:bg-white/5"
@@ -30,7 +30,7 @@
   <div class="border-b border-white/10 px-5 py-6">
     <a routerLink="/" class="block focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300">
       <span class="block text-lg font-bold text-white">Poets Anders</span>
-      <span class="mt-1 block text-xs font-semibold uppercase text-cyan-300">Admin</span>
+      <span class="mt-1 block text-xs font-semibold uppercase text-cyan-300">{{ i18n.copy().navbar.adminLabel }}</span>
     </a>
   </div>
 

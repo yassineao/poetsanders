@@ -44,7 +44,7 @@
                 <span class="block text-xs uppercase tracking-[0.16em] text-zinc-500">
                   {{ paginationLabels().pageLabel }} {{ stepIndex + 1 }}
                 </span>
-                <span class="mt-1 block">{{ step.label }}</span>
+                <span class="mt-1 block">{{ t(step.label) }}</span>
               </button>
             }
           </div>
@@ -55,7 +55,7 @@
             <p class="text-xs font-bold uppercase tracking-[0.18em] text-red-400">
               {{ paginationLabels().pageLabel }} {{ currentPage() + 1 }} {{ paginationLabels().ofLabel }} {{ totalPages() }}
             </p>
-            <h2 class="mt-1 text-xl font-black text-white">{{ step.label }}</h2>
+            <h2 class="mt-1 text-xl font-black text-white">{{ t(step.label) }}</h2>
           </div>
         }
 

@@ -2,10 +2,10 @@ import type { AdminCopy } from '../../../interfaces/admin';
 
 export const nlAdminCopy: AdminCopy = {
   eyebrow: 'Beheer',
-  heading: 'Admin dashboard',
+  heading: 'Beheerdashboard',
   description: 'Bekijk klantaccounts en alle poetsafspraken op één plek.',
   loadingLabel: 'Dashboard laden...',
-  errorLabel: 'Het admin dashboard kon niet worden geladen.',
+  errorLabel: 'Het beheerdashboard kon niet worden geladen.',
   usersStatLabel: 'Gebruikers',
   appointmentsStatLabel: 'Afspraken',
   pendingStatLabel: 'In afwachting',

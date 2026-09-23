@@ -25,6 +25,9 @@ export interface ServicesTreatmentsCopy {
   description: string;
   includedLabel: string;
   detailLinkLabel: string;
+  beforeLabel: string;
+  afterLabel: string;
+  comparisonLabel: string;
   benefitsLabel: string;
   processLabel: string;
   backLabel: string;

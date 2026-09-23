@@ -64,7 +64,7 @@ export const enPagesCopy: Copy["pages"] = {
         intro:
           "This page explains how personal data is collected, used, stored, shared, and protected on this website and during client communication and service delivery.",
         heroMeta: [
-          "Last updated: [DATE]",
+          // Publication date must be supplied by the business.
           "GDPR Art. 13 & 14 compliant",
           "Version 1.0",
         ],
@@ -367,8 +367,8 @@ export const enPagesCopy: Copy["pages"] = {
               "Privacy & GDPR: privacy@autoanders.com\nData Protection Officer: dpo@autoanders.com (if applicable)\nPost: AutoAnders, [Full address], Attn: Privacy Team\nResponse time: Within 30 calendar days (GDPR deadline)",
           },
         ],
-        note:
-          "Before publishing, replace all placeholders such as [DATE], company name, address, VAT number, privacy email, and DPO details. Also verify that the listed tools, processors, retention periods, and legal bases match the services actually used by the live business.",
+        // Editorial reminder (not displayed):
+        // "Before publishing, replace all placeholders such as [DATE], company name, address, VAT number, privacy email, and DPO details. Also verify that the listed tools, processors, retention periods, and legal bases match the services actually used by the live business."
       },
       impressum: {
         metadata: {
@@ -389,7 +389,7 @@ export const enPagesCopy: Copy["pages"] = {
         intro:
           "This page contains the mandatory provider and legal disclosure information for the AutoAnders website.",
         heroMeta: [
-          "Last updated: [DATE]",
+          // Publication date must be supplied by the business.
           "Jurisdiction: European Union",
           "Applicable to all EU visitors",
         ],
@@ -494,8 +494,8 @@ export const enPagesCopy: Copy["pages"] = {
             ],
           },
         ],
-        note:
-          "Before publishing, replace all placeholders such as [DATE], company name, legal form, share capital, address, registration number, VAT number, publication director, contact details, hosting provider details, and country of registration.",
+        // Editorial reminder (not displayed):
+        // "Before publishing, replace all placeholders such as [DATE], company name, legal form, share capital, address, registration number, VAT number, publication director, contact details, hosting provider details, and country of registration."
       },
       terms: {
         metadata: {
@@ -516,7 +516,7 @@ export const enPagesCopy: Copy["pages"] = {
         intro:
           "This page sets out the terms governing AutoAnders services, including vehicle inquiries, car sales, trade-ins, financing support, payments, liability, and dispute resolution.",
         heroMeta: [
-          "Last updated: [DATE]",
+          // Publication date must be supplied by the business.
           "Directive 2011/83/EU compliant",
           "Version 1.0",
         ],
@@ -916,8 +916,8 @@ export const enPagesCopy: Copy["pages"] = {
             ],
           },
         ],
-        note:
-          "Before publishing, replace all placeholders such as [DATE], company name, address, VAT, legal email, contact email, deposit percentage, notice periods, and country/jurisdiction details. Also make sure the payment methods, services, and legal terms match your actual business operations.",
+        // Editorial reminder (not displayed):
+        // "Before publishing, replace all placeholders such as [DATE], company name, address, VAT, legal email, contact email, deposit percentage, notice periods, and country/jurisdiction details. Also make sure the payment methods, services, and legal terms match your actual business operations."
       },
       cookie: {
         metadata: {
@@ -938,7 +938,7 @@ export const enPagesCopy: Copy["pages"] = {
         intro:
           "This page explains how cookies and similar technologies are used on this website, which categories exist, and how consent can be managed.",
         heroMeta: [
-          "Last updated: [DATE]",
+          // Publication date must be supplied by the business.
           "CNIL & EDPB guidelines compliant",
           "Version 1.0",
         ],
@@ -1098,7 +1098,7 @@ export const enPagesCopy: Copy["pages"] = {
             ],
           },
         ],
-        note:
-          "Before publishing, replace [DATE] if needed and make sure the listed cookies and third-party services match the tools actually used on the live website.",
+        // Editorial reminder (not displayed):
+        // "Before publishing, replace [DATE] if needed and make sure the listed cookies and third-party services match the tools actually used on the live website."
       },
     };

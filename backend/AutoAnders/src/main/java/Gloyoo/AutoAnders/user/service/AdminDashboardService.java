@@ -240,6 +240,10 @@ public class AdminDashboardService {
         carService.deleteCar(id);
     }
 
+    public List<Car> getCars() {
+        return carService.findAllCars();
+    }
+
     @Transactional
     public Car createCar(UUID adminId, AdminCarCreateRequest request) {
         User admin = userRepository.findById(adminId)

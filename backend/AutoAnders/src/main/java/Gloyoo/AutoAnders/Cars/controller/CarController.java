@@ -39,10 +39,14 @@ public class CarController {
     @PostMapping
     public ResponseEntity<Car> addCar(
             @Valid @RequestBody CarRequest carRequest,
-            Authentication authentication
+        Authentication authentication
     ) {
         UUID userId = authenticatedUserId(authentication);
-        Car savedCar = carService.addCar(carRequest, userId);
+        Car savedCar = carService.addCar(
+                carRequest,
+                userId,
+                authenticatedRole(authentication)
+        );
 
         userRepository.findById(userId)
                 .ifPresent(user -> sendCarRequestConfirmation(user, savedCar));
@@ -52,7 +56,7 @@ public class CarController {
 
     @GetMapping
     public ResponseEntity<List<Car>> getAllCars() {
-        return ResponseEntity.ok(carService.findAllCars());
+        return ResponseEntity.ok(carService.findAvailableCars());
     }
 
     @GetMapping("/{id}")

@@ -9,7 +9,7 @@ export const nlFaqCopy: FaqCopy = {
     {
       question: 'Welke behandeling past bij mijn auto?',
       answer:
-        'Kies de Total Treatment voor complete verzorging van binnen en buiten. Kies een interieur- of exterieurbehandeling voor gericht werk, koplampbehandeling voor doffe lampen of ozonbehandeling tegen hardnekkige geuren.',
+        'Kies de Totaalbehandeling voor complete verzorging van binnen en buiten. Kies een interieur- of exterieurbehandeling voor gericht werk, koplampbehandeling voor doffe lampen of ozonbehandeling tegen hardnekkige geuren.',
     },
     {
       question: 'Hoe lang duurt een behandeling?',

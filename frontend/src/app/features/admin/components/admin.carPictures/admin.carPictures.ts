@@ -1,3 +1,4 @@
+import { translateUi } from '../../../../core/i18/ui-translations';
 import { CommonModule } from '@angular/common';
 import { afterNextRender, Component, computed, effect, inject, Injector, input, output, signal, untracked } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
@@ -21,6 +22,10 @@ interface PendingPicture {
   templateUrl: './admin.carPicture.html',
 })
 export class AdminCarPicturesComponent {
+  protected t(value: string): string {
+    return translateUi(value, this.i18n.getCurrentLanguage());
+  }
+
   readonly car = input<Car | null>(null);
   readonly closed = output<void>();
   readonly picturesChanged = output<CarPicture[]>();
@@ -152,7 +157,7 @@ export class AdminCarPicturesComponent {
       this.removedPictureIds.set([]);
       await this.loadImageUrls(updatedPictures);
     } catch {
-      this.errorMessage.set('Could not save picture changes. Please try again.');
+      this.errorMessage.set(this.t('Could not save picture changes. Please try again.'));
     } finally {
       this.saving.set(false);
     }

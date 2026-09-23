@@ -1,11 +1,11 @@
 <section class="border-t border-white/10 bg-slate-900/50">
-  <div class="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8 lg:py-24 sm:py-16">
-    <div class="grid gap-8 lg:grid-cols-[1.35fr_0.65fr] sm:gap-12">
-      <div class="space-y-12">
+  <div class="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-16 lg:px-8 lg:py-24">
+    <div class="grid gap-8 sm:gap-12 lg:grid-cols-[1.35fr_0.65fr]">
+      <div class="space-y-8 sm:space-y-12">
         <article *ngFor="let section of details.sections">
           <h2 class="text-2xl font-semibold tracking-tight text-white sm:text-3xl">{{ section.heading }}</h2>
-          <div class="mt-5 space-y-4">
-            <p *ngFor="let paragraph of section.paragraphs" class="text-base leading-8 text-slate-300">
+          <div class="mt-4 space-y-3 sm:mt-5 sm:space-y-4">
+            <p *ngFor="let paragraph of section.paragraphs" class="text-sm leading-7 text-slate-300 sm:text-base sm:leading-8">
               {{ paragraph }}
             </p>
           </div>
@@ -31,9 +31,7 @@
         </article>
 
         <article class="rounded-lg bg-cyan-200 p-4 text-slate-950 shadow-xl shadow-cyan-950/20 sm:p-6">
-          <p class="text-sm font-semibold uppercase tracking-[0.18em]">{{ details.priceLabel }}</p>
-          <p class="mt-2 text-3xl font-bold sm:text-4xl">{{ details.price }}</p>
-          <h2 class="mt-6 text-xl font-semibold">{{ details.ctaHeading }}</h2>
+          <h2 class="text-xl font-semibold">{{ details.ctaHeading }}</h2>
           <a
             [routerLink]="copy.bookLink"
             class="mt-5 inline-flex w-full items-center justify-center rounded-md bg-slate-950 px-5 py-3 text-sm font-bold text-white transition hover:bg-slate-800"

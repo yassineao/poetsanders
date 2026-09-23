@@ -50,7 +50,7 @@
                 </p>
               }
               <label class="mt-4 block">
-                <span class="text-xs font-bold uppercase tracking-[0.18em] text-cyan-200">Reply</span>
+                <span class="text-xs font-bold uppercase tracking-[0.18em] text-cyan-200">{{ t('Reply') }}</span>
                 <textarea
                   [value]="replyValue(message)"
                   (input)="updateReplyDraft(message, $event)"
@@ -58,17 +58,17 @@
                   class="mt-2 w-full resize-y rounded-lg border border-white/10 bg-slate-950 px-3 py-2 text-sm text-white outline-none transition placeholder:text-slate-600 focus:border-cyan-300/50"></textarea>
               </label>
               @if (message.repliedAt) {
-                <p class="mt-2 text-xs text-slate-500">Replied {{ formatDate(message.repliedAt) }}</p>
+                <p class="mt-2 text-xs text-slate-500">{{ t('Replied') }} {{ formatDate(message.repliedAt) }}</p>
               }
             </td>
             <td role="cell" [attr.data-label]="copy().statusLabel" class="px-6 py-4">
               <span
                 class="rounded-full px-2.5 py-1 text-xs font-bold"
                 [ngClass]="message.status === 'NEW' ? 'bg-cyan-300/10 text-cyan-200' : message.status === 'READ' ? 'bg-emerald-300/10 text-emerald-200' : 'bg-white/[0.06] text-slate-300'">
-                {{ message.status }}
+                {{ t(message.status) }}
               </span>
             </td>
-            <td role="cell" [attr.data-label]="copy().deliveredLabel" class="px-6 py-4 text-slate-300">{{ message.emailDelivered ? 'Yes' : 'No' }}</td>
+            <td role="cell" [attr.data-label]="copy().deliveredLabel" class="px-6 py-4 text-slate-300">{{ message.emailDelivered ? t('Yes') : t('No') }}</td>
             <td role="cell" [attr.data-label]="copy().dateLabel" class="px-6 py-4 text-slate-400">{{ formatDate(message.createdAt) }}</td>
             <td role="cell" [attr.data-label]="copy().actionsLabel" class="px-6 py-4">
               <div class="flex flex-wrap gap-2">

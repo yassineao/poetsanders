@@ -95,6 +95,12 @@ export class AdminService {
     });
   }
 
+  getCars(): Observable<Car[]> {
+    return this.http.get<Car[]>(`${this.apiBaseUrl}/admin/cars`, {
+      withCredentials: true,
+    });
+  }
+
   updateContactMessage(
     id: string,
     status: AdminContactMessageStatus,

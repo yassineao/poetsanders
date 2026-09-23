@@ -2,8 +2,8 @@ import type { HomeCardsSectionCopy } from '../../../../interfaces/types';
 
 export const nlHomeCardsCopy: HomeCardsSectionCopy = {
   eyebrow: 'Behandelingspakketten',
-  heading: 'Kies de zorg die je auto verdient.',
-  description: 'Van een nauwkeurige interieur opfrisbeurt tot een complete premium behandeling: elk pakket is duidelijk opgebouwd, zodat je precies weet wat je auto krijgt. Kies gerichte cabineverzorging, exterieurpolijsting met bescherming, koplampherstel of een volledige behandeling van binnen en buiten passend bij de staat van je voertuig.',
+  heading: 'Kies de zorg die uw auto verdient.',
+  description: 'Van een nauwkeurige opfrisbeurt van het interieur tot een complete premiumbehandeling: elk pakket is duidelijk opgebouwd, zodat u precies weet wat uw auto krijgt. Kies gerichte cabineverzorging, exterieurpolijsting met bescherming, koplampherstel of een volledige behandeling van binnen en buiten passend bij de staat van uw voertuig.',
   detailLinkLabel: 'Meer informatie',
   info: [
     { label: 'Bedrijf', value: 'Poets Anders' },
@@ -16,9 +16,9 @@ export const nlHomeCardsCopy: HomeCardsSectionCopy = {
     { label: 'Coördinaten', value: '51.8300852, 4.6861988' },
   ],
   highlight: {
-    eyebrow: 'Signature verzorging',
+    eyebrow: 'Verzorging op maat',
     title: 'Een schonere auto, behandeld met geduld en precisie.',
-    body: 'Poets Anders combineert zorgvuldig handwerk met hoogwaardige afwerking, zodat je auto fris, beschermd en klaar voor de weg is.',
+    body: 'Poets Anders combineert zorgvuldig handwerk met hoogwaardige afwerking, zodat uw auto fris, beschermd en klaar voor de weg is.',
     image: '/beautiful-car-washing-service.jpg',
     stats: [
       { value: '5', label: 'Behandelingsopties' },
@@ -29,7 +29,7 @@ export const nlHomeCardsCopy: HomeCardsSectionCopy = {
   items: [
     {
       title: 'Buitenwas',
-      body: 'Zachte reiniging, velgenzorg en een droog schoon resultaat voor priveauto\'s en zakelijke wagens.',
+      body: 'Zachte reiniging, velgenzorg en een droog schoon resultaat voor privéauto\'s en zakelijke wagens.',
     },
     {
       title: 'Interieur opfrissen',
@@ -37,13 +37,13 @@ export const nlHomeCardsCopy: HomeCardsSectionCopy = {
     },
     {
       title: 'Premium detailing',
-      body: 'Extra aandacht voor lak, glas, trim en afwerking wanneer je auto de volledige behandeling nodig heeft.',
+      body: 'Extra aandacht voor lak, glas, trim en afwerking wanneer uw auto de volledige behandeling nodig heeft.',
     },
   ],
   treatments: [
     {
       slug: 'total-treatment',
-      title: 'Total Treatment',
+      title: 'Totaalbehandeling',
       description: 'Een complete opfrisbeurt van binnen en buiten voor auto\'s die de volledige Poets Anders afwerking nodig hebben.',
       image: '/beautiful-car-washing-service.jpg',
       featured: true,
@@ -52,15 +52,15 @@ export const nlHomeCardsCopy: HomeCardsSectionCopy = {
     },
     {
       slug: 'interior-treatment',
-      title: 'Interior Treatment',
-      description: 'Diepe cabineverzorging gericht op comfort, frisheid en de oppervlakken die je dagelijks aanraakt.',
+      title: 'Interieurbehandeling',
+      description: 'Diepe cabineverzorging gericht op comfort, frisheid en de oppervlakken die u dagelijks aanraakt.',
       image: '/Image_wash.jpg',
       featured: false,
       services: ['Bekleding reinigen', 'Geurbehandeling', 'Kunststof behandelen'],
     },
     {
       slug: 'exterior-treatment',
-      title: 'Exterior Treatment',
+      title: 'Exterieurbehandeling',
       description: 'Lak, velgen, banden en afwerking worden stap voor stap behandeld voor een premium uitstraling.',
       image: '/hero_Image.jpg',
       featured: false,
@@ -69,7 +69,7 @@ export const nlHomeCardsCopy: HomeCardsSectionCopy = {
     {
       slug: 'headlight-treatment',
       title: 'Koplampbehandeling',
-      description: 'Je koplampen worden weer helder, voor een betere voorkant en beter zicht in het donker.',
+      description: 'Uw koplampen worden weer helder, voor een betere voorkant en beter zicht in het donker.',
       image: '/bg_heroo.jpg',
       featured: false,
       services: ['Heldere afwerking herstellen'],

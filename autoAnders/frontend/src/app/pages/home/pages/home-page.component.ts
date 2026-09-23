@@ -29,7 +29,7 @@ export class HomeComponent {
   private readonly carsService = inject(CarsService);
   private readonly supabase = inject(SupabaseService);
   private readonly carsSource$: Observable<Car[] | null> = this.isBrowser
-    ? this.carsService.getCars()
+    ? this.carsService.getAvailableCars()
     : of(null);
   private readonly apiCars = toSignal(
     this.carsSource$.pipe(

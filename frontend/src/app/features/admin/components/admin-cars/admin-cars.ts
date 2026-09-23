@@ -1,3 +1,4 @@
+import { translateUi } from '../../../../core/i18/ui-translations';
 import { CommonModule } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import {
@@ -58,6 +59,10 @@ const pageSize = 10;
   templateUrl: './admin-cars.html',
 })
 export class AdminCarsComponent {
+  protected t(value: string): string {
+    return translateUi(value, this.i18n.getCurrentLanguage());
+  }
+
   readonly cars = input.required<Car[]>();
   readonly updatingIds = input<string[]>([]);
   readonly updateError = input(false);
@@ -439,7 +444,7 @@ export class AdminCarsComponent {
       return;
     }
 
-    if (!window.confirm(`Save changes to ${car.brand} ${car.model}?`)) {
+    if (!window.confirm(this.t("Save changes to {name}?").replace('{name}', car.brand + ' ' + car.model))) {
       return;
     }
 
@@ -466,7 +471,7 @@ export class AdminCarsComponent {
       return;
     }
 
-    if (!window.confirm(`Delete ${car.brand} ${car.model}? This cannot be undone.`)) {
+    if (!window.confirm(this.t("Delete {name}? This cannot be undone.").replace('{name}', car.brand + ' ' + car.model))) {
       return;
     }
 
@@ -514,7 +519,7 @@ export class AdminCarsComponent {
       .replace(/([a-z0-9])([A-Z])/g, '$1 $2')
       .replaceAll('_', ' ')
       .toLowerCase();
-    return words.charAt(0).toUpperCase() + words.slice(1);
+    return this.t(words.charAt(0).toUpperCase() + words.slice(1));
   }
 
   private async toPictureRequests(files: File[]): Promise<CarPictureRequest[]> {
@@ -579,7 +584,7 @@ export class AdminCarsComponent {
     }
 
     if (typeof value === 'boolean') {
-      return value ? 'Yes' : 'No';
+      return this.t(value ? 'Yes' : 'No');
     }
 
     if (key === 'price' || key.toLowerCase().includes('leaseprice')) {

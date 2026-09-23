@@ -1,3 +1,4 @@
+import { translateUi } from '../../../core/lib/i18n/ui-translations';
 import { isPlatformBrowser } from "@angular/common";
 import { Component, PLATFORM_ID, computed, inject, signal } from "@angular/core";
 import { toSignal } from "@angular/core/rxjs-interop";
@@ -16,17 +17,16 @@ import { ProfileCarsComponent } from "./profile-cars.component";
     templateUrl: "./profile.form.html",
 })
 export class ProfileForm {
+    protected t(value: string): string {
+        return translateUi(value, this.locale());
+    }
+
     private readonly route = inject (ActivatedRoute);
     private readonly router = inject(Router);
     private readonly platformId = inject(PLATFORM_ID);
     private readonly isBrowser = isPlatformBrowser(this.platformId);
     protected readonly authService = inject(AuthService);
-    private readonly user = toSignal(
-        (this.isBrowser ? this.authService.me() : of(this.authService.currentUser())).pipe(
-            catchError(() => of(this.authService.currentUser())),
-        ),
-        { initialValue: this.authService.currentUser() },
-    );
+    protected readonly user = this.authService.currentUser;
     
     private readonly localeParam = toSignal(
             (this.route.parent?.paramMap ?? this.route.paramMap).pipe(
@@ -45,6 +45,16 @@ export class ProfileForm {
     protected readonly sending = signal(false);
     protected readonly sent = signal(false);
     protected readonly failed = signal(false);
+    protected readonly initials = computed(() => {
+        const name = this.user()?.user?.trim() ?? "";
+        return name.split(/\s+/).filter(Boolean).slice(0, 2).map(part => part[0]?.toUpperCase()).join("") || "AA";
+    });
+
+    constructor() {
+        if (this.isBrowser && !this.authService.currentUser()) {
+            this.authService.me().pipe(catchError(() => of(null))).subscribe();
+        }
+    }
 
     protected fieldValue(name: string): string {
         const user = this.user();
@@ -67,19 +77,19 @@ export class ProfileForm {
         }
 
         if (control.errors?.["required"]) {
-            return field.errors?.required ?? "This field is required.";
+            return field.errors?.required ?? translateUi("This field is required.", this.locale());
         }
         if (control.errors?.["email"]) {
-            return field.errors?.email ?? "Enter a valid email address.";
+            return field.errors?.email ?? translateUi("Enter a valid email address.", this.locale());
         }
         if (control.errors?.["minlength"]) {
-            return field.errors?.minlength ?? "This value is too short.";
+            return field.errors?.minlength ?? translateUi("This value is too short.", this.locale());
         }
         if (control.errors?.["maxlength"]) {
-            return field.errors?.maxlength ?? "This value is too long.";
+            return field.errors?.maxlength ?? translateUi("This value is too long.", this.locale());
         }
         if (control.errors?.["pattern"]) {
-            return field.errors?.pattern ?? "Enter a valid value.";
+            return field.errors?.pattern ?? translateUi("Enter a valid value.", this.locale());
         }
 
         return null;

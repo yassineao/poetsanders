@@ -19,7 +19,7 @@ export const nlServicesCopy: Copy["servicePage"] = {
       hero: {
         eyebrow: "Onze autoservices",
         title:
-          "Alles rond uw volgende auto op een plek",
+          "Alles rond uw volgende auto op één plek",
         description:
           "Ontdek hoe AutoAnders u helpt de juiste auto te vinden, duidelijk te financieren of uw huidige voertuig eerlijk te verkopen.",
         primaryCta: "Auto's bekijken",
@@ -144,7 +144,7 @@ export const nlServicesCopy: Copy["servicePage"] = {
             "Plan een bezichtiging of proefrit",
             "Weet welke documenten nodig zijn",
             "Krijg ondersteuning voordat u iets ondertekent",
-            "Maak beslissingen op basis van feiten",
+            "Neem beslissingen op basis van feiten",
             "Rijd weg met vertrouwen",
           ],
         },
@@ -171,7 +171,7 @@ export const nlServicesCopy: Copy["servicePage"] = {
         "Voertuigcheck",
         "Autowaardering",
       ],
-      offerCatalogName: "Onze Diensten",
+      offerCatalogName: "Onze diensten",
       services: [
         "Beschikbare auto's",
         "Auto verkopen",

@@ -1,3 +1,4 @@
+import { I18nService } from '../../../../core/i18/i18n.service';
 import { CommonModule } from '@angular/common';
 import { Component, DestroyRef, inject, input, output, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -13,6 +14,7 @@ import type { AdminSection, AdminSidebar } from '../../../../core/interfaces/adm
   templateUrl: './admin-sidebar.html',
 })
 export class AdminSidebarComponent {
+  protected readonly i18n = inject(I18nService);
   readonly sidebar = input.required<AdminSidebar>();
   readonly activeSection = input.required<AdminSection>();
   readonly sectionSelected = output<AdminSection>();

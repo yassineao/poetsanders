@@ -1,8 +1,12 @@
 <main class="min-h-screen bg-zinc-950 px-4 pb-16 pt-28 text-white sm:px-6">
-  <div class="mx-auto max-w-5xl overflow-hidden rounded-3xl border border-white/10 bg-zinc-900 shadow-2xl shadow-black/40">
+  <div class="mx-auto max-w-6xl overflow-hidden rounded-3xl border border-white/10 bg-zinc-900 shadow-2xl shadow-black/40">
     <section class="p-6 sm:p-10 lg:p-14">
       <div class="flex flex-col gap-6 border-b border-white/10 pb-8 lg:flex-row lg:items-end lg:justify-between">
-        <div class="max-w-2xl">
+        <div class="flex max-w-3xl items-start gap-4 sm:items-center sm:gap-5">
+          <div class="grid h-14 w-14 shrink-0 place-items-center rounded-2xl bg-red-600 text-lg font-black shadow-lg shadow-red-950/40 sm:h-16 sm:w-16 sm:text-xl">
+            {{ initials() }}
+          </div>
+          <div>
           <p class="text-sm font-bold uppercase tracking-[0.2em] text-red-500">
             {{ content().eyebrow }}
           </p>
@@ -12,6 +16,7 @@
           <p class="mt-4 max-w-xl leading-7 text-zinc-400">
             {{ content().description }}
           </p>
+          </div>
         </div>
 
         <div class="flex flex-wrap gap-3">
@@ -29,6 +34,23 @@
           </button>
         </div>
       </div>
+
+      @if (user(); as account) {
+        <div class="mt-6 grid gap-3 sm:grid-cols-3">
+          <div class="rounded-2xl border border-white/10 bg-black/20 p-4">
+            <p class="text-xs font-bold uppercase tracking-wider text-zinc-500">{{ t('Account name') }}</p>
+            <p class="mt-2 truncate font-bold text-white">{{ account.user || '-' }}</p>
+          </div>
+          <div class="rounded-2xl border border-white/10 bg-black/20 p-4">
+            <p class="text-xs font-bold uppercase tracking-wider text-zinc-500">{{ t('Email') }}</p>
+            <p class="mt-2 truncate font-bold text-white">{{ account.email || '-' }}</p>
+          </div>
+          <div class="rounded-2xl border border-white/10 bg-black/20 p-4">
+            <p class="text-xs font-bold uppercase tracking-wider text-zinc-500">{{ t('Phone number') }}</p>
+            <p class="mt-2 truncate font-bold text-white">{{ account.phoneNumber || '-' }}</p>
+          </div>
+        </div>
+      }
 
       @if (!edit()) {
         <p class="mt-6 rounded-2xl border border-white/10 bg-black/20 px-4 py-3 text-sm text-zinc-400">
@@ -76,7 +98,7 @@
     </section>
   </div>
 
-  <app-profile-cars />
+  <app-profile-cars [locale]="locale()" />
 
   @if (sent()) {
     <div class="fixed inset-0 z-[80] flex items-center justify-center bg-black/75 p-4 backdrop-blur-sm">

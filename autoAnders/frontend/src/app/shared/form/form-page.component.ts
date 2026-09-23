@@ -1,3 +1,4 @@
+import { translateUi } from '../../core/lib/i18n/ui-translations';
 import { Component, computed, input, output, signal } from "@angular/core";
 import { FormsModule, NgForm, NgModel } from "@angular/forms";
 import { RouterLink } from "@angular/router";
@@ -20,6 +21,7 @@ interface FormStep {
   templateUrl: "./form-page.component.html",
 })
 export class FormPageComponent {
+  protected t(value: string): string { return translateUi(value, this.locale()); }
   readonly locale = input.required<Locale>();
   readonly content = input.required<FormPageContent>();
   readonly sending = input(false);
@@ -362,26 +364,26 @@ export class FormPageComponent {
     }
 
     if (control.errors?.["required"]) {
-      return field.errors?.required ?? "This field is required.";
+      return field.errors?.required ?? this.t("This field is required.");
     }
     if (control.errors?.["email"]) {
-      return field.errors?.email ?? "Enter a valid email address.";
+      return field.errors?.email ?? this.t("Enter a valid email address.");
     }
     if (control.errors?.["minlength"]) {
-      return field.errors?.minlength ?? "This value is too short.";
+      return field.errors?.minlength ?? this.t("This value is too short.");
     }
     if (control.errors?.["maxlength"]) {
-      return field.errors?.maxlength ?? "This value is too long.";
+      return field.errors?.maxlength ?? this.t("This value is too long.");
     }
     if (control.errors?.["pattern"]) {
-      return field.errors?.pattern ?? "Enter a valid value.";
+      return field.errors?.pattern ?? this.t("Enter a valid value.");
     }
     if (
       field.matchField &&
       control.value &&
       control.value !== form.controls[field.matchField]?.value
     ) {
-      return field.errors?.mismatch ?? "The values do not match.";
+      return field.errors?.mismatch ?? this.t("The values do not match.");
     }
 
     return null;
