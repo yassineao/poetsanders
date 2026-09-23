@@ -32,6 +32,8 @@ export class HomePageComponent {
   protected readonly hero = computed(() => ({
     ...this.copy().home.hero,
     description: this.copy().home.meta.description,
+    beforeLabel: this.copy().services.treatments.beforeLabel,
+    afterLabel: this.copy().services.treatments.afterLabel,
     primaryLink: `tel:${this.copy().home.maps.PHONE.replace(/[^+\d]/g, '')}`,
     highlightTitle: this.copy().home.cards.highlight.title,
     highlightBody: this.copy().home.cards.highlight.body,

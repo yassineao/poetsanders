@@ -1,14 +1,43 @@
-<section class="mx-auto max-w-7xl py-8 sm:py-18 lg:py-22">
-  <div class="grid items-center gap-10 lg:grid-cols-[minmax(0,1fr)_460px]">
+<section class="mx-auto max-w-7xl px-0 py-3 sm:py-8 lg:px-0 lg:py-20">
+  <!-- Compact phone-first hero: one image, one short message, two actions. -->
+  <div class="mobile-only mx-auto max-w-xl">
+    <p class="flex items-center gap-2 text-[0.65rem] font-bold uppercase tracking-[0.18em] text-cyan-200">
+      <span class="h-1.5 w-1.5 rounded-full bg-cyan-200"></span>
+      {{ hero.eyebrow }}
+    </p>
+    <h1 class="mt-1 max-w-lg text-[1.85rem] font-extrabold leading-[1.08] tracking-tight text-white sm:text-5xl">
+      {{ hero.heading }}
+    </h1>
+    <p class="mt-2 max-w-lg line-clamp-3 text-sm leading-6 text-slate-200 sm:text-lg sm:leading-8">
+      {{ hero.subheading }}
+    </p>
+
+    <div class="mt-4 grid grid-cols-2 gap-2">
+      <a [href]="hero.primaryLink" class="inline-flex min-h-11 items-center justify-center rounded-xl bg-cyan-200 px-2.5 py-2.5 text-center text-xs font-bold leading-5 text-slate-950 shadow-lg shadow-black/20 transition hover:bg-white focus:outline-none focus:ring-2 focus:ring-cyan-200 focus:ring-offset-2 focus:ring-offset-slate-950 sm:text-sm">
+        {{ hero.ctaPrimary }}
+      </a>
+      <a [href]="hero.secondaryLink" class="inline-flex min-h-11 items-center justify-center rounded-xl border border-white/25 bg-white/10 px-2.5 py-2.5 text-center text-xs font-semibold leading-5 text-white backdrop-blur transition hover:bg-white/15 focus:outline-none focus:ring-2 focus:ring-cyan-200 focus:ring-offset-2 focus:ring-offset-slate-950 sm:text-sm">
+        {{ hero.ctaSecondary }}
+      </a>
+    </div>
+
+    <div class="relative mt-8 aspect-[16/10] overflow-hidden rounded-2xl border border-white/15 bg-slate-900 shadow-xl shadow-black/30">
+      <img src="/treatments/total-treatment-before-after.png" class="home-hero-after absolute top-0 h-full w-[202%] max-w-none object-cover" style="left: -102%" alt="" fetchpriority="high">
+      <img src="/treatments/total-treatment-before-after.png" class="home-hero-before absolute left-0 top-0 h-full w-[202%] max-w-none object-cover" alt="" fetchpriority="high">
+      <span class="absolute left-3 top-3 z-10 rounded-md border border-white/15 bg-slate-950/75 px-2.5 py-1 text-[0.65rem] font-bold uppercase tracking-[0.14em] text-white shadow backdrop-blur">{{ hero.beforeLabel }}</span>
+      <span class="absolute right-3 top-3 z-10 rounded-md border border-white/15 bg-slate-950/75 px-2.5 py-1 text-[0.65rem] font-bold uppercase tracking-[0.14em] text-white shadow backdrop-blur">{{ hero.afterLabel }}</span>
+      <div class="absolute inset-0 bg-gradient-to-t from-slate-950/75 via-transparent to-slate-950/10"></div>
+    </div>
+  </div>
+
+  <!-- Desktop layout remains the original split hero. -->
+  <div class="desktop-only">
+    <div class="grid items-center gap-10 lg:grid-cols-[minmax(0,1fr)_460px]">
     <div class="max-w-3xl text-center lg:text-left">
-<!--      <div class="inline-flex items-center gap-2 rounded-full border border-cyan-200/25 bg-white/10 px-3 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-cyan-100 shadow-lg shadow-black/10 backdrop-blur">-->
-<!--        <span class="h-2 w-2 rounded-full bg-cyan-200"></span>-->
-<!--        {{ hero.eyebrow }}-->
-<!--      </div>-->
       <h1 class="mt-2 max-w-4xl text-3xl font-semibold leading-tight tracking-tight text-white sm:text-6xl">
         {{ hero.heading }}
       </h1>
-      <p class="mt-4 max-w-2xl text-base leading-7 sm:mt-6 sm:text-lg sm:leading-8 text-slate-100 lg:text-xl">{{ hero.subheading }}</p>
+      <p class="mt-4 max-w-2xl text-base leading-7 text-slate-100 sm:mt-6 sm:text-lg sm:leading-8 lg:text-xl">{{ hero.subheading }}</p>
       <p class="mt-4 max-w-2xl text-sm leading-7 text-slate-300 sm:text-base">{{ hero.description }}</p>
 
       <div class="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-center lg:justify-start">
@@ -17,39 +46,26 @@
       </div>
 
       <div class="mt-6 grid gap-2 text-left sm:grid-cols-3">
-        <a
-          *ngFor="let item of hero.contactItems"
-          class="flex items-center justify-between gap-4 rounded-xl border border-white/10 bg-slate-950/55 sm:block px-4 py-3 shadow-sm backdrop-blur transition hover:border-cyan-200/35 hover:bg-white/10"
-          [href]="item.href || '#content'"
-        >
+        <a *ngFor="let item of hero.contactItems"
+          class="flex items-center justify-between gap-4 rounded-xl border border-white/10 bg-slate-950/55 px-4 py-3 shadow-sm backdrop-blur transition hover:border-cyan-200/35 hover:bg-white/10"
+          [href]="item.href || '#content'">
           <span class="block shrink-0 text-xs font-semibold uppercase tracking-[0.16em] text-cyan-200">{{ item.label }}</span>
           <span class="block text-right text-sm font-medium leading-6 text-white sm:mt-2 sm:text-left">{{ item.value }}</span>
         </a>
       </div>
-
-      <!-- <ul class="mt-6 grid gap-3 text-left text-sm text-slate-200 sm:grid-cols-3">
-        <li *ngFor="let feature of hero.features" class="rounded-md border border-white/15 bg-white/10 px-4 py-3 shadow-sm backdrop-blur">
-          <span class="mb-3 block h-px w-8 bg-cyan-200"></span>
-          {{ feature }}
-        </li>
-      </ul> -->
     </div>
 
-    <div class="rounded-lg border border-white/15 bg-white/10 p-3 shadow-2xl shadow-black/30 backdrop-blur desktop-only">
+    <div class="rounded-lg border border-white/15 bg-white/10 p-3 shadow-2xl shadow-black/30 backdrop-blur">
       <div class="relative aspect-[4/5] overflow-hidden rounded-md bg-slate-900">
-        <img class="absolute inset-0 h-full w-full object-cover object-center opacity-65" alt="" [src]="hero.image">
+        <img src="/treatments/total-treatment-before-after.png" class="home-hero-after absolute top-0 h-full w-[202%] max-w-none object-cover opacity-80" style="left: -102%" alt="" fetchpriority="high">
+        <img src="/treatments/total-treatment-before-after.png" class="home-hero-before absolute left-0 top-0 h-full w-[202%] max-w-none object-cover opacity-80" alt="">
+        <span class="absolute left-4 top-4 z-10 rounded-md border border-white/15 bg-slate-950/75 px-3 py-1.5 text-xs font-bold uppercase tracking-[0.14em] text-white shadow backdrop-blur">{{ hero.beforeLabel }}</span>
+        <span class="absolute right-4 top-4 z-10 rounded-md border border-white/15 bg-slate-950/75 px-3 py-1.5 text-xs font-bold uppercase tracking-[0.14em] text-white shadow backdrop-blur">{{ hero.afterLabel }}</span>
         <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-slate-950/10"></div>
-
         <div class="absolute inset-x-0 bottom-0 p-5">
           <img src="/logo-poets-website-1_high_resolution.png" alt="Poets Anders" class="mb-5 h-20 w-20 object-contain drop-shadow-2xl">
-          <!-- <p class="text-xs font-semibold uppercase tracking-[0.2em] text-cyan-100">{{ hero.reviewLabel }}</p> -->
-          <!-- <h2 class="mt-3 text-2xl font-semibold leading-tight text-white">{{ hero.highlightTitle }}</h2>
-          <p class="mt-3 text-sm leading-6 text-slate-300">{{ hero.highlightBody }}</p> -->
-
           <div class="mt-5 flex flex-wrap gap-2">
-            <span *ngFor="let service of hero.serviceNames" class="rounded bg-white/10 px-3 py-1 text-xs font-semibold text-white backdrop-blur">
-              {{ service }}
-            </span>
+            <span *ngFor="let service of hero.serviceNames" class="rounded bg-white/10 px-3 py-1 text-xs font-semibold text-white backdrop-blur">{{ service }}</span>
           </div>
         </div>
       </div>
@@ -59,6 +75,7 @@
           <dd class="mt-1 text-xs leading-5 text-slate-300">{{ item.label }}</dd>
         </div>
       </dl>
+    </div>
     </div>
   </div>
 </section>
