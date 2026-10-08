@@ -1,7 +1,64 @@
 import { AuthUser } from "./AuthUser";
 
 
-export interface Car {
+export type DriveType = 'FRONT_WHEEL_DRIVE' | 'REAR_WHEEL_DRIVE' | 'ALL_WHEEL_DRIVE' | 'FOUR_WHEEL_DRIVE';
+
+export interface CarSpecifications {
+  variant?: string | null;
+  trimLevel?: string | null;
+  vin?: string | null;
+  originalPrice?: number | null;
+  discountAmount?: number | null;
+  taxScheme?: string | null;
+  lastServiceDate?: string | null;
+  warrantyUntil?: string | null;
+  accidentFree?: boolean | null;
+  imported?: boolean | null;
+  numberOfPreviousOwners?: number | null;
+  conditionDescription?: string | null;
+  horsepower?: number | null;
+  kilowatts?: number | null;
+  torqueNm?: number | null;
+  topSpeed?: number | null;
+  acceleration?: number | null;
+  tankCapacity?: number | null;
+  engineCode?: string | null;
+  wltpFuelConsumption?: number | null;
+  electricRange?: number | null;
+  batteryCapacityKwh?: number | null;
+  chargingTimeHours?: number | null;
+  fastChargingPowerKw?: number | null;
+  numberOfSeats?: number | null;
+  lengthMm?: number | null;
+  widthMm?: number | null;
+  heightMm?: number | null;
+  grossVehicleWeight?: number | null;
+  maxPayload?: number | null;
+  trunkCapacityLitres?: number | null;
+  numberOfGears?: number | null;
+  driveType?: DriveType | null;
+  manufacturerColour?: string | null;
+  wheelSize?: string | null;
+  tyreSize?: string | null;
+  upholsteryColour?: string | null;
+  interiorColour?: string | null;
+  featured?: boolean | null;
+  reserved?: boolean | null;
+  sold?: boolean | null;
+  features?: string[];
+}
+
+export interface GuestCarRequest {
+    name: string;
+    email: string;
+    phoneNumber: string;
+    car: CarRequest;
+}
+
+export interface Car extends CarSpecifications {
+    version?: number;
+    createdAt?: string;
+    updatedAt?: string;
     id: string;
 
     brand: string;
@@ -56,74 +113,66 @@ export interface Car {
     upholstery: Upholstery;
     status: CarStatus;
 
-    user: AuthUser;
+    user?: AuthUser;
     pictures: CarPicture[];
 }
 
 enum BodyType {
-    MPV,
-    SUV,
-    SEDAN,
-    HATCHBACK,
-    STATION_WAGON,
-    COUPE,
-    CABRIOLET,
-    VAN
-}
+    MPV = "MPV",
+    SUV = "SUV",
+    SEDAN = "SEDAN",
+    HATCHBACK = "HATCHBACK",
+    STATION_WAGON = "STATION_WAGON",
+    COUPE = "COUPE",
+    CABRIOLET = "CABRIOLET",
+    VAN = "VAN"}
 
 enum EmissionClass {
-    EURO_1,
-    EURO_2,
-    EURO_3,
-    EURO_4,
-    EURO_5,
-    EURO_6
-}
+    EURO_1 = "EURO_1",
+    EURO_2 = "EURO_2",
+    EURO_3 = "EURO_3",
+    EURO_4 = "EURO_4",
+    EURO_5 = "EURO_5",
+    EURO_6 = "EURO_6"}
 enum EnergyLabel {
-    A,
-    B,
-    C,
-    D,
-    E,
-    F,
-    G
-}
+    A = "A",
+    B = "B",
+    C = "C",
+    D = "D",
+    E = "E",
+    F = "F",
+    G = "G"}
 enum Fuel {
-    PETROL,
-    DIESEL,
-    ELECTRIC,
-    HYBRID,
-    LPG,
-    CNG
-}
+    PETROL = "PETROL",
+    DIESEL = "DIESEL",
+    ELECTRIC = "ELECTRIC",
+    HYBRID = "HYBRID",
+    LPG = "LPG",
+    CNG = "CNG"}
 enum Gearbox {
-    MANUAL,
-    AUTOMATIC,
-    SEMI_AUTOMATIC
-}
+    MANUAL = "MANUAL",
+    AUTOMATIC = "AUTOMATIC",
+    SEMI_AUTOMATIC = "SEMI_AUTOMATIC"}
 enum PaintType {
-    BASIC,
-    METALLIC,
-    PEARL,
-    MATTE
-}
+    BASIC = "BASIC",
+    METALLIC = "METALLIC",
+    PEARL = "PEARL",
+    MATTE = "MATTE"}
 enum CarStatus {
-    Available,
-    Pending_Confirmation,
-    Booked,
-    Cancelled,
+    Available = "Available",
+    Pending_Confirmation = "Pending_Confirmation",
+    Booked = "Booked",
+    Cancelled = "Cancelled",
 }
 enum Transmission {
-    Automatic,
-    Manual,
-    Semi_Automatic
-}
+    Automatic = "Automatic",
+    Manual = "Manual",
+    Semi_Automatic = "Semi_Automatic"}
 enum Upholstery {
-    FABRIC,
-    LEATHER,
-    PART_LEATHER,
-    ALCANTARA
-}
+    FABRIC = "FABRIC",
+    LEATHER = "LEATHER",
+    PART_LEATHER = "PART_LEATHER",
+    ALCANTARA = "ALCANTARA"}
 
 export interface CarPicture {
     id: string;
@@ -163,7 +212,7 @@ export interface CarPictureRequest {
     width: number;
     height: number;
 }
-export type CarRequest = Omit<Car, 'id' | 'user' | 'pictures' | 'bodyType' | 'gearbox' | 'fuel' | 'emissionClass' | 'energyLabel' | 'paintType' | 'upholstery' | 'status'> & {
+export type CarRequest = Omit<Car, 'id' | 'version' | 'createdAt' | 'updatedAt' | 'user' | 'pictures' | 'bodyType' | 'gearbox' | 'fuel' | 'emissionClass' | 'energyLabel' | 'paintType' | 'upholstery' | 'status'> & {
     bodyType: BodyType | null;
     gearbox: Gearbox | null;
     fuel: Fuel | null;

@@ -284,6 +284,8 @@ interface AuthContent  {
 
 
 export interface CatalogueCar  {
+  specifications?: import("./Car").CarSpecifications;
+  features?: string[];
   id: number | string;
   brand: string;
   model: string;

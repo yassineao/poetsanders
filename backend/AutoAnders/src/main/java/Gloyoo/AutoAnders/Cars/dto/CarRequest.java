@@ -2,14 +2,15 @@ package Gloyoo.AutoAnders.Cars.dto;
 
 
 import Gloyoo.AutoAnders.Cars.entity.*;
+import jakarta.validation.constraints.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
 public record CarRequest(
-        String brand,
-        String model,
+        @NotBlank String brand,
+        @NotBlank String model,
 
         String title,
         String subtitle,
@@ -60,5 +61,47 @@ public record CarRequest(
         Upholstery upholstery,
         Status status,
 
+        String variant,
+        String trimLevel,
+        @Size(max = 17) String vin,
+        @PositiveOrZero BigDecimal originalPrice,
+        @PositiveOrZero BigDecimal discountAmount,
+        String taxScheme,
+        LocalDate lastServiceDate,
+        LocalDate warrantyUntil,
+        Boolean accidentFree,
+        Boolean imported,
+        @PositiveOrZero Integer numberOfPreviousOwners,
+        @Size(max = 2000) String conditionDescription,
+        @PositiveOrZero Integer horsepower,
+        @PositiveOrZero Integer kilowatts,
+        @PositiveOrZero Integer torqueNm,
+        @PositiveOrZero Integer topSpeed,
+        @PositiveOrZero BigDecimal acceleration,
+        @PositiveOrZero Integer tankCapacity,
+        String engineCode,
+        @PositiveOrZero BigDecimal wltpFuelConsumption,
+        @PositiveOrZero Integer electricRange,
+        @PositiveOrZero BigDecimal batteryCapacityKwh,
+        @PositiveOrZero BigDecimal chargingTimeHours,
+        @PositiveOrZero Integer fastChargingPowerKw,
+        @Positive Integer numberOfSeats,
+        @PositiveOrZero Integer lengthMm,
+        @PositiveOrZero Integer widthMm,
+        @PositiveOrZero Integer heightMm,
+        @PositiveOrZero Integer grossVehicleWeight,
+        @PositiveOrZero Integer maxPayload,
+        @PositiveOrZero Integer trunkCapacityLitres,
+        @PositiveOrZero Integer numberOfGears,
+        DriveType driveType,
+        String manufacturerColour,
+        String wheelSize,
+        String tyreSize,
+        String upholsteryColour,
+        String interiorColour,
+        Boolean featured,
+        Boolean reserved,
+        Boolean sold,
+        List<@NotBlank @Size(max = 255) String> features,
         List<CarPictureMetadataRequest> pictures
 ) {}

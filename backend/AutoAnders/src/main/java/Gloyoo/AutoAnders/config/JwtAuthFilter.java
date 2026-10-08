@@ -109,6 +109,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                 || path.equals("/auth/refresh")
                 || path.equals("/auth/logout")
                 || path.equals("/wash_calendar/guest")
+                || (path.equals("/cars/guest") && request.getMethod().equals("POST"))
                 || path.startsWith("/wash_calendar/cancel/");
     }
 

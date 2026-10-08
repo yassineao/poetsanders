@@ -1,4 +1,4 @@
-<main class="min-h-screen bg-zinc-950 px-4 pb-16 pt-28 text-white sm:px-6">
+<main [class.compact-mobile]="compactMobile()" class="min-h-screen bg-zinc-950 px-4 pb-16 pt-28 text-white sm:px-6">
   <div
     class="mx-auto grid max-w-7xl overflow-hidden rounded-3xl border border-white/10 bg-zinc-900 shadow-2xl shadow-black/40 lg:min-h-[42rem] lg:grid-cols-[minmax(0,1fr)_28rem]">
     <section class="p-6 sm:p-10 lg:p-14">
@@ -33,11 +33,23 @@
 
       <form #form="ngForm" (ngSubmit)="submit(form)" class="mt-8 space-y-6">
         @if (steps().length > 1) {
-          <div class="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
+          @if (compactMobile()) {
+            <div class="sm:hidden" aria-live="polite">
+              <div class="flex items-baseline justify-between gap-3 text-sm">
+                <span class="min-w-0 font-semibold">{{ t(currentStep().label) }}</span>
+                <span class="shrink-0 text-zinc-400">{{ paginationLabels().pageLabel }} {{ currentPage() + 1 }} / {{ totalPages() }}</span>
+              </div>
+              <div class="mt-2 h-1 overflow-hidden rounded-full bg-white/10" aria-hidden="true">
+                <div class="h-full rounded-full bg-red-500" [style.width.%]="(currentPage() + 1) / totalPages() * 100"></div>
+              </div>
+            </div>
+          }
+          <div class="step-grid grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
             @for (step of steps(); track step.label; let stepIndex = $index) {
               <button
                 type="button"
                 (click)="goToStep(stepIndex)"
+                [disabled]="stepIndex > currentPage() || sending()"
                 [class.border-red-500]="currentPage() === stepIndex"
                 [class.bg-red-950]="currentPage() === stepIndex"
                 class="rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-left text-sm font-bold text-zinc-200 transition hover:border-red-500/50 hover:bg-white/5">
@@ -161,6 +173,12 @@
                       {{ error }}
                     </span>
                   }
+                } @else if (field.type === 'textarea') {
+                  <textarea [name]="field.name" [ngModel]="fieldValue(field)"
+                    (ngModelChange)="persistFieldValue(field.name, $event)"
+                    [required]="field.required ?? false" [maxlength]="field.maxLength ?? null"
+                    [placeholder]="field.placeholder ?? ''" rows="5"
+                    class="mt-2 w-full rounded-xl border border-white/10 bg-zinc-950/80 px-4 py-3.5 text-white outline-none focus:border-red-500"></textarea>
                 } @else if (field.options?.length) {
                   <select
                     #fieldControl="ngModel"
@@ -192,6 +210,8 @@
                     [maxlength]="field.maxLength ?? null"
                     [pattern]="field.pattern ?? ''"
                     [type]="field.type"
+                    [min]="field.min ?? null"
+                    [step]="field.inputStep ?? 'any'"
                     [placeholder]="field.placeholder ?? ''"
                     [attr.aria-invalid]="fieldError(field, fieldControl, form) ? 'true' : null"
                     [class.border-red-500]="fieldError(field, fieldControl, form)"
@@ -226,7 +246,7 @@
               </button>
               <button
                 type="button"
-                (click)="toggleNext()"
+                (click)="toggleNext(form)"
                 [disabled]="isLastPage()"
                 class="rounded-xl bg-red-600 px-5 py-3 text-sm font-bold text-white shadow-lg shadow-red-950/30 transition hover:bg-red-500 disabled:cursor-not-allowed disabled:bg-red-900 disabled:opacity-50">
                 {{ paginationLabels().nextLabel }}

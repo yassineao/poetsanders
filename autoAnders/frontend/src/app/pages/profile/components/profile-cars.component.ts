@@ -8,6 +8,7 @@ import { CarsService } from "../../../core/cars/cars.service";
 import type { Car, CarPicture, CarPictureRequest, CarRequest } from "../../../core/interfaces/Car";
 
 type CarEditValues = CarRequest;
+import { specificationFields, toSpecifications } from "../../../core/cars/car-specifications";
 type CarEditKey = keyof CarEditValues;
 type PicturePreview = { file: File; name: string; url: string };
 
@@ -62,6 +63,14 @@ export class ProfileCarsComponent {
   protected readonly pendingCars = computed(() => this.cars().filter(car => String(car.status) === "Pending_Confirmation").length);
   protected readonly availableCars = computed(() => this.cars().filter(car => String(car.status) === "Available").length);
   protected readonly addSteps = ["Basics", "Specs", "Finance", "Pictures"];
+  protected readonly extraFields = specificationFields.filter(field => field.type !== "boolean" && field.type !== "select");
+  protected readonly extraSelectFields = specificationFields.filter(field => field.type === "select" || field.type === "boolean");
+  protected featureText(values: CarEditValues): string {
+    return (values.features ?? []).join("\n");
+  }
+  protected setFeatures(values: CarEditValues, text: string): void {
+    values.features = text.split(/\r?\n/);
+  }
   protected readonly colorOptions: CarColorOption[] = [
     { label: "Black", hex: "#111827" },
     { label: "White", hex: "#f8fafc" },
@@ -77,7 +86,7 @@ export class ProfileCarsComponent {
   ];
   protected readonly addBasicsValid = computed(() => {
     const values = this.addValues();
-    return Boolean(values.brand && values.model && values.mileage);
+    return Boolean(values.brand.trim() && values.model.trim()) && values.mileage >= 0;
   });
   protected readonly canGoToNextAddStep = computed(() => {
     if (this.addStep() === 0) {
@@ -529,6 +538,7 @@ export class ProfileCarsComponent {
 
   private toEditValues(car: Car): CarEditValues {
     return {
+      ...toSpecifications(car),
       brand: car.brand ?? "",
       model: car.model ?? "",
       title: car.title ?? "",
@@ -647,10 +657,11 @@ export class ProfileCarsComponent {
 
   private toCarRequest(values: CarEditValues, status: CarRequest["status"]): CarRequest {
     return {
+      ...toSpecifications(values),
       brand: values.brand,
       model: values.model,
-      title: "",
-      subtitle: "",
+      title: values.title,
+      subtitle: values.subtitle,
       yearOfManufacture: this.toNumber(values.yearOfManufacture),
       mileage: this.toNumber(values.mileage),
       power: values.power,

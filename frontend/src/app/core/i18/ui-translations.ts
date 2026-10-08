@@ -1,6 +1,9 @@
 // Display translations for vehicle management and legacy interface labels.
 // API values stay unchanged when submitting forms.
 const uiTranslations: Record<string, readonly [string, string]> = {
+  "Features": ["Uitrusting", "Ausstattung"],
+  "Feature": ["Voorziening", "Ausstattungsmerkmal"],
+  "Add feature": ["Voorziening toevoegen", "Ausstattung hinzufügen"],
   "Account name": ["Accountnaam", "Kontoname"],
   "Phone number": ["Telefoonnummer", "Telefonnummer"],
   "View the cars linked to your account and manage their information and pictures.": ["Bekijk de auto’s die aan uw account zijn gekoppeld en beheer de gegevens en foto’s.", "Sehen Sie die mit Ihrem Konto verknüpften Fahrzeuge und verwalten Sie deren Daten und Bilder."],

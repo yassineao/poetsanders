@@ -210,6 +210,42 @@
               </label>
             }
           </div>
+
+<section class="mt-6 space-y-4 rounded-2xl border border-white/10 bg-black/20 p-5">
+  <h3 class="text-lg font-bold text-white">{{ t('Specifications') }}</h3>
+  <div class="grid gap-4 sm:grid-cols-2">
+    @for (field of extraFields; track field.key) {
+      <label class="text-sm text-zinc-300">{{ t(field.label) }}
+        <input [name]="'spec-' + field.key" [type]="field.type" [(ngModel)]="addValues()[field.key]"
+          [min]="field.min ?? null" [step]="field.step ?? 'any'" [maxlength]="field.maxLength ?? null"
+          class="mt-2 w-full rounded-xl border border-white/10 bg-zinc-950 px-4 py-3 text-white" />
+      </label>
+    }
+    @for (field of extraSelectFields; track field.key) {
+      <label class="text-sm text-zinc-300">{{ t(field.label) }}
+        <select [name]="'spec-' + field.key" [(ngModel)]="addValues()[field.key]"
+          class="mt-2 w-full rounded-xl border border-white/10 bg-zinc-950 px-4 py-3 text-white">
+          <option [ngValue]="null">{{ t('Select') }}</option>
+          @if (field.type === 'boolean') {
+            <option [ngValue]="true">{{ t('Yes') }}</option>
+            <option [ngValue]="false">{{ t('No') }}</option>
+          } @else {
+            @for (option of field.options; track option) {
+              <option [ngValue]="option">{{ t(option.replaceAll('_', ' ')) }}</option>
+            }
+          }
+        </select>
+      </label>
+    }
+  </div>
+  <label class="block text-sm text-zinc-300">
+    <span class="block text-lg font-bold text-white">{{ t('Features') }}</span>
+    <span class="mt-1 block text-zinc-400">{{ t('One feature per line') }}</span>
+    <textarea name="features" [ngModel]="featureText(addValues())" (ngModelChange)="setFeatures(addValues(), $event)"
+      rows="5" class="mt-3 w-full rounded-xl border border-white/10 bg-zinc-950 px-4 py-3 text-white"
+      placeholder="Navigation&#10;Heated seats&#10;Rear camera"></textarea>
+  </label>
+</section>
         } @else if (addStep() === 2) {
           <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             @for (field of addFinanceNumberFields; track field.key) {
@@ -539,6 +575,42 @@
                     }
                   </div>
 
+
+<section class="mt-6 space-y-4 rounded-2xl border border-white/10 bg-black/20 p-5">
+  <h3 class="text-lg font-bold text-white">{{ t('Specifications') }}</h3>
+  <div class="grid gap-4 sm:grid-cols-2">
+    @for (field of extraFields; track field.key) {
+      <label class="text-sm text-zinc-300">{{ t(field.label) }}
+        <input [name]="'spec-' + field.key" [type]="field.type" [(ngModel)]="values[field.key]"
+          [min]="field.min ?? null" [step]="field.step ?? 'any'" [maxlength]="field.maxLength ?? null"
+          class="mt-2 w-full rounded-xl border border-white/10 bg-zinc-950 px-4 py-3 text-white" />
+      </label>
+    }
+    @for (field of extraSelectFields; track field.key) {
+      <label class="text-sm text-zinc-300">{{ t(field.label) }}
+        <select [name]="'spec-' + field.key" [(ngModel)]="values[field.key]"
+          class="mt-2 w-full rounded-xl border border-white/10 bg-zinc-950 px-4 py-3 text-white">
+          <option [ngValue]="null">{{ t('Select') }}</option>
+          @if (field.type === 'boolean') {
+            <option [ngValue]="true">{{ t('Yes') }}</option>
+            <option [ngValue]="false">{{ t('No') }}</option>
+          } @else {
+            @for (option of field.options; track option) {
+              <option [ngValue]="option">{{ t(option.replaceAll('_', ' ')) }}</option>
+            }
+          }
+        </select>
+      </label>
+    }
+  </div>
+  <label class="block text-sm text-zinc-300">
+    <span class="block text-lg font-bold text-white">{{ t('Features') }}</span>
+    <span class="mt-1 block text-zinc-400">{{ t('One feature per line') }}</span>
+    <textarea name="features" [ngModel]="featureText(values)" (ngModelChange)="setFeatures(values, $event)"
+      rows="5" class="mt-3 w-full rounded-xl border border-white/10 bg-zinc-950 px-4 py-3 text-white"
+      placeholder="Navigation&#10;Heated seats&#10;Rear camera"></textarea>
+  </label>
+</section>
                   <button
                     type="submit"
                     [disabled]="carForm.invalid || savingCarId() === car.id"

@@ -2,6 +2,7 @@ import { translateUi } from '../../../core/lib/i18n/ui-translations';
 import { CommonModule } from "@angular/common";
 import { Component, computed, input, signal } from "@angular/core";
 import { FormsModule } from "@angular/forms";
+import { specificationFields, SpecificationField } from "../../../core/cars/car-specifications";
 import { RouterLink } from "@angular/router";
 import type { CatalogueCar, CatalogueLabels } from "../../../core/interfaces/LocaleDictionary";
 import type { Locale } from "../../../core/interfaces/locale";
@@ -12,6 +13,12 @@ import type { Locale } from "../../../core/interfaces/locale";
   templateUrl: "./catalogue.component.html",
 })
 export class CatalogueComponent {
+  protected readonly specificationFields: SpecificationField[] = [
+    ...specificationFields,
+    { key: 'featured', label: 'Featured', type: 'boolean' },
+    { key: 'reserved', label: 'Reserved', type: 'boolean' },
+    { key: 'sold', label: 'Sold', type: 'boolean' },
+  ];
   protected t(value: string): string {
     return translateUi(value, this.locale());
   }
@@ -131,10 +138,10 @@ export class CatalogueComponent {
     }
 
     if (typeof value === "number") {
-      return value > 0 ? `${new Intl.NumberFormat(this.locale()).format(value)}${suffix}` : "-";
+      return `${new Intl.NumberFormat(this.locale()).format(value)}${suffix}`;
     }
 
-    return `${this.t(value)}${suffix}`;
+    return `${this.t(value.replaceAll("_", " "))}${suffix}`;
   }
 
   protected imagesFor(car: CatalogueCar): string[] {

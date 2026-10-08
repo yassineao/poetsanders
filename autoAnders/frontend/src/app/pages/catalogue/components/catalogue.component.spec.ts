@@ -4,6 +4,31 @@ import { getDictionary } from '../../../core/lib/i18n';
 import { CatalogueComponent } from './catalogue.component';
 
 describe('catalogue translations', () => {
+  it('shows backend specifications and features, preserving false and zero values', () => {
+    TestBed.configureTestingModule({ imports: [CatalogueComponent], providers: [provideRouter([])] });
+    const fixture = TestBed.createComponent(CatalogueComponent);
+    const catalogue = getDictionary('en').home.catalogue;
+    const car = { ...catalogue.cars[0], features: ['Heated seats', 'Navigation'],
+      specifications: { variant: 'Long Range', electricRange: 450, numberOfPreviousOwners: 0,
+        accidentFree: false, batteryCapacityKwh: null, featured: true } };
+    fixture.componentRef.setInput('title', catalogue.title);
+    fixture.componentRef.setInput('subtitle', catalogue.subtitle);
+    fixture.componentRef.setInput('labels', catalogue.labels);
+    fixture.componentRef.setInput('locale', 'en');
+    fixture.componentRef.setInput('cars', [car]);
+    fixture.componentInstance['selectedCar'].set(car);
+    fixture.detectChanges();
+    const text = fixture.nativeElement.textContent;
+    expect(text).toContain('Long Range');
+    expect(text).toContain('450');
+    expect(text).toContain('Previous owners');
+    expect(text).toContain('Accident free');
+    expect(text).toContain('Heated seats');
+    expect(text).toContain('Navigation');
+    expect(text).not.toContain('Battery capacity (kWh)');
+    expect(fixture.componentInstance['detailValue'](false)).toBe('No');
+    expect(fixture.componentInstance['detailValue'](0)).toBe('0');
+  });
   it('updates labels, vehicle enums and number formatting when the locale changes', () => {
     TestBed.configureTestingModule({
       imports: [CatalogueComponent],

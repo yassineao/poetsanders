@@ -1,7 +1,55 @@
 import { AuthUser } from "./AuthUser";
 
 
-export interface Car {
+export type DriveType = 'FRONT_WHEEL_DRIVE' | 'REAR_WHEEL_DRIVE' | 'ALL_WHEEL_DRIVE' | 'FOUR_WHEEL_DRIVE';
+
+export interface CarSpecifications {
+  variant?: string | null;
+  trimLevel?: string | null;
+  vin?: string | null;
+  originalPrice?: number | null;
+  discountAmount?: number | null;
+  taxScheme?: string | null;
+  lastServiceDate?: string | null;
+  warrantyUntil?: string | null;
+  accidentFree?: boolean | null;
+  imported?: boolean | null;
+  numberOfPreviousOwners?: number | null;
+  conditionDescription?: string | null;
+  horsepower?: number | null;
+  kilowatts?: number | null;
+  torqueNm?: number | null;
+  topSpeed?: number | null;
+  acceleration?: number | null;
+  tankCapacity?: number | null;
+  engineCode?: string | null;
+  wltpFuelConsumption?: number | null;
+  electricRange?: number | null;
+  batteryCapacityKwh?: number | null;
+  chargingTimeHours?: number | null;
+  fastChargingPowerKw?: number | null;
+  numberOfSeats?: number | null;
+  lengthMm?: number | null;
+  widthMm?: number | null;
+  heightMm?: number | null;
+  grossVehicleWeight?: number | null;
+  maxPayload?: number | null;
+  trunkCapacityLitres?: number | null;
+  numberOfGears?: number | null;
+  driveType?: DriveType | null;
+  manufacturerColour?: string | null;
+  wheelSize?: string | null;
+  tyreSize?: string | null;
+  upholsteryColour?: string | null;
+  interiorColour?: string | null;
+  featured?: boolean | null;
+  reserved?: boolean | null;
+  sold?: boolean | null;
+  features?: string[];
+}
+
+export interface Car extends CarSpecifications {
+    features?: string[];
     id: string;
 
     brand: string;
@@ -108,3 +156,10 @@ export interface CarPictureRequest {
     height: number;
 }
 export type CarRequest = Omit<Car, 'id' | 'user' | 'pictures'>;
+
+export interface GuestCarRequest {
+  name: string;
+  email: string;
+  phoneNumber: string;
+  car: Pick<CarRequest, 'brand' | 'model'> & Partial<CarRequest>;
+}

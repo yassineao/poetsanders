@@ -24,6 +24,8 @@ import type {
   CarStatus,
 } from '../../../../core/interfaces/Car';
 import { AdminCarPicturesComponent } from '../admin.carPictures/admin.carPictures';
+import { CarSpecificationFieldsComponent } from '../../../../core/cars/car-specification-fields.component';
+import { specificationFields } from '../../../../core/cars/car-specifications';
 
 export interface CarStatusChange {
   car: Car;
@@ -55,10 +57,11 @@ const pageSize = 10;
 @Component({
   selector: 'app-admin-cars',
   standalone: true,
-  imports: [CommonModule, FormsModule, AdminCarPicturesComponent],
+  imports: [CommonModule, FormsModule, AdminCarPicturesComponent, CarSpecificationFieldsComponent],
   templateUrl: './admin-cars.html',
 })
 export class AdminCarsComponent {
+  protected readonly specificationFields = specificationFields;
   protected t(value: string): string {
     return translateUi(value, this.i18n.getCurrentLanguage());
   }
@@ -80,6 +83,27 @@ export class AdminCarsComponent {
   protected readonly status = signal<CarStatusFilter>('all');
   protected readonly page = signal(1);
   protected readonly selectedCar = signal<Car | null>(null);
+  protected readonly addingFeature = signal(false);
+  protected readonly featureError = signal(false);
+
+  protected addFeature(car: Car, input: HTMLInputElement): void {
+    const feature = input.value.trim();
+    if (!feature || feature.length > 255 || this.addingFeature()) return;
+    this.addingFeature.set(true);
+    this.featureError.set(false);
+    this.carsService.addCarFeatures(car.id, [feature]).pipe(
+      finalize(() => this.addingFeature.set(false)),
+      takeUntilDestroyed(this.destroyRef),
+    ).subscribe({
+      next: (features) => {
+        const updated = { ...car, features };
+        if (this.selectedCar()?.id === car.id) this.selectedCar.set(updated);
+        this.carUpdated.emit(updated);
+        input.value = '';
+      },
+      error: () => this.featureError.set(true),
+    });
+  }
   protected readonly selectedPicturesCar = signal<Car | null>(null);
   protected readonly editingCar = signal<Car | null>(null);
   protected readonly savingEdit = signal(false);
@@ -451,7 +475,7 @@ export class AdminCarsComponent {
     this.savingEdit.set(true);
     this.editError.set(false);
     const { id, user: _user, pictures: _pictures, ...request } = car;
-    this.admin
+    this.carsService
       .updateCar(id, request)
       .pipe(
         finalize(() => this.savingEdit.set(false)),

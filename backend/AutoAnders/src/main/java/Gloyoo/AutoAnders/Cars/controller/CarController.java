@@ -1,12 +1,15 @@
 package Gloyoo.AutoAnders.Cars.controller;
 
 import Gloyoo.AutoAnders.Cars.dto.CarRequest;
+import Gloyoo.AutoAnders.Cars.dto.CarFeaturesRequest;
+import Gloyoo.AutoAnders.Cars.dto.GuestCarRequest;
 import Gloyoo.AutoAnders.Cars.entity.Car;
 import Gloyoo.AutoAnders.Cars.entity.Status;
 import Gloyoo.AutoAnders.Cars.service.CarService;
 import Gloyoo.AutoAnders.notification.CarManagementEmail;
 import Gloyoo.AutoAnders.user.entity.User;
 import Gloyoo.AutoAnders.user.repository.UserRepository;
+import Gloyoo.AutoAnders.user.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
@@ -25,15 +28,18 @@ public class CarController {
     private final CarService carService;
     private final UserRepository userRepository;
     private final CarManagementEmail carManagementEmail;
+    private final UserService userService;
 
     public CarController(
             CarService carService,
             UserRepository userRepository,
-            CarManagementEmail carManagementEmail
+            CarManagementEmail carManagementEmail,
+            UserService userService
     ) {
         this.carService = carService;
         this.userRepository = userRepository;
         this.carManagementEmail = carManagementEmail;
+        this.userService = userService;
     }
 
     @PostMapping
@@ -54,6 +60,13 @@ public class CarController {
         return ResponseEntity.status(HttpStatus.CREATED).body(savedCar);
     }
 
+    @PostMapping("/guest")
+    public ResponseEntity<Car> addGuestCar(@Valid @RequestBody GuestCarRequest request) {
+        Car savedCar = carService.addGuestCar(request);
+        sendCarRequestConfirmation(savedCar.getUser(), savedCar);
+        return ResponseEntity.status(HttpStatus.CREATED).body(savedCar);
+    }
+
     @GetMapping
     public ResponseEntity<List<Car>> getAllCars() {
         return ResponseEntity.ok(carService.findAvailableCars());
@@ -64,6 +77,41 @@ public class CarController {
         Car car = carService.findCarById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Car not found"));
         return ResponseEntity.ok(car);
+    }
+
+    @GetMapping("/{id}/features")
+    public ResponseEntity<List<String>> getCarFeatures(@PathVariable UUID id) {
+        return ResponseEntity.ok(carService.findCarFeatures(id));
+    }
+
+    @PostMapping("/{id}/features")
+    public ResponseEntity<List<String>> addCarFeatures(
+            @PathVariable UUID id,
+            @Valid @RequestBody CarFeaturesRequest request,
+            Authentication authentication
+    ) {
+        return ResponseEntity.ok(carService.addCarFeatures(
+                id, request.features(), authenticatedUserId(authentication), authenticatedRole(authentication)));
+    }
+
+    @PutMapping("/{id}/features")
+    public ResponseEntity<List<String>> replaceCarFeatures(
+            @PathVariable UUID id,
+            @Valid @RequestBody CarFeaturesRequest request,
+            Authentication authentication
+    ) {
+        return ResponseEntity.ok(carService.replaceCarFeatures(
+                id, request.features(), authenticatedUserId(authentication), authenticatedRole(authentication)));
+    }
+
+    @DeleteMapping("/{id}/features")
+    public ResponseEntity<List<String>> removeCarFeatures(
+            @PathVariable UUID id,
+            @Valid @RequestBody CarFeaturesRequest request,
+            Authentication authentication
+    ) {
+        return ResponseEntity.ok(carService.removeCarFeatures(
+                id, request.features(), authenticatedUserId(authentication), authenticatedRole(authentication)));
     }
 
     @GetMapping("/accepted")
@@ -137,7 +185,7 @@ public class CarController {
     private void sendCarRequestConfirmation(User user, Car car) {
         carManagementEmail.sendCarRequestConfirmation(
                 user.getName(),
-                user.getEmail(),
+                userService.contactEmail(user),
                 car
         );
     }

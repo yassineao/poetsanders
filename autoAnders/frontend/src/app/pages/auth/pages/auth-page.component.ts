@@ -1,4 +1,5 @@
 import { Component, computed, inject, signal } from "@angular/core";
+import { HttpErrorResponse } from "@angular/common/http";
 import {
     FormPageComponent,
     type FormSubmission,
@@ -52,9 +53,13 @@ export class AuthPageComponent {
     protected readonly sending = signal(false);
     protected readonly sent = signal(false);
     protected readonly failed = signal(false);
+    protected readonly failureMessage = signal<string | null>(null);
     protected readonly sent_Url = computed(() => this.returnUrlParam());
 
     protected submit(submission: FormSubmission): void {
+        if (this.sending()) return;
+        this.failed.set(false);
+        this.failureMessage.set(null);
         const credentials = createCredentials(submission, this.registring());
         this.sending.set(true);
 
@@ -84,6 +89,11 @@ export class AuthPageComponent {
                         
                     },
                     error: (error) => {
+                        if (error instanceof HttpErrorResponse) {
+                            const body = error.error;
+                            const message = body?.detail ?? body?.message ?? body?.error;
+                            this.failureMessage.set(typeof message === 'string' ? message : null);
+                        }
                         console.error(
                             this.registring() ? 'Registration failed:' : 'Login failed:',
                             error,
