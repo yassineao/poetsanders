@@ -2,15 +2,18 @@ package Gloyoo.AutoAnders.Cars.service;
 
 import Gloyoo.AutoAnders.CarPictures.entity.CarPicture;
 import Gloyoo.AutoAnders.Cars.dto.CarRequest;
+import Gloyoo.AutoAnders.Cars.dto.GuestCarRequest;
 import Gloyoo.AutoAnders.Cars.entity.*;
 import Gloyoo.AutoAnders.Cars.repository.CarRepository;
 
 import Gloyoo.AutoAnders.notification.StatusChangeEmailService;
 import Gloyoo.AutoAnders.user.entity.User;
 import Gloyoo.AutoAnders.user.repository.UserRepository;
+import Gloyoo.AutoAnders.user.service.UserService;
 import Gloyoo.AutoAnders.storage.service.SupaBasePictureStorage;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 
 import java.util.ArrayList;
@@ -25,17 +28,26 @@ public class CarService {
     private final UserRepository userRepository;
     private final SupaBasePictureStorage pictureStorage;
     private final StatusChangeEmailService statusChangeEmailService;
+    private final UserService userService;
 
     public CarService(
             CarRepository carRepository,
             UserRepository userRepository,
             SupaBasePictureStorage pictureStorage,
-            StatusChangeEmailService statusChangeEmailService
+            StatusChangeEmailService statusChangeEmailService,
+            UserService userService
     ) {
         this.carRepository = carRepository;
         this.userRepository = userRepository;
         this.pictureStorage = pictureStorage;
         this.statusChangeEmailService = statusChangeEmailService;
+        this.userService = userService;
+    }
+
+    @Transactional
+    public Car addGuestCar(GuestCarRequest request) {
+        User guest = userService.registerGuest(request.name(), request.email(), request.phoneNumber());
+        return addCar(request.car(), guest.getId(), "USER");
     }
 
     public Car addCar(
@@ -102,11 +114,18 @@ public class CarService {
                 .pictures(new ArrayList<>())
                 .build();
 
+        applySpecifications(car, carRequest);
+        if (!"ADMIN".equals(role)) {
+            car.setFeatured(false);
+            car.setReserved(false);
+            car.setSold(false);
+        }
         addPicturesFromRequest(car, carRequest);
 
         return carRepository.save(car);
     }
 
+    @Transactional
     public Car updateCar(@NotNull CarRequest carRequest,@NotNull UUID id) {
         Car car = carRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Car not found"));
@@ -164,6 +183,7 @@ public class CarService {
         car.setPaintType(carRequest.paintType());
         car.setUpholstery(carRequest.upholstery());
         car.setStatus(carRequest.status());
+        applySpecifications(car, carRequest);
 
         Car savedCar = carRepository.save(car);
         statusChangeEmailService.sendCarUpdated(savedCar);
@@ -190,6 +210,7 @@ public class CarService {
         carRepository.deleteById(car.getId());
     }
 
+    @Transactional
     public Car updateCarForUser(
             @NotNull CarRequest carRequest,
             @NotNull UUID id,
@@ -203,12 +224,49 @@ public class CarService {
         return updateCar(carRequest, id);
     }
 
+    @Transactional(readOnly = true)
+    public List<String> findCarFeatures(UUID id) {
+        return List.copyOf(requireCar(id).getFeatures());
+    }
+
+    @Transactional
+    public List<String> addCarFeatures(UUID id, List<String> features, UUID userId, String role) {
+        Car car = requireCar(id);
+        ensureOwnerOrAdmin(car, userId, role);
+        features.forEach(car::addFeature);
+        return List.copyOf(car.getFeatures());
+    }
+
+    @Transactional
+    public List<String> replaceCarFeatures(UUID id, List<String> features, UUID userId, String role) {
+        Car car = requireCar(id);
+        ensureOwnerOrAdmin(car, userId, role);
+        car.getFeatures().clear();
+        features.forEach(car::addFeature);
+        return List.copyOf(car.getFeatures());
+    }
+
+    @Transactional
+    public List<String> removeCarFeatures(UUID id, List<String> features, UUID userId, String role) {
+        Car car = requireCar(id);
+        ensureOwnerOrAdmin(car, userId, role);
+        car.getFeatures().removeAll(features.stream().map(String::trim).toList());
+        return List.copyOf(car.getFeatures());
+    }
+
+    private Car requireCar(UUID id) {
+        return carRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Car not found"));
+    }
+
+    @Transactional(readOnly = true)
     public List<Car> findAllCars() {
         return carRepository.findAll().stream()
                 .peek(this::resolvePictureUrls)
                 .toList();
     }
 
+    @Transactional(readOnly = true)
     public Optional<Car> findCarById(UUID id) {
         Car car = carRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Car not found"));
@@ -216,12 +274,14 @@ public class CarService {
         return Optional.of(car);
     }
 
+    @Transactional(readOnly = true)
     public List<Car> findCarByUser(UUID id){
         List<Car> cars = carRepository.findByUserId(id);
         cars.forEach(this::resolvePictureUrls);
         return cars;
     }
 
+    @Transactional(readOnly = true)
     public List<Car> findAvailableCars(){
         List<Car> cars = carRepository.findByStatus(Status.Available);
         cars.forEach(this::resolvePictureUrls);
@@ -240,6 +300,54 @@ public class CarService {
                 savedCar.getStatus()
         );
         return savedCar;
+    }
+
+    private void applySpecifications(Car car, CarRequest request) {
+        if (request.variant() != null) car.setVariant(request.variant());
+        if (request.trimLevel() != null) car.setTrimLevel(request.trimLevel());
+        if (request.vin() != null) car.setVin(request.vin());
+        if (request.originalPrice() != null) car.setOriginalPrice(request.originalPrice());
+        if (request.discountAmount() != null) car.setDiscountAmount(request.discountAmount());
+        if (request.taxScheme() != null) car.setTaxScheme(request.taxScheme());
+        if (request.lastServiceDate() != null) car.setLastServiceDate(request.lastServiceDate());
+        if (request.warrantyUntil() != null) car.setWarrantyUntil(request.warrantyUntil());
+        if (request.accidentFree() != null) car.setAccidentFree(request.accidentFree());
+        if (request.imported() != null) car.setImported(request.imported());
+        if (request.numberOfPreviousOwners() != null) car.setNumberOfPreviousOwners(request.numberOfPreviousOwners());
+        if (request.conditionDescription() != null) car.setConditionDescription(request.conditionDescription());
+        if (request.horsepower() != null) car.setHorsepower(request.horsepower());
+        if (request.kilowatts() != null) car.setKilowatts(request.kilowatts());
+        if (request.torqueNm() != null) car.setTorqueNm(request.torqueNm());
+        if (request.topSpeed() != null) car.setTopSpeed(request.topSpeed());
+        if (request.acceleration() != null) car.setAcceleration(request.acceleration());
+        if (request.tankCapacity() != null) car.setTankCapacity(request.tankCapacity());
+        if (request.engineCode() != null) car.setEngineCode(request.engineCode());
+        if (request.wltpFuelConsumption() != null) car.setWltpFuelConsumption(request.wltpFuelConsumption());
+        if (request.electricRange() != null) car.setElectricRange(request.electricRange());
+        if (request.batteryCapacityKwh() != null) car.setBatteryCapacityKwh(request.batteryCapacityKwh());
+        if (request.chargingTimeHours() != null) car.setChargingTimeHours(request.chargingTimeHours());
+        if (request.fastChargingPowerKw() != null) car.setFastChargingPowerKw(request.fastChargingPowerKw());
+        if (request.numberOfSeats() != null) car.setNumberOfSeats(request.numberOfSeats());
+        if (request.lengthMm() != null) car.setLengthMm(request.lengthMm());
+        if (request.widthMm() != null) car.setWidthMm(request.widthMm());
+        if (request.heightMm() != null) car.setHeightMm(request.heightMm());
+        if (request.grossVehicleWeight() != null) car.setGrossVehicleWeight(request.grossVehicleWeight());
+        if (request.maxPayload() != null) car.setMaxPayload(request.maxPayload());
+        if (request.trunkCapacityLitres() != null) car.setTrunkCapacityLitres(request.trunkCapacityLitres());
+        if (request.numberOfGears() != null) car.setNumberOfGears(request.numberOfGears());
+        if (request.driveType() != null) car.setDriveType(request.driveType());
+        if (request.manufacturerColour() != null) car.setManufacturerColour(request.manufacturerColour());
+        if (request.wheelSize() != null) car.setWheelSize(request.wheelSize());
+        if (request.tyreSize() != null) car.setTyreSize(request.tyreSize());
+        if (request.upholsteryColour() != null) car.setUpholsteryColour(request.upholsteryColour());
+        if (request.interiorColour() != null) car.setInteriorColour(request.interiorColour());
+        if (request.featured() != null) car.setFeatured(request.featured());
+        if (request.reserved() != null) car.setReserved(request.reserved());
+        if (request.sold() != null) car.setSold(request.sold());
+        if (request.features() != null) {
+            car.getFeatures().clear();
+            request.features().forEach(car::addFeature);
+        }
     }
 
     private void addPicturesFromRequest(Car car, CarRequest carRequest) {
@@ -287,7 +395,10 @@ public class CarService {
             return;
         }
 
-        if (!Objects.equals(car.getStatus(), carRequest.status())) {
+        if (!Objects.equals(car.getStatus(), carRequest.status())
+                || (carRequest.featured() != null && !Objects.equals(car.getFeatured(), carRequest.featured()))
+                || (carRequest.reserved() != null && !Objects.equals(car.getReserved(), carRequest.reserved()))
+                || (carRequest.sold() != null && !Objects.equals(car.getSold(), carRequest.sold()))) {
             throw new IllegalArgumentException("Only admins can change car status");
         }
     }

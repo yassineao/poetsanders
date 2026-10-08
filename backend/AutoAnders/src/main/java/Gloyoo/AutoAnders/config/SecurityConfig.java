@@ -45,6 +45,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers("/", "/health", "/auth/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/wash_calendar/guest").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/cars/guest").permitAll()
                         .requestMatchers(HttpMethod.DELETE, "/wash_calendar/cancel/**").permitAll()
 
                         // Admin endpoints

@@ -41,6 +41,8 @@ export interface Infos  {
 };
 
 export interface FormField {
+  min?: number;
+  inputStep?: string;
   name: string;
   label: string;
   type: string;

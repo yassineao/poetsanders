@@ -127,7 +127,7 @@ public class UserService {
         if (users.existsByEmail(guestEmail)) {
             throw new ResponseStatusException(
                     HttpStatus.CONFLICT,
-                    "This email address has already been used for a guest appointment"
+                    "This email address has already been used for a guest request"
             );
         }
 

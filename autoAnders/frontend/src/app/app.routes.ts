@@ -22,7 +22,6 @@ export const routes: Routes = [
       { path: "catalogue", redirectTo: "Catalogue" },
       {
         path: "Sell", component: SellPageComponent,
-        canActivate: [authGuard],
       },
       { path: "sell", redirectTo: "Sell" },
       { path: "faq", component: FaqPageComponent },

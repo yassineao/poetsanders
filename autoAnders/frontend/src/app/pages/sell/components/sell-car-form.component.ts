@@ -1,4 +1,7 @@
-import { Component, input, output, signal, inject } from "@angular/core";
+import { Component, computed, input, output, signal, inject, PLATFORM_ID } from "@angular/core";
+import { isPlatformBrowser } from "@angular/common";
+import { specificationFields, toSpecifications } from "../../../core/cars/car-specifications";
+import { translateUi } from "../../../core/lib/i18n/ui-translations";
 import { HttpErrorResponse } from "@angular/common/http";
 import { catchError, finalize, map, of, switchMap, throwError } from "rxjs";
 import type { Locale } from "../../../core/interfaces/locale";
@@ -9,6 +12,7 @@ import type {
     CarRequest,
 } from "../../../core/interfaces/Car";
 import { CarsService } from "../../../core/cars/cars.service";
+import { AuthService } from "../../../core/auth/auth.service";
 import {
     FormPageComponent,
     type FormSubmission,
@@ -20,8 +24,45 @@ import {
     templateUrl: "./sell-car-form.component.html",
 })
 export class SellCarFormComponent {
+    protected t(value: string): string { return translateUi(value, this.locale()); }
+    private readonly auth = inject(AuthService);
+    constructor() {
+        if (isPlatformBrowser(inject(PLATFORM_ID)) && !this.auth.currentUser()) {
+            this.auth.me().pipe(catchError(() => of(null))).subscribe();
+        }
+    }
+    protected readonly isGuest = computed(() => !this.auth.currentUser());
     readonly locale = input.required<Locale>();
     readonly content = input.required<FormPageContent>();
+    protected readonly formContent = computed<FormPageContent>(() => ({
+        ...this.content(),
+        description: this.isGuest()
+            ? this.t('Submit your car without an account. We will contact you after review. Sign in to upload photos.')
+            : this.content().description,
+        fields: [
+            ...(this.isGuest() ? [
+                { name: "name", label: translateUi("Name", this.locale()), type: "text", required: true, maxLength: 255, step: translateUi("Contact details", this.locale()) },
+                { name: "email", label: translateUi("Email", this.locale()), type: "email", required: true, maxLength: 240, step: translateUi("Contact details", this.locale()) },
+                { name: "phoneNumber", label: translateUi("Phone number", this.locale()), type: "tel", required: true, minLength: 8, maxLength: 30, step: translateUi("Contact details", this.locale()) },
+            ] : []),
+            ...this.content().fields.filter(field => field.name !== "status" && (!this.isGuest() || field.type !== "file")),
+            ...specificationFields.map(field => ({
+                name: field.key,
+                label: translateUi(field.label, this.locale()),
+                type: field.type === "boolean" || field.type === "select" ? "select" : field.type,
+                step: translateUi("Specifications", this.locale()),
+                min: field.min,
+                inputStep: field.step,
+                maxLength: field.maxLength,
+                options: field.type === "boolean"
+                    ? [{ label: translateUi("Yes", this.locale()), value: "true" }, { label: translateUi("No", this.locale()), value: "false" }]
+                    : field.options?.map(value => ({ label: translateUi(value.replaceAll("_", " "), this.locale()), value })),
+            })),
+            { name: "features", label: translateUi("Features", this.locale()), type: "textarea",
+              step: translateUi("Features", this.locale()),
+              placeholder: translateUi("One feature per line", this.locale()) },
+        ],
+    }));
     readonly picturesUploaded = output<CarPicture[]>();
 
     private readonly carsService = inject(CarsService);
@@ -32,15 +73,25 @@ export class SellCarFormComponent {
     protected readonly sent = signal(false);
 
     protected submit(submission: FormSubmission): void {
+        if (this.sending()) return;
         this.sent.set(false);
         this.failed.set(false);
         this.failureMessage.set(null);
         this.picturesUploaded.emit([]);
         this.sending.set(true);
 
-        const pictures = this.toPictureRequests(submission.values["pictures"]);
+        const pictures = this.isGuest() ? [] : this.toPictureRequests(submission.values["pictures"]);
+        const car = this.toCarRequest(submission);
+        const request = this.isGuest()
+            ? this.carsService.addGuestCar({
+                name: this.toString(submission.values["name"]),
+                email: this.toString(submission.values["email"]),
+                phoneNumber: this.toString(submission.values["phoneNumber"]),
+                car,
+            })
+            : this.carsService.addCar(car);
 
-        this.carsService.AddCar(this.toCarRequest(submission))
+        request
             .pipe(
                 switchMap((car) => {
                     if (pictures.length === 0) {
@@ -107,6 +158,7 @@ export class SellCarFormComponent {
         const values = submission.values;
 
         return {
+            ...toSpecifications(values),
             brand: this.toString(values["brand"]),
             model: this.toString(values["model"]),
             title: this.toString(values["title"]),

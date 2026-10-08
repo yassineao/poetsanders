@@ -2,7 +2,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable, inject, signal } from '@angular/core';
 import { forkJoin, Observable, of, tap } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { Car, CarPicture , CarPictureRequest , CarRequest} from "../interfaces/Car"
+import { Car, CarPicture , CarPictureRequest , CarRequest, GuestCarRequest } from "../interfaces/Car"
 
 
 
@@ -16,6 +16,14 @@ export class CarsService {
   private readonly requestOptions = { withCredentials: true };
 
   readonly currentCar = signal<Car | null>(null);
+
+  addGuestCar(request: GuestCarRequest): Observable<Car> {
+    return this.http.post<Car>(`${this.carsUrl}/guest`, request, this.requestOptions);
+  }
+
+  addCarFeatures(id: string, features: string[]): Observable<string[]> {
+    return this.http.post<string[]>(`${this.carsUrl}/${id}/features`, { features }, this.requestOptions);
+  }
 
   addCar(car: CarRequest): Observable<Car> {
     return this.http

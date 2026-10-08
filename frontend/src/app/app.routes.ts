@@ -20,6 +20,7 @@ export const routes: Routes = [
       ),
   },
   { path: 'book', component: BookingPageComponent },
+  { path: 'sell', loadComponent: () => import('./features/cars/guest-car-page.component').then(module => module.GuestCarPageComponent) },
   { path: 'appointments', component: AppointmentsPageComponent },
   { path: 'faq', component: FaqPageComponent },
   { path: 'login', component: LoginPageComponent },

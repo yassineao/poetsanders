@@ -19,12 +19,23 @@ interface FormStep {
   selector: "app-form-page",
   imports: [FormsModule, RouterLink],
   templateUrl: "./form-page.component.html",
+  styles: [`
+    @media (max-width: 639px) {
+      .compact-mobile { padding-top: 5.5rem; padding-inline: .75rem; }
+      .compact-mobile > div > section { padding: 1rem; }
+      .compact-mobile h1 { margin-top: .375rem; font-size: 1.5rem; line-height: 1.2; }
+      .compact-mobile h1 + p { margin-top: .5rem; font-size: .875rem; line-height: 1.5; }
+      .compact-mobile form { margin-top: 1rem; }
+      .compact-mobile .step-grid { display: none; }
+    }
+  `],
 })
 export class FormPageComponent {
   protected t(value: string): string { return translateUi(value, this.locale()); }
   readonly locale = input.required<Locale>();
   readonly content = input.required<FormPageContent>();
   readonly sending = input(false);
+  readonly compactMobile = input(false);
   readonly sent = input(false);
   readonly failed = input(false);
   readonly failureMessage = input<string | null>(null);
@@ -119,7 +130,9 @@ export class FormPageComponent {
     return this.currentPage() >= this.totalPages() - 1;
   }
 
-  protected toggleNext(): void {
+  protected toggleNext(form: NgForm): void {
+    form.form.markAllAsTouched();
+    if (form.invalid || this.sending()) return;
     this.persistCurrentFormValues();
     const next = this.currentPage() + 1;
     if(next < this.totalPages()){
