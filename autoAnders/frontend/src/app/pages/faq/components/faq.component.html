@@ -7,7 +7,7 @@
     <div class="mt-10 space-y-4">
       @for (item of displayedItems(); track item.question) {
         <details class="group rounded-2xl border border-white/10 bg-white/5 p-5">
-          <summary class="flex cursor-pointer list-none items-center justify-between gap-4 text-lg font-medium">
+          <summary class="flex cursor-pointer list-none items-center justify-between gap-4 text-m sm:text-lg font-medium">
             {{ item.question }}
             <span class="flex h-9 w-9 items-center justify-center rounded-full border border-white/10 text-red-400 transition group-open:rotate-45">+</span>
           </summary>
