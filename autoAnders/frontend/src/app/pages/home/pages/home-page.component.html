@@ -35,8 +35,8 @@
   <section id="services" class="px-4 py-16 sm:px-6 lg:px-8">
     <div class="mx-auto max-w-7xl">
       <p class=" border-l-2 border-gray-600 pl-6 text-m font-semibold uppercase tracking-widest text-red-500">{{ home().services.eyebrow }}</p>
-      <h2 class="mt-3 text-l sm:text-3xl font-black text-white sm:text-5xl">{{ home().services.title }}</h2>
-      <p class="mt-5 max-w-3xl text-[calc(0.8rem)] sm:text-lg sm:leading-8 text-zinc-400">{{ home().services.description }}</p>
+      <h2 class="hidden sm:visible mt-3 text-l sm:text-3xl font-black text-white sm:text-5xl">{{ home().services.title }}</h2>
+      <p class="mt-5 max-w-3xl text-[calc(0.8rem)] sm:text-lg sm:leading-8 text-white sm:text-zinc-400">{{ home().services.description }}</p>
       <div class="mt-10 grid gap-6 lg:grid-cols-3">
         @for (item of home().services.items; track item.title; let index = $index) {
         <a [routerLink]="index === 0 ? ['/', locale(), 'Catalogue'] : index === 1 ? ['/', locale(), 'form'] : ['/', locale(), 'Sell']"
@@ -45,10 +45,10 @@
             <img id="pictures_of_services" [src]="index === 0 ? '/new-car.png' : index === 1 ? '/loan.png' : '/deal.png'"
                  alt="" class="mx-auto py-auto h-20 lg:h-36 object-contain invert transition group-hover:scale-105" />
           </div>
-          <div class="text-xs leading-4 col-span-2">
+          <div class="text-xs sm:text-xl leading-4 col-span-2 sm:content-center">
             <p class="mt-6 hidden  sm:visible sm:text-xs font-black tracking-widest text-white/30">0{{ index + 1 }}</p>
             <h3 class="mt-1 sm:mt-3 text-[calc(1rem)] sm:text-2xl font-black text-white">{{ item.title }}</h3>
-            <p class="mt-1 text-[calc(0.7rem)] sm:mt-3 sm:leading-7 text-zinc-400">{{ item.description }}</p>
+            <p class="mt-1 text-[calc(0.7rem)] sm:text-[calc(1rem)] sm:mt-3 sm:leading-7 text-zinc-400">{{ item.description }}</p>
             <span class="mt-1 sm:mt-5 inline-block sm:font-bold text-red-500">{{ home().services.cta }} →</span>
 
           </div>
@@ -64,8 +64,8 @@
     <div class="mx-auto max-w-7xl sm:text-center">
       <img src="/LogoBG-noBG.png" alt="AutoAnders Logo" class="mx-auto h-16 w-auto" />
       <p class="mt-6 text-sm uppercase tracking-widest text-zinc-400">{{ home().advantages.eyebrow }}</p>
-      <h2 class="mt-3 text-l sm:text-3xl font-semibold text-white sm:text-5xl">{{ home().advantages.title }}</h2>
-      <p class="mx-auto mt-4 max-w-2xl text-[calc(0.8rem)] sm:text-lg text-zinc-400">{{ home().advantages.description }}</p>
+      <h2 class="hidden sm:visible mt-3 text-l sm:text-3xl font-semibold text-white sm:text-5xl">{{ home().advantages.title }}</h2>
+      <p class="mx-auto mt-4 max-w-2xl text-[calc(0.8rem)] sm:text-lg text-white sm:text-zinc-400">{{ home().advantages.description }}</p>
       <div class="mt-12 grid gap-5 md:grid-cols-3">
         @for (item of home().advantages.items; track item.title) {
         <article class="grid grid-cols-3 sm:block  rounded-3xl border border-white/10 bg-white/5 p-5 sm:p-8">
@@ -87,7 +87,7 @@
       <img src="/Hero2.jpg" alt="AutoAnders" class="h-[32rem] w-full rounded-xl object-cover" />
       <div>
         <p class="border-l-2 border-gray-600 pl-4 text-xl sm:text-sm font-semibold text-red-500">{{ home().about.eyebrow }}</p>
-        <h2 class="mt-5 text-l sm:text-4xl font-bold text-white sm:text-6xl">{{ home().about.title }}</h2>
+        <h2 class=" mt-5 text-l sm:text-4xl font-bold text-white sm:text-6xl">{{ home().about.title }}</h2>
         @for (paragraph of home().about.paragraphs; track paragraph) {
         <p class="mt-4 text-m sm:text-lg leading-5 sm:leading-8 text-zinc-400">{{ paragraph }}</p>
         }
