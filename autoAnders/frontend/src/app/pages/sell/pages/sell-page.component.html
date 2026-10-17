@@ -5,3 +5,13 @@
 />
 
 <app-sell-uploaded-pictures [pictures]="uploadedPictures()" [locale]="locale()" />
+<section class="bg-black px-6 py-12 text-white">
+  <div class="mx-auto max-w-5xl">
+    <h2 class="text-2xl font-bold">{{ seo().sellGuideHeading }}</h2>
+    <p class="mt-4 max-w-3xl leading-7 text-zinc-300">{{ seo().sellGuide }}</p>
+    <div class="mt-6 flex flex-wrap gap-6 text-red-400 underline">
+      <a [routerLink]="['/', locale(), 'Catalogue']">{{ seo().buyLink }}</a>
+      <a [routerLink]="['/', locale(), 'faq']">{{ seo().faqLink }}</a>
+    </div>
+  </div>
+</section>

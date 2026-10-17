@@ -14,6 +14,7 @@ type PageKey = keyof LocaleDictionary["pages"];
 })
 export class LegalPageComponent {
   private readonly route = inject(ActivatedRoute);
+  private readonly pageKey = toSignal(this.route.data.pipe(map(data => (data['page'] ?? 'about') as PageKey)), { initialValue: 'about' as PageKey });
   private readonly localeParam = toSignal(
     (this.route.parent?.paramMap ?? this.route.paramMap).pipe(
       map((params) => params.get("locale") ?? "de"),
@@ -26,7 +27,7 @@ export class LegalPageComponent {
     return isValidLocale(value) ? value : "de";
   });
   protected readonly page = computed(() => {
-    const key = (this.route.snapshot.data["page"] ?? "about") as PageKey;
+    const key = this.pageKey();
     return getDictionary(this.locale()).pages[key];
   });
 }

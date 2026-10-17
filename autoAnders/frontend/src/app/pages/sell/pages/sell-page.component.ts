@@ -1,5 +1,6 @@
 import { Component, computed, signal, inject } from "@angular/core";
-import { ActivatedRoute } from "@angular/router";
+import { ActivatedRoute, RouterLink } from "@angular/router";
+import { seoContent } from '../../../core/lib/seo-content';
 import { toSignal } from "@angular/core/rxjs-interop";
 import { map } from "rxjs";
 import { getDictionary, isValidLocale } from "../../../core/lib/i18n";
@@ -9,7 +10,7 @@ import { SellCarFormComponent } from "../components/sell-car-form.component";
 import { SellUploadedPicturesComponent } from "../components/sell-uploaded-pictures.component";
 
 @Component({
-    imports: [SellCarFormComponent, SellUploadedPicturesComponent],
+    imports: [SellCarFormComponent, SellUploadedPicturesComponent, RouterLink],
     templateUrl: "./sell-page.component.html",
 })
 export class SellPageComponent {
@@ -28,8 +29,9 @@ export class SellPageComponent {
     });
 
     protected readonly content = computed(
-        () => getDictionary(this.locale()).sell,
+        () => ({ ...getDictionary(this.locale()).sell, title: seoContent[this.locale()].sellHeading, description: seoContent[this.locale()].sellDescription }),
     );
+    protected readonly seo = computed(() => seoContent[this.locale()]);
 
     protected readonly uploadedPictures = signal<CarPicture[]>([]);
 }

@@ -16,6 +16,10 @@ const apiBaseUrl = (
 const dealershipUrl = (
   envValue('DEALERSHIP_URL') || 'https://auto-anders.vercel.app'
 ).replace(/\/+$/, '');
+const parsedDealershipUrl = new URL(dealershipUrl);
+if (!['https:', 'http:'].includes(parsedDealershipUrl.protocol) || parsedDealershipUrl.pathname !== '/' || parsedDealershipUrl.search || parsedDealershipUrl.hash || parsedDealershipUrl.username || parsedDealershipUrl.password) {
+  throw new Error('DEALERSHIP_URL must be the public site origin, for example https://www.example.com (no path, query or credentials).');
+}
 const supabaseUrl = envValue('SUPABASE_URL').replace(/\/+$/, '');
 const supabaseKey = envValue('SUPABASE_KEY');
 

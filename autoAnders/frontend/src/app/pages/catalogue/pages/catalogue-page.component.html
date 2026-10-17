@@ -1,11 +1,53 @@
-<main class="bg-black pt-20">
-  <app-catalogue
-    [cars]="cars()"
-    [locale]="locale()"
-    [title]="catalogue().title"
-    [subtitle]="catalogue().subtitle"
-    [labels]="catalogue().labels"
-    [loaded]="carsLoaded()"
-    
-  />
+<main class="relative min-h-screen overflow-hidden pt-20">
+
+  <!-- TOP RED BLUR GRADIENT -->
+  <div
+    class="pointer-events-none absolute inset-x-0 top-0 z-0 h-40
+           bg-gradient-to-t from-transparent via-black/60 to-red-950
+           backdrop-blur-sm
+           [mask-image:linear-gradient(to_top,transparent,black)]">
+  </div>
+
+  <!-- HEADER -->
+  <header
+    class="relative sm:grid sm:grid-cols-3 sm:gap-2   z-10  mx-auto mb-12 max-w-7xl px-4 pt-12 text-white sm:px-6 lg:px-8
+">
+    <div class="col-span-2">
+      <h1 class="text-3xl font-black sm:text-5xl">
+        {{ seo().catalogueHeading }}
+      </h1>
+
+      <div class="my-2 h-1 w-28 bg-red-600"></div>
+
+      <p class="leading-5 text-[0.8rem] sm:text-lg mt-5 max-w-3xl sm:leading-7 text-zinc-300">
+        {{ seo().catalogueDescription }}
+      </p>
+    </div>
+
+    <div class="col-span-1">
+
+    </div>
+
+  </header>
+
+  <!-- CATALOGUE -->
+  <div class="relative z-10">
+    <app-catalogue
+      [cars]="cars()"
+      [locale]="locale()"
+      [title]="catalogue().title"
+      [subtitle]="catalogue().subtitle"
+      [labels]="catalogue().labels"
+      [loaded]="carsLoaded()"
+      [errorMessage]="loadFailed() ? seo().unavailable : ''"
+    />
+  </div>
+  <!--  <section class="mx-auto max-w-7xl px-4 py-12 text-white sm:px-6 lg:px-8">-->
+  <!--    <h2 class="text-2xl font-bold">{{ seo().guideHeading }}</h2>-->
+  <!--    <p class="mt-4 max-w-3xl leading-7 text-zinc-300">{{ seo().guide }}</p>-->
+  <!--    <div class="mt-6 flex flex-wrap gap-6 text-red-400 underline">-->
+  <!--      <a [routerLink]="['/', locale(), 'Sell']">{{ seo().sellLink }}</a>-->
+  <!--      <a [routerLink]="['/', locale(), 'faq']">{{ seo().faqLink }}</a>-->
+  <!--    </div>-->
+  <!--  </section>-->
 </main>

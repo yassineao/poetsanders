@@ -32,7 +32,7 @@
 
       <div class="">
         <div class="relative">
-          <button type="button" [routerLink]="['/auth']"
+          <button type="button" [routerLink]="['/', locale(), 'auth']" [attr.aria-label]="content().authLabel"
             class="inline-flex h-10 items-center gap-2 rounded-lg px-4 text-sm font-medium text-zinc-300 hover:bg-white/5 hover:text-white">
 
           </button>

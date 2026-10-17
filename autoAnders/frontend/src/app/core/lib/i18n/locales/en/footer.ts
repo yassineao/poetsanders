@@ -14,13 +14,13 @@ export const enFooterCopy: Copy["footer"] = {
       serviceLinks: [
         { label: "Available Cars", href: "/Catalogue" },
         { label: "Car Financing", href: "/Catalogue" },
-        { label: "Trade-In Service", href: "/Catalogue" },
+        { label: "Trade-In Service", href: "/Sell" },
         { label: "Vehicle Check", href: "/Catalogue" },
       ],
       contactLinks: [
-        { label: "Sell Your Car", href: "/form" },
+        { label: "Sell Your Car", href: "/Sell" },
         { label: "Request an Offer", href: "/form" },
-        { label: "Browse Cars", href: "#services" },
+        { label: "Browse Cars", href: "/Catalogue" },
       ],
       rights: "All rights reserved.",
       legalLinks: [

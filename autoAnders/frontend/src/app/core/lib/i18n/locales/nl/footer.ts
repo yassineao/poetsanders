@@ -14,13 +14,13 @@ export const nlFooterCopy: Copy["footer"] = {
     serviceLinks: [
       { label: "Beschikbare auto's", href: "/Catalogue" },
       { label: "Financiering", href: "/Catalogue" },
-      { label: "Inruilservice", href: "/Catalogue" },
+      { label: "Inruilservice", href: "/Sell" },
       { label: "Voertuigcheck", href: "/Catalogue" },
     ],
     contactLinks: [
-      { label: "Auto verkopen", href: "/form" },
+      { label: "Auto verkopen", href: "/Sell" },
       { label: "Bod aanvragen", href: "/form" },
-      { label: "Auto's bekijken", href: "#services" },
+      { label: "Auto's bekijken", href: "/Catalogue" },
     ],
     rights: "Alle rechten voorbehouden.",
     legalLinks: [
