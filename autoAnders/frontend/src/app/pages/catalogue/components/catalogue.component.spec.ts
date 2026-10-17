@@ -4,6 +4,20 @@ import { getDictionary } from '../../../core/lib/i18n';
 import { CatalogueComponent } from './catalogue.component';
 
 describe('catalogue translations', () => {
+  it('exposes crawlable vehicle links and descriptive image text', () => {
+    TestBed.configureTestingModule({ imports: [CatalogueComponent], providers: [provideRouter([])] });
+    const fixture = TestBed.createComponent(CatalogueComponent);
+    const catalogue = getDictionary('de').home.catalogue;
+    fixture.componentRef.setInput('title', catalogue.title);
+    fixture.componentRef.setInput('subtitle', catalogue.subtitle);
+    fixture.componentRef.setInput('labels', catalogue.labels);
+    fixture.componentRef.setInput('locale', 'de');
+    fixture.componentRef.setInput('cars', [catalogue.cars[0]]);
+    fixture.detectChanges();
+    const link = fixture.nativeElement.querySelector('a[href="/de/Catalogue/1"]');
+    expect(link).not.toBeNull();
+    expect(fixture.nativeElement.querySelector('img').alt).toBe('BMW 320i');
+  });
   it('shows backend specifications and features, preserving false and zero values', () => {
     TestBed.configureTestingModule({ imports: [CatalogueComponent], providers: [provideRouter([])] });
     const fixture = TestBed.createComponent(CatalogueComponent);

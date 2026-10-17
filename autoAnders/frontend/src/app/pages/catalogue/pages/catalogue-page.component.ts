@@ -1,7 +1,7 @@
-import { isPlatformBrowser } from "@angular/common";
-import { Component, PLATFORM_ID, computed, inject } from "@angular/core";
-import { toSignal } from "@angular/core/rxjs-interop";
+import { Component, Injector, RESPONSE_INIT, computed, inject, signal } from "@angular/core";
+import { pendingUntilEvent, toSignal } from "@angular/core/rxjs-interop";
 import { ActivatedRoute } from "@angular/router";
+import { seoContent } from '../../../core/lib/seo-content';
 import { catchError, forkJoin, from, map, of, startWith, switchMap, type Observable } from "rxjs";
 import { getDictionary, isValidLocale } from "../../../core/lib/i18n";
 import type { Locale } from "../../../core/interfaces/locale";
@@ -22,8 +22,8 @@ type CatalogueApiCar = Car & {
 })
 export class CataloguePageComponent {
   private readonly route = inject(ActivatedRoute);
-  private readonly platformId = inject(PLATFORM_ID);
-  private readonly isBrowser = isPlatformBrowser(this.platformId);
+  private readonly injector = inject(Injector);
+  private readonly response = inject(RESPONSE_INIT, { optional: true });
   private readonly localeParam = toSignal(
     (this.route.parent?.paramMap ?? this.route.paramMap).pipe(
       map((params) => params.get("locale") ?? "de"),
@@ -32,9 +32,8 @@ export class CataloguePageComponent {
   );
   private readonly carsService = inject(CarsService);
   private readonly supabase = inject(SupabaseService);
-  private readonly carsSource$: Observable<Car[] | null> = this.isBrowser
-    ? this.carsService.GetAvailableCars()
-    : of(null);
+  private readonly carsSource$: Observable<Car[] | null> = this.carsService.GetAvailableCars();
+  protected readonly loadFailed = signal(false);
 
   private readonly apiCars = toSignal(
     this.carsSource$
@@ -51,9 +50,10 @@ export class CataloguePageComponent {
 
           return forkJoin(
             cars.map((car) =>
-              this.carsService.getCarPictures(car.id).pipe(
+              (car.pictures?.length ? of(car.pictures) : this.carsService.getPublicCarPictures(car.id)).pipe(
                 switchMap((pictures) =>
                   from(this.resolveCatalogueImages(pictures)).pipe(
+                    pendingUntilEvent(this.injector),
                     map((catalogueImages) => ({
                       ...car,
                       pictures,
@@ -77,6 +77,13 @@ export class CataloguePageComponent {
         }),
         catchError((error) => {
           console.error("Loading cars failed:", error);
+          this.loadFailed.set(true);
+          if (this.response) {
+            this.response.status = 503;
+            const headers = new Headers(this.response.headers);
+            headers.set('Retry-After', '300');
+            this.response.headers = headers;
+          }
           return of([] as CatalogueApiCar[]);
         }),
 
@@ -87,6 +94,7 @@ export class CataloguePageComponent {
     return isValidLocale(value) ? value : "de";
   });
   protected readonly catalogue = computed(() => getDictionary(this.locale()).home.catalogue);
+  protected readonly seo = computed(() => seoContent[this.locale()]);
   protected readonly carsLoaded = computed(() => this.apiCars() !== null);
   protected readonly cars = computed<CatalogueCar[]>(() =>
     ((this.apiCars() as CatalogueApiCar[] | null) ?? []).map((car) => this.toCatalogueCar(car)),

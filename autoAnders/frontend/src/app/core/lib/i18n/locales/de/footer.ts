@@ -14,13 +14,13 @@ export const deFooterCopy: Copy["footer"] = {
     serviceLinks: [
       { label: "Verfuegbare Autos", href: "/Catalogue" },
       { label: "Finanzierung", href: "/Catalogue" },
-      { label: "Inzahlungnahme", href: "/Catalogue" },
+      { label: "Inzahlungnahme", href: "/Sell" },
       { label: "Fahrzeugcheck", href: "/Catalogue" },
     ],
     contactLinks: [
-      { label: "Auto verkaufen", href: "/form" },
+      { label: "Auto verkaufen", href: "/Sell" },
       { label: "Angebot anfragen", href: "/form" },
-      { label: "Autos ansehen", href: "#services" },
+      { label: "Autos ansehen", href: "/Catalogue" },
     ],
     rights: "Alle Rechte vorbehalten.",
     legalLinks: [

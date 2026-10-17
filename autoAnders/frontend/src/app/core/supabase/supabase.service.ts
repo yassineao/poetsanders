@@ -53,7 +53,11 @@ export class SupabaseService {
       return null;
     }
 
-    this.supabase = createClient(environment.supabaseUrl, environment.supabaseKey);
+    this.supabase = createClient(environment.supabaseUrl, environment.supabaseKey, {
+      // Storage reads do not need a persisted browser session or background refresh.
+      auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false },
+      global: { fetch: (input, init) => fetch(input, { ...init, signal: AbortSignal.timeout(10000) }) },
+    });
     return this.supabase;
   }
 }

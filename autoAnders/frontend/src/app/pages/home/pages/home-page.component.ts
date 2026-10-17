@@ -1,6 +1,5 @@
-import { isPlatformBrowser } from "@angular/common";
-import { Component, PLATFORM_ID, computed, inject } from "@angular/core";
-import { toSignal } from "@angular/core/rxjs-interop";
+import { Component, Injector, computed, inject, signal } from "@angular/core";
+import { pendingUntilEvent, toSignal } from "@angular/core/rxjs-interop";
 import { ActivatedRoute, RouterLink } from "@angular/router";
 import { catchError, forkJoin, from, map, of, startWith, switchMap, type Observable } from "rxjs";
 import { CarsService } from "../../../core/cars/cars.service";
@@ -11,6 +10,7 @@ import type { Locale } from "../../../core/interfaces/locale";
 import { CatalogueComponent } from "../../catalogue/components/catalogue.component";
 import { FaqComponent } from "../../faq/components/faq.component";
 import { SupabaseService } from "../../../core/supabase/supabase.service";
+import { seoContent } from '../../../core/lib/seo-content';
 
 type CatalogueApiCar = Car & {
   catalogueImage: string;
@@ -24,13 +24,11 @@ type CatalogueApiCar = Car & {
 })
 export class HomeComponent {
   private readonly route = inject(ActivatedRoute);
-  private readonly platformId = inject(PLATFORM_ID);
-  private readonly isBrowser = isPlatformBrowser(this.platformId);
+  private readonly injector = inject(Injector);
   private readonly carsService = inject(CarsService);
   private readonly supabase = inject(SupabaseService);
-  private readonly carsSource$: Observable<Car[] | null> = this.isBrowser
-    ? this.carsService.getAvailableCars()
-    : of(null);
+  private readonly carsSource$: Observable<Car[] | null> = this.carsService.getAvailableCars();
+  private readonly loadFailed = signal(false);
   private readonly apiCars = toSignal(
     this.carsSource$.pipe(
       switchMap((cars) => {
@@ -46,9 +44,10 @@ export class HomeComponent {
 
         return forkJoin(
           previewCars.map((car) =>
-            this.carsService.getCarPictures(car.id).pipe(
+            (car.pictures?.length ? of(car.pictures) : this.carsService.getPublicCarPictures(car.id)).pipe(
               switchMap((pictures) =>
                 from(this.resolveCatalogueImages(pictures)).pipe(
+                  pendingUntilEvent(this.injector),
                   map((catalogueImages) => ({
                     ...car,
                     pictures,
@@ -73,6 +72,7 @@ export class HomeComponent {
       startWith(null),
       catchError((error) => {
         console.error("Loading cars failed:", error);
+        this.loadFailed.set(true);
         return of([] as CatalogueApiCar[]);
       }),
     ),
@@ -93,6 +93,7 @@ export class HomeComponent {
    
   protected readonly dictionary = computed(() => getDictionary(this.locale()));
   protected readonly home = computed(() => this.dictionary().home);
+  protected readonly catalogueError = computed(() => this.loadFailed() ? seoContent[this.locale()].unavailable : '');
   protected readonly carsLoaded = computed(() => this.apiCars() !== null);
   protected readonly cars = computed<CatalogueCar[]>(() =>
     (this.apiCars() ?? []).map((car) => this.toCatalogueCar(car)),

@@ -3,7 +3,7 @@ import type { Copy } from "../../../../interfaces/types";
 export const deHomeCopy: Copy["home"] = {
     metadata: {
       // ✅ IMPROVED: More specific, keyword-rich title
-      title: "Autos kaufen und verkaufen | AutoAnders",
+      title: "Gebrauchtwagen & Auto verkaufen | AutoAnders",
 
       // ✅ IMPROVED: Removed "aus Deutschland", added remote positioning, more compelling
       description:
@@ -27,7 +27,7 @@ export const deHomeCopy: Copy["home"] = {
       // ✅ IMPROVED: Removed "aus Deutschland" - focus on value
       eyebrow: "Autos kaufen und verkaufen mit Vertrauen",
 
-      titleFirst: "Finden Sie Ihr naechstes Auto",
+      titleFirst: "Finden Sie Ihren nächsten Gebrauchtwagen",
       titleSecond: "oder verkaufen Sie Ihres zum fairen Preis",
 
       // ✅ IMPROVED: Removed location, added remote benefit

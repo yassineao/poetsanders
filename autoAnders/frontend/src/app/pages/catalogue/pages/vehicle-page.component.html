@@ -1,0 +1,45 @@
+<main class="min-h-screen bg-black px-4 pb-16 pt-28 text-white sm:px-6">
+  <div class="mx-auto max-w-6xl">
+    <nav aria-label="Breadcrumb" class="mb-8 flex flex-wrap gap-3 text-sm text-zinc-300">
+      <a [routerLink]="['/', locale()]">AutoAnders</a><span aria-hidden="true">/</span>
+      <a [routerLink]="['/', locale(), 'Catalogue']">{{ copy().buyLink }}</a>
+      @if (result()?.car; as car) { <span aria-hidden="true">/</span><span aria-current="page">{{ car.brand }} {{ car.model }}</span> }
+    </nav>
+    @if (result()?.car; as car) {
+      <h1 class="text-3xl font-black sm:text-5xl">{{ car.brand }} {{ car.model }} {{ car.variant }} {{ car.yearOfManufacture }}</h1>
+      @if (car.subtitle) { <p class="mt-4 text-lg text-zinc-300">{{ car.subtitle }}</p> }
+      <div class="mt-8 grid gap-8 lg:grid-cols-2">
+        <div>
+          @for (image of result()!.images; track $index) {
+            <img [src]="image" [alt]="car.brand + ' ' + car.model + ' – ' + ($index + 1)"
+              width="960" height="640" [attr.loading]="$first ? 'eager' : 'lazy'"
+              [attr.fetchpriority]="$first ? 'high' : 'auto'" decoding="async"
+              class="mb-4 aspect-[3/2] w-full rounded-2xl bg-zinc-900 object-contain" />
+          }
+        </div>
+        <div>
+          @if (car.price > 0) { <p class="text-3xl font-bold text-emerald-400">{{ price(car.price) }}</p> }
+          <h2 class="mt-6 text-xl font-bold">{{ copy().details }}</h2>
+          <dl class="mt-4 grid grid-cols-2 gap-4">
+            @for (fact of facts(); track fact.label) {
+              <div class="rounded-xl bg-zinc-900 p-4"><dt class="text-sm text-zinc-400">{{ t(fact.label) }}</dt><dd class="mt-1">{{ value(fact.value) }}</dd></div>
+            }
+            @for (field of fields; track field.key) {
+              @if (car[field.key] !== null && car[field.key] !== undefined && car[field.key] !== '') {
+                <div class="rounded-xl bg-zinc-900 p-4"><dt class="text-sm text-zinc-400">{{ t(field.label) }}</dt><dd class="mt-1 break-words">{{ value(car[field.key]) }}</dd></div>
+              }
+            }
+          </dl>
+          @if (car.features?.length) {
+            <h2 class="mt-8 text-xl font-bold">{{ t('Features') }}</h2>
+            <ul class="mt-4 list-inside list-disc space-y-2 text-zinc-300">@for (feature of car.features; track $index) { <li>{{ feature }}</li> }</ul>
+          }
+          <a [routerLink]="['/', locale(), 'form']" class="mt-8 inline-flex rounded-xl bg-red-600 px-6 py-4 font-bold">{{ copy().request }}</a>
+        </div>
+      </div>
+    } @else {
+      <h1 class="text-3xl font-bold">{{ result()?.unavailable ? copy().unavailable : copy().notFound }}</h1>
+    }
+    <a [routerLink]="['/', locale(), 'Catalogue']" class="mt-10 inline-block text-red-400 underline">{{ copy().back }}</a>
+  </div>
+</main>

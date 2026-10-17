@@ -14,6 +14,6 @@ export class FooterComponent {
   protected readonly year = new Date().getFullYear();
 
   protected localized(href: string): string {
-    return `/${this.locale()}${href}`;
+    return `/${this.locale()}${href === '/' ? '' : href}`;
   }
 }

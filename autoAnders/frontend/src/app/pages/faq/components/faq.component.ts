@@ -11,6 +11,7 @@ export class FaqComponent {
   readonly content = input.required<FaqContent>();
   readonly items = input<FaqContent["items"]>();
   readonly ctaHref = input<string>();
+  readonly pageHeading = input(false);
 
   protected displayedItems(): FaqContent["items"] {
     return this.items() ?? this.content().items;

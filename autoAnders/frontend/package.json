@@ -12,7 +12,8 @@
     "watch": "ng build --watch --configuration development",
     "pretest": "npm run generate:environment",
     "test": "ng test",
-    "serve:ssr:frontend": "node dist/frontend/server/server.mjs"
+    "serve:ssr:frontend": "node dist/frontend/server/server.mjs",
+    "verify:seo": "node scripts/verify-seo.mjs"
   },
   "private": true,
   "packageManager": "npm@11.6.1",

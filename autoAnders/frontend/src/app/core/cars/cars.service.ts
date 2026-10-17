@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, inject, signal } from '@angular/core';
-import { Observable, tap } from 'rxjs';
+import { Observable, tap, timeout } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { Car, CarPicture, CarPictureRequest, CarRequest, GuestCarRequest } from '../interfaces/Car';
 
@@ -110,15 +110,20 @@ export class CarsService {
   getCarPictures(carId: string): Observable<CarPicture[]> {
     return this.http.get<CarPicture[]>(
       `${this.carsUrl}/${carId}/pictures`,
-      this.requestOptions
-    );
+      this.requestOptions,
+    ).pipe(timeout(10000));
+  }
+
+  getPublicCarPictures(carId: string): Observable<CarPicture[]> {
+    return this.http.get<CarPicture[]>(
+      `${this.carsUrl}/${carId}/pictures`,
+    ).pipe(timeout(10000));
   }
 
   getAvailableCars(): Observable<Car[]> {
     return this.http.get<Car[]>(
       `${this.carsUrl}/accepted`,
-      this.requestOptions
-    );
+    ).pipe(timeout(10000));
 
   }
 

@@ -30,6 +30,7 @@ export class CatalogueComponent {
   readonly labels = input.required<CatalogueLabels>();
   readonly showMoreButton = input(false);
   readonly loaded = input(true);
+  readonly errorMessage = input('');
 
   protected readonly search = signal("");
   protected readonly filtersOpen = signal(false);

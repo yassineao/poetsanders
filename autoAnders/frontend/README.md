@@ -2,6 +2,8 @@
 
 This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.2.15.
 
+SEO configuration, keyword research, production requirements and verification commands are documented in [docs/seo.md](docs/seo.md). Run `npm run build` followed by `npm run verify:seo` to check the production server's rendered metadata, inventory, sitemap and HTTP behavior using controlled test data.
+
 ## Development server
 
 To start a local development server, run:
